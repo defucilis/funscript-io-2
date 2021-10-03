@@ -1,10 +1,16 @@
-import React, { ReactNode, useState } from "react";
+import React, { ReactNode, useEffect, useState } from "react";
 import Head from "next/head";
+import { useRouter } from "next/dist/client/router";
 import Header from "./Header";
 import Sidebar from "./Sidebar";
 
 const Layout = ({ children }: { children: ReactNode }): JSX.Element => {
+    const router = useRouter();
     const [menuOpen, setMenuOpen] = useState(false);
+
+    useEffect(() => {
+        setMenuOpen(false);
+    }, [router]);
 
     return (
         <>

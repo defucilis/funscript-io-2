@@ -9,7 +9,7 @@
         "type-check": "tsc --pretty --noEmit",
         "format": "prettier --write .",
         "lint": "eslint . --ext ts --ext tsx --ext js",
-        "combo": "format && lint && type-check",
+        "combo": "npm run format && npm run lint && npm run type-check",
         "test": "jest",
         "test:watch": "jest --watchAll"
     },

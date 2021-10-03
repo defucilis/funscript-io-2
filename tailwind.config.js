@@ -19,6 +19,10 @@ module.exports = {
                 mobilemain: `calc(100vh - ${theme("height.mobileHeader")})`,
                 48: "12rem",
             }),
+            inset: theme => ({
+                main: `${theme("height.header")}`,
+                mobilemain: `${theme("height.mobileHeader")}`,
+            }),
         },
     },
     variants: {

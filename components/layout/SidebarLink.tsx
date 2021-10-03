@@ -13,6 +13,7 @@ import {
     MdChangeHistory,
     MdWhatshot,
     MdPeople,
+    MdCode,
 } from "react-icons/md";
 import EroScriptsIcon from "./EroScriptsIcon";
 
@@ -42,31 +43,32 @@ const GetIcon = (path: string): JSX.Element => {
             return <MdTune className={iconClassName} />;
         case "app/create":
             return <MdTimeline className={iconClassName} />;
+        case "app/debug":
+            return <MdCode className={iconClassName} />;
         case "changelog":
             return <MdChangeHistory className={iconClassName} />;
     }
-    
-    if(path.includes("github")) return <FaGithub className={iconClassName} />;
-    if(path.includes("eroscripts")) return <EroScriptsIcon className={iconClassName} />;
+
+    if (path.includes("github")) return <FaGithub className={iconClassName} />;
+    if (path.includes("eroscripts")) return <EroScriptsIcon className={iconClassName} />;
 
     return <MdError className={iconClassName} />;
 };
 
-const SidebarLink = ({
-    path,
-    label,
-}: {
-    path: string;
-    label: string;
-}): JSX.Element => {
+const SidebarLink = ({ path, label }: { path: string; label: string }): JSX.Element => {
     const router = useRouter();
-    const fullPath = router.pathname.includes("app/") ? "/app/" + String(router.query.app) : router.pathname;
+    const fullPath = router.pathname.includes("app/")
+        ? "/app/" + String(router.query.app)
+        : router.pathname;
     return (
         <Link href={path.includes("://") ? path : `/${path}`}>
             <a
                 className={`flex items-center py-2 px-4 gap-4 hover:bg-neutral-700 ${
-                    fullPath === `/${path}` ? "bg-neutral-900 shadow-inner" : "bg-transparent"
+                    fullPath === `/${path}`
+                        ? "bg-neutral-900 shadow-inner border-b border-neutral-700"
+                        : "bg-transparent"
                 } transition-all`}
+                target={path.includes("://") ? "_blank" : ""}
             >
                 {GetIcon(path)}
                 <span className="text-white inline md:hidden lg:inline">{label}</span>

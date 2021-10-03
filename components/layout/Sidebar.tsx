@@ -5,7 +5,7 @@ import SidebarLink from "./SidebarLink";
 const Sidebar = ({ open }: { open: boolean }): JSX.Element => {
     return (
         <div
-            className={`bg-neutral-800 flex-col justify-between w-full md:w-auto lg:w-60 flex absolute md:relative min-h-mobilemain md:min-h-main ${
+            className={`bg-neutral-800 flex-col justify-between w-full md:w-auto lg:w-60 flex absolute md:relative min-h-mobilemain md:min-h-main z-40 ${
                 open ? "-left-0" : "-left-full"
             } md:left-0 transition-all md:transition-none`}
         >
@@ -27,7 +27,7 @@ const Sidebar = ({ open }: { open: boolean }): JSX.Element => {
                         <SidebarLink path="creators" label="Creators" />
                     </li>
                 </ul>
-                <hr className="border-neutral-700" />
+                <hr className="border-neutral-900 my-1" />
                 <ul>
                     <li>
                         <SidebarLink path="app/play" label="Play local script" />
@@ -44,26 +44,37 @@ const Sidebar = ({ open }: { open: boolean }): JSX.Element => {
                     <li>
                         <SidebarLink path="app/create" label="Create script" />
                     </li>
+                    <li>
+                        <SidebarLink path="app/debug" label="Debug Mode" />
+                    </li>
                 </ul>
-                <hr className="border-neutral-700" />
+                <hr className="border-neutral-900 my-1" />
             </div>
             <div>
-                <hr className="border-neutral-700" />
+                <hr className="border-neutral-900 my-1" />
                 <ul>
                     <li>
-                        <SidebarLink path="https://github.com/defucilis/funscript-io" label="GitHub repository" />
-                        <SidebarLink path="https://discuss.eroscripts.com/t/funscript-io-a-website-for-playing-modifying-and-generating-funscripts/20624" label="EroScripts thread" />
+                        <SidebarLink
+                            path="https://github.com/defucilis/funscript-io"
+                            label="GitHub repository"
+                        />
+                        <SidebarLink
+                            path="https://discuss.eroscripts.com/t/funscript-io-a-website-for-playing-modifying-and-generating-funscripts/20624"
+                            label="EroScripts thread"
+                        />
                         <SidebarLink path="changelog" label="Changelog" />
                     </li>
                 </ul>
-                <hr className="border-neutral-700" />
+                <hr className="border-neutral-900 my-1" />
                 <ul>
                     <li>
                         <div className="my-2 px-4 flex-col hidden lg:flex">
                             <span className="text-neutral-500 text-sm">
                                 Funscript.io Version {packageJson.version}
                             </span>
-                            <span className="text-neutral-500 text-sm">&copy; Funscript.io 2021</span>
+                            <span className="text-neutral-500 text-sm">
+                                &copy; Funscript.io 2021
+                            </span>
                         </div>
                     </li>
                 </ul>

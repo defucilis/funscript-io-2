@@ -2,7 +2,14 @@
 @tailwind components;
 @tailwind utilities;
 
-body {
-    margin-top: 0 !important;
-    margin-bottom: 0 !important;
+@layer base {
+    body {
+        margin-top: 0 !important;
+        margin-bottom: 0 !important;
+        @apply bg-neutral-900;
+    }
+
+    html {
+        -webkit-tap-highlight-color: transparent;
+    }
 }

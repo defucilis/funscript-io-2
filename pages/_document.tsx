@@ -5,10 +5,9 @@ class MyDocument extends Document {
         return (
             <Html>
                 <Head>
-                    <link rel="preload" href="/font/hobo.woff" as="font" crossOrigin="" />
                     <title>Funscript.io</title>
                 </Head>
-                <body style={{marginTop: 0, marginBottom: 0}}>
+                <body style={{ marginTop: 0, marginBottom: 0 }}>
                     <Main />
                     <NextScript />
                 </body>
