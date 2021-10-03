@@ -13,3 +13,21 @@
         -webkit-tap-highlight-color: transparent;
     }
 }
+
+@layer components {
+    .fsio-field-wrapper {
+        @apply flex flex-col w-full;
+    }
+
+    .fsio-field-error {
+        @apply text-red-300 text-sm;
+    }
+
+    .fsio-field-text {
+        @apply bg-neutral-700 text-white px-2 py-1 rounded outline-none;
+    }
+
+    .fsio-field-text-disabled {
+        @apply bg-neutral-800 text-neutral-200 px-2 py-1 rounded;
+    }
+}
