@@ -1,0 +1,47 @@
+{
+    "name": "funscript-io-2",
+    "author": "@defucilis",
+    "license": "MIT",
+    "version": "2.0.0",
+    "scripts": {
+        "dev": "next dev",
+        "build": "next build",
+        "type-check": "tsc --pretty --noEmit",
+        "format": "prettier --write .",
+        "lint": "eslint . --ext ts --ext tsx --ext js",
+        "combo": "format && lint && type-check",
+        "test": "jest",
+        "test:watch": "jest --watchAll"
+    },
+    "dependencies": {
+        "next": "latest",
+        "next-auth": "latest",
+        "react": "latest",
+        "react-dom": "latest",
+        "react-icons": "^4.2.0"
+    },
+    "devDependencies": {
+        "@testing-library/react": "latest",
+        "@types/jest": "latest",
+        "@types/next-auth": "latest",
+        "@types/node": "latest",
+        "@types/react": "latest",
+        "@typescript-eslint/eslint-plugin": "latest",
+        "@typescript-eslint/parser": "latest",
+        "autoprefixer": "latest",
+        "babel-jest": "latest",
+        "babel-plugin-macros": "latest",
+        "eslint": "latest",
+        "eslint-config-prettier": "latest",
+        "eslint-plugin-import": "latest",
+        "eslint-plugin-react": "latest",
+        "identity-obj-proxy": "latest",
+        "jest": "latest",
+        "jest-watch-typeahead": "latest",
+        "lint-staged": "latest",
+        "postcss": "latest",
+        "prettier": "latest",
+        "tailwindcss": "latest",
+        "typescript": "latest"
+    }
+}

@@ -1,0 +1,10 @@
+@tailwind base;
+@tailwind components;
+
+@layer components {
+    .btn {
+        @apply block px-4 py-8 text-xl text-white bg-red-500 w-full;
+    }
+}
+
+@tailwind utilities;
