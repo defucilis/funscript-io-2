@@ -1,10 +1,8 @@
+import { useRouter } from "next/dist/client/router";
 import Link from "next/link";
-import { FaHome } from "react-icons/fa";
+import { FaGithub, FaHome } from "react-icons/fa";
 import {
     MdExplore,
-    MdWeb,
-    MdFiberNew,
-    MdPerson,
     MdOndemandVideo,
     MdTune,
     MdTimeline,
@@ -12,10 +10,15 @@ import {
     MdError,
     MdGamepad,
     MdMemory,
+    MdChangeHistory,
+    MdWhatshot,
+    MdPeople,
 } from "react-icons/md";
+import EroScriptsIcon from "./EroScriptsIcon";
 
 const GetIcon = (path: string): JSX.Element => {
     const iconClassName = "text-white text-3xl";
+
     switch (path) {
         case "":
             return <FaHome className={iconClassName} />;
@@ -24,42 +27,45 @@ const GetIcon = (path: string): JSX.Element => {
         case "search":
             return <MdExplore className={iconClassName} />;
         case "categories":
-            return <MdWeb className={iconClassName} />;
+            return <MdList className={iconClassName} />;
         case "trending":
-            return <MdFiberNew className={iconClassName} />;
+            return <MdWhatshot className={iconClassName} />;
         case "creators":
-            return <MdPerson className={iconClassName} />;
-        case "play":
+            return <MdPeople className={iconClassName} />;
+        case "app/play":
             return <MdOndemandVideo className={iconClassName} />;
-        case "manual":
+        case "app/manual":
             return <MdGamepad className={iconClassName} />;
-        case "auto":
+        case "app/auto":
             return <MdMemory className={iconClassName} />;
-        case "modify":
+        case "app/modify":
             return <MdTune className={iconClassName} />;
-        case "create":
+        case "app/create":
             return <MdTimeline className={iconClassName} />;
         case "changelog":
-            return <MdList className={iconClassName} />;
-        default:
-            return <MdError className={iconClassName} />;
+            return <MdChangeHistory className={iconClassName} />;
     }
+    
+    if(path.includes("github")) return <FaGithub className={iconClassName} />;
+    if(path.includes("eroscripts")) return <EroScriptsIcon className={iconClassName} />;
+
+    return <MdError className={iconClassName} />;
 };
 
 const SidebarLink = ({
-    pathname,
     path,
     label,
 }: {
-    pathname: string;
     path: string;
     label: string;
 }): JSX.Element => {
+    const router = useRouter();
+    const fullPath = router.pathname.includes("app/") ? "/app/" + String(router.query.app) : router.pathname;
     return (
-        <Link href={`/${path}`}>
+        <Link href={path.includes("://") ? path : `/${path}`}>
             <a
                 className={`flex items-center py-2 px-4 gap-4 hover:bg-neutral-700 ${
-                    pathname === `/${path}` ? "bg-neutral-900 shadow-inner" : "bg-transparent"
+                    fullPath === `/${path}` ? "bg-neutral-900 shadow-inner" : "bg-transparent"
                 } transition-all`}
             >
                 {GetIcon(path)}
