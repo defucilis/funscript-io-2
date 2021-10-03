@@ -6,6 +6,7 @@ import Handy from "lib/thehandy";
 import AppManual from "components/apps/AppManual";
 import AppRandom from "components/apps/AppRandom";
 import AppCycler from "components/apps/AppCycler";
+import AppModify from "components/apps/AppModify";
 
 const GetApp = (app: string, handy: Handy) => {
     switch (app) {
@@ -17,8 +18,8 @@ const GetApp = (app: string, handy: Handy) => {
             return <AppRandom handy={handy} />;
         case "cycler":
             return <AppCycler handy={handy} />;
-        // case "modify":
-        //     return <MdTune className={iconClassName} />;
+        case "modify":
+            return <AppModify />;
         // case "create":
         //     return <MdTimeline className={iconClassName} />;
         case "debug":
