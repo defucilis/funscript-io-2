@@ -36,7 +36,10 @@ const Sidebar = ({ open }: { open: boolean }): JSX.Element => {
                         <SidebarLink path="app/manual" label="Manual mode" />
                     </li>
                     <li>
-                        <SidebarLink path="app/auto" label="Auto mode" />
+                        <SidebarLink path="app/random" label="Random mode" />
+                    </li>
+                    <li>
+                        <SidebarLink path="app/cycler" label="Cycler mode" />
                     </li>
                     <li>
                         <SidebarLink path="app/modify" label="Modify script" />

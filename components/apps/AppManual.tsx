@@ -41,8 +41,8 @@ const AppManual = ({ handy }: { handy: Handy }): JSX.Element => {
                 setSlideMax(slideSettings.max);
                 setHampRunning((await handy.getStatus()).state === HampState.moving);
                 setLoading(false);
-            } catch {
-                setError("connection key not set");
+            } catch (error: any) {
+                setError(error.message);
             }
         };
 
@@ -312,7 +312,7 @@ const AppManual = ({ handy }: { handy: Handy }): JSX.Element => {
                     </select>
                 </div>
                 {error && (
-                    <p className="text-neutral-900 bg-red-500 rounded font-bold text-sm w-full grid place-items-center p-2 my-2">
+                    <p className="text-neutral-900 bg-red-500 rounded font-bold text-sm w-full grid place-items-center p-2 my-2 text-center">
                         {error}
                     </p>
                 )}

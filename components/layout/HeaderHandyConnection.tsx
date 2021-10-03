@@ -6,32 +6,35 @@ const HeaderHandyConnection = (): JSX.Element => {
     const { handy } = useHandy();
     const [expanded, setExpanded] = useState(false);
     const [connected, setConnected] = useState(false);
-    const [loading, setLoading] = useState(true);
+    const [loading, setLoading] = useState(false);
     const [connectionKey, setConnectionKey] = useState("");
     const [error, setError] = useState("");
 
     useEffect(() => {
+        const checkConnection = async () => {
+            if (!handy) return;
+            if (!handy.connectionKey || handy.connectionKey !== "") return;
+            setLoading(true);
+            try {
+                const connected = await handy.getConnected();
+                if (!connected) {
+                    setConnected(false);
+                } else {
+                    await handy.getStatus();
+                    setConnected(true);
+                }
+            } catch {
+                setConnected(false);
+            }
+
+            setLoading(false);
+        };
+
         if (!handy) return;
 
-        setConnectionKey(handy.connectionKey);
-
-        if (handy.connectionKey && handy.connectionKey !== "") {
-            handy
-                .getConnected()
-                .then(connected => {
-                    handy.getStatus().then(() => {
-                        setLoading(false);
-                        setConnected(connected);
-                    });
-                })
-                .catch(() => {
-                    setLoading(false);
-                    setConnected(false);
-                });
-        } else {
-            setLoading(false);
-            setConnected(false);
-        }
+        if (handy.connectionKey) setConnectionKey(handy.connectionKey);
+        else handy.connectionKey = connectionKey;
+        checkConnection();
     }, [handy]);
 
     const tryConnect = useCallback(() => {
@@ -109,14 +112,22 @@ const HeaderHandyConnection = (): JSX.Element => {
                 />
                 {connected ? (
                     <button
-                        className="bg-red-900 grid place-items-center text-white font-bold rounded px-4 mt-2 pb-1"
+                        className="bg-red-900 grid place-items-center text-white font-bold rounded px-4 mt-2"
                         onClick={disconnect}
                     >
                         Disconnect
                     </button>
+                ) : loading ? (
+                    <button
+                        className="bg-neutral-800 grid place-items-center text-white font-bold rounded px-4 mt-2"
+                        onClick={tryConnect}
+                        disabled={true}
+                    >
+                        Connecting
+                    </button>
                 ) : (
                     <button
-                        className="bg-green-800 grid place-items-center text-white font-bold rounded px-4 mt-2 pb-1"
+                        className="bg-green-800 grid place-items-center text-white font-bold rounded px-4 mt-2"
                         onClick={tryConnect}
                     >
                         Connect

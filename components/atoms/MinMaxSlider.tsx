@@ -44,6 +44,14 @@ const MinMaxSlider = ({
     const [draggingMin, setDraggingMin] = useState(false);
     const [draggingMax, setDraggingMax] = useState(false);
 
+    const getPercentage = useCallback(
+        (val: number, round = false): number => {
+            const percentage = (val - min) / (max - min);
+            return round ? Math.round(percentage * 100) : percentage;
+        },
+        [min, max]
+    );
+
     const getValFromPos = useCallback(
         (pos: number) => {
             if (!trackDiv.current) return 0;
@@ -115,12 +123,12 @@ const MinMaxSlider = ({
             onChangeMin(val);
             setDraggingMin(true);
             if (onStartEditMin && !disabled) onStartEditMin();
-            handleMouse(e, false);
+            dragMin(e);
         } else {
             onChangeMax(val);
             setDraggingMax(true);
             if (onStartEditMax && !disabled) onStartEditMax();
-            handleMouse(e, false);
+            dragMax(e);
         }
     };
 
@@ -162,9 +170,12 @@ const MinMaxSlider = ({
                 style={{
                     backgroundImage: `linear-gradient(${
                         vertical ? "to top" : "to right"
-                    }, rgba(0,0,0,0) ${valueMin}%, ${
+                    }, rgba(0,0,0,0) ${getPercentage(valueMin, true)}%, ${
                         disabled ? "rgb(200,200,200)" : "rgb(244,63,94)"
-                    } ${valueMin}% ${valueMax}%, rgba(0,0,0,0) ${valueMax}%)`,
+                    } ${getPercentage(valueMin, true)}% ${getPercentage(
+                        valueMax,
+                        true
+                    )}%, rgba(0,0,0,0) ${getPercentage(valueMax, true)}%)`,
                 }}
                 onMouseDown={handleMouseClicked}
             />

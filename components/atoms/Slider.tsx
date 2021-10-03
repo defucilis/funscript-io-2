@@ -35,6 +35,14 @@ const Slider = ({
     const trackDiv = useRef<HTMLDivElement>(null);
     const [dragging, setDragging] = useState(false);
 
+    const getPercentage = useCallback(
+        (val: number, round = false): number => {
+            const percentage = (val - min) / (max - min);
+            return round ? Math.round(percentage * 100) : percentage;
+        },
+        [min, max]
+    );
+
     const handleMouse = useCallback(
         (
             e: MouseEvent | TouchEvent | React.MouseEvent | React.TouchEvent,
@@ -97,7 +105,10 @@ const Slider = ({
                 style={{
                     backgroundImage: `linear-gradient(${vertical ? "to top" : "to right"}, ${
                         disabled ? "rgb(200,200,200)" : "rgb(244,63,94)"
-                    } ${value}%, rgba(0, 0, 0, 0) ${value}% 100%)`,
+                    } ${getPercentage(value, true)}%, rgba(0, 0, 0, 0) ${getPercentage(
+                        value,
+                        true
+                    )}% 100%)`,
                 }}
                 onMouseDown={(e: React.MouseEvent) => {
                     console.log(e);

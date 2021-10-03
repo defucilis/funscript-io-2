@@ -9,11 +9,12 @@ import {
     MdList,
     MdError,
     MdGamepad,
-    MdMemory,
     MdChangeHistory,
     MdWhatshot,
     MdPeople,
     MdCode,
+    MdShuffle,
+    MdRepeat,
 } from "react-icons/md";
 import EroScriptsIcon from "./EroScriptsIcon";
 
@@ -37,8 +38,10 @@ const GetIcon = (path: string): JSX.Element => {
             return <MdOndemandVideo className={iconClassName} />;
         case "app/manual":
             return <MdGamepad className={iconClassName} />;
-        case "app/auto":
-            return <MdMemory className={iconClassName} />;
+        case "app/random":
+            return <MdShuffle className={iconClassName} />;
+        case "app/cycler":
+            return <MdRepeat className={iconClassName} />;
         case "app/modify":
             return <MdTune className={iconClassName} />;
         case "app/create":

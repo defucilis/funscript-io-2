@@ -4,6 +4,8 @@ import AppDebug from "components/apps/AppDebug";
 import useHandy from "lib/thehandy-react";
 import Handy from "lib/thehandy";
 import AppManual from "components/apps/AppManual";
+import AppRandom from "components/apps/AppRandom";
+import AppCycler from "components/apps/AppCycler";
 
 const GetApp = (app: string, handy: Handy) => {
     switch (app) {
@@ -11,8 +13,10 @@ const GetApp = (app: string, handy: Handy) => {
         //     return <MdOndemandVideo className={iconClassName} />;
         case "manual":
             return <AppManual handy={handy} />;
-        // case "auto":
-        //     return <MdMemory className={iconClassName} />;
+        case "random":
+            return <AppRandom handy={handy} />;
+        case "cycler":
+            return <AppCycler handy={handy} />;
         // case "modify":
         //     return <MdTune className={iconClassName} />;
         // case "create":
