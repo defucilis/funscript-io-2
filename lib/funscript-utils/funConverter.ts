@@ -56,3 +56,24 @@ export const convertFunscriptToCsv = (funscript: string): Blob => {
 
     return csvBlob;
 };
+
+/** Converts a .csv file of the format time(ms),pos(0-100) into a funscript.  */
+export const convertCsvToFunscript = (csv: string, title?: string): Funscript => {
+    const script: Funscript = {
+        actions: [],
+    };
+    const lines = csv.split("\n");
+    lines.forEach(line => {
+        if (line.length === 0) return;
+        const pieces = line.split(",");
+        if (pieces.length !== 2) return;
+        const [time, pos] = pieces;
+        script.actions.push({ at: parseInt(time), pos: parseInt(pos) });
+    });
+    if (title) {
+        script.metadata = {
+            title: title.replace(".csv", ""),
+        };
+    }
+    return script;
+};

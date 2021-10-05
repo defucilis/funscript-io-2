@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState , useEffect } from "react";
 import { MdAdd } from "react-icons/md";
 import Modifier, { ModifierOperations, ModifierType } from "lib/modify/Modifier";
 import { getHalfSpeedScript } from "lib/funscript-utils/funHalver";
@@ -9,6 +9,10 @@ import {
     getOffsetScript,
     getRemappedScript,
 } from "lib/funscript-utils/funTweaker";
+import FunscriptDropzone from "components/molecules/FunscriptDropzone";
+import FunscriptHeatmap from "components/molecules/FunscriptHeatmap";
+import { Funscript } from "lib/funscript-utils/types";
+import { addFunscriptMetadata } from "lib/funscript-utils/funConverter";
 import ModifierBlock from "./modify/ModifierBlock";
 import ModifierControls from "./modify/ModifierControls";
 
@@ -24,6 +28,11 @@ const AppModify = (): JSX.Element => {
     const [newModifier, setNewModifier] = useState<Modifier | null>(null);
     const [nextId, setNextId] = useState(0);
     const [newModifierType, setNewModifierType] = useState<ModifierType | 0>(0);
+    const [rawFunscript, setRawFunscript] = useState<Funscript | null>(null);
+    const [modifiedFunscript, setModifiedFunscript] = useState<Funscript | null>(null);
+    const [downloadFile, setDownloadFile] = useState<{ url: string; filename: string } | null>(
+        null
+    );
 
     const handleError = (error: string) => {
         console.error(error);
@@ -121,6 +130,39 @@ const AppModify = (): JSX.Element => {
         setNewModifierType(0);
     };
 
+    useEffect(() => {
+        if (!rawFunscript) {
+            setModifiedFunscript(null);
+            return;
+        }
+        if (modifiers.length === 0) {
+            setModifiedFunscript(rawFunscript);
+            return;
+        }
+
+        setModifiedFunscript(
+            addFunscriptMetadata(
+                modifiers.reduce((acc, modifier) => {
+                    return modifier.operation(acc, modifier.options, modifier.onError);
+                }, rawFunscript)
+            )
+        );
+    }, [modifiers, rawFunscript]);
+
+    useEffect(() => {
+        if (!modifiedFunscript) {
+            setDownloadFile(null);
+            return;
+        }
+
+        const newFilename =
+            (modifiedFunscript.metadata?.title || "Unnamed script") + "_MODIFIED.funscript";
+        setDownloadFile({
+            url: window.URL.createObjectURL(new Blob([JSON.stringify(modifiedFunscript)])),
+            filename: newFilename,
+        });
+    }, [modifiedFunscript]);
+
     return (
         <div>
             <div className="relative w-full overflow-x-hidden overflow-y-visible min-h-mobilemain md:min-h-main">
@@ -131,7 +173,11 @@ const AppModify = (): JSX.Element => {
                         transition: "all 0.5s",
                     }}
                 >
-                    <h1>Funscript and such</h1>
+                    <FunscriptDropzone
+                        className="h-16 mb-5"
+                        value={rawFunscript}
+                        onChange={setRawFunscript}
+                    />
                     <div className="flex flex-col gap-4 items-center">
                         {modifiers.map((modifier, index) => (
                             <ModifierBlock
@@ -167,11 +213,30 @@ const AppModify = (): JSX.Element => {
                     <div className="w-full flex justify-center mt-4">
                         <button
                             onClick={() => setAddingModifier(true)}
-                            className="bg-neutral-600 text-white rounded text-4xl grid place-items-center"
+                            className={`bg-neutral-600 text-white rounded grid place-items-center ${
+                                modifiers.length === 0 ? "px-4 py-2 text-2xl" : "text-4xl "
+                            }`}
                         >
-                            <MdAdd />
+                            {modifiers.length === 0 ? "Add your first modifier" : <MdAdd />}
                         </button>
                     </div>
+                    {modifiedFunscript && downloadFile && (
+                        <a
+                            href={downloadFile.url}
+                            download={downloadFile.filename}
+                            className="h-16 mt-4 relative block"
+                        >
+                            <div className="relative w-full h-full">
+                                <div className="relative z-10 bg-black bg-opacity-20 grid place-items-center w-full h-full">
+                                    Save modified script
+                                </div>
+                                <FunscriptHeatmap
+                                    className="absolute w-full h-full left-0 top-0 z-0"
+                                    funscript={modifiedFunscript}
+                                />
+                            </div>
+                        </a>
+                    )}
                 </div>
                 <div
                     className="absolute w-full"

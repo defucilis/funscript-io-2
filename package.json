@@ -18,6 +18,7 @@
         "next-auth": "latest",
         "react": "latest",
         "react-dom": "latest",
+        "react-dropzone": "^11.4.2",
         "react-icons": "^4.2.0"
     },
     "devDependencies": {
