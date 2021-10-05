@@ -25,7 +25,9 @@ const FunscriptDropzone = ({
 
     const acceptFiles = (files: File[]) => {
         setLocalError("");
-        const extension = files[0].name.split(".").pop();
+        const split = files[0].name.split(".");
+        const name = split[0];
+        const extension = split.pop();
         const reader = new FileReader();
 
         reader.onloadend = async (e: ProgressEvent<FileReader>) => {
@@ -33,9 +35,13 @@ const FunscriptDropzone = ({
             const resultString = String(e.target.result);
             if (extension === "funscript") {
                 const newFunscript = getFunscriptFromString(resultString);
+                if (!newFunscript.metadata?.title) {
+                    if (!newFunscript.metadata) newFunscript.metadata = { title: name };
+                    else newFunscript.metadata.title = name;
+                }
                 onChange(newFunscript);
             } else if (extension === "csv") {
-                const newFunscript = convertCsvToFunscript(resultString);
+                const newFunscript = convertCsvToFunscript(resultString, name);
                 onChange(newFunscript);
             } else {
                 throw new Error("invalid type for script file");

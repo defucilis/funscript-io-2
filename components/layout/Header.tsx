@@ -13,7 +13,7 @@ const Header = ({
     onToggleOpen: () => void;
 }): JSX.Element => {
     return (
-        <div className="flex flex-col bg-neutral-800 py-2 shadow-lg gap-2 w-screen">
+        <div className="flex flex-col bg-neutral-800 py-2 shadow-lg gap-2">
             <div className="flex justify-between h-6">
                 <div className="w-60 flex items-center px-5 md:border-r border-neutral-700">
                     <div className="flex items-baseline gap-2">

@@ -16,6 +16,7 @@
     "dependencies": {
         "next": "latest",
         "next-auth": "latest",
+        "nprogress": "^0.2.0",
         "react": "latest",
         "react-dom": "latest",
         "react-dropzone": "^11.4.2",
@@ -26,6 +27,7 @@
         "@types/jest": "latest",
         "@types/next-auth": "latest",
         "@types/node": "latest",
+        "@types/nprogress": "^0.2.0",
         "@types/react": "latest",
         "@typescript-eslint/eslint-plugin": "latest",
         "@typescript-eslint/parser": "latest",
