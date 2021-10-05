@@ -7,6 +7,7 @@ import useAnim from "lib/hooks/useAnim";
 import Mathf from "lib/Mathf";
 import Slider from "components/atoms/Slider";
 import MinMaxSlider from "components/atoms/MinMaxSlider";
+import IconButton from "components/atoms/IconButton";
 
 type Range = {
     min: number;
@@ -292,15 +293,13 @@ const AppCycler = ({ handy }: { handy: Handy }): JSX.Element => {
                     <Slider min={0} max={100} value={easeInLength} onChange={setEaseInLength} />
                 </div>
                 <div className="flex flex-col items-center">
-                    <button
+                    <IconButton
                         disabled={loading}
-                        className={`w-12 h-12 grid place-items-center rounded text-4xl text-neutral-900 ${
-                            loading ? "bg-neutral-400" : "bg-primary-400"
-                        }`}
+                        className={`${loading ? "bg-neutral-400" : "bg-primary-400"}`}
                         onClick={tryTogglePlay}
                     >
                         {hampRunning ? <MdPause /> : <MdPlayArrow />}
-                    </button>
+                    </IconButton>
                     <span className="text-sm">{hampRunning ? "Stop" : "Start"}</span>
                 </div>
                 <div>

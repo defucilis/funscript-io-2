@@ -1,3 +1,5 @@
+import CheckboxField from "components/atoms/CheckboxField";
+import NumberField from "components/atoms/NumberField";
 import Modifier, { ModifierOperations } from "lib/modify/Modifier";
 
 const ModifierControlsHalver = ({
@@ -7,50 +9,37 @@ const ModifierControlsHalver = ({
     modifier: Modifier;
     onSetValue: (key: string, value: any) => void;
 }): JSX.Element => {
-    console.log(modifier);
     return (
-        <div className="flex flex-col gap-4 my-4">
-            <div className="flex gap-4">
-                <label>Reset After Pause</label>
-                <input
-                    type="checkbox"
-                    checked={ModifierOperations.getBoolean(modifier, "resetAfterPause")}
-                    onChange={e => onSetValue("resetAfterPause", e.target.checked)}
-                />
-            </div>
-            <div className="flex gap-4">
-                <label>Remove Short Pauses</label>
-                <input
-                    type="checkbox"
-                    checked={ModifierOperations.getBoolean(modifier, "removeShortPauses")}
-                    onChange={e => onSetValue("removeShortPauses", e.target.checked)}
-                />
-            </div>
-            <div className="flex gap-4">
-                <label>Short Pause Duration</label>
-                <input
-                    type="number"
-                    value={ModifierOperations.getNumber(modifier, "shortPauseDuration")}
-                    onChange={e => onSetValue("shortPauseDuration", parseInt(e.target.value))}
-                    className="bg-neutral-700 text-white p-1 rounded"
-                />
-            </div>
-            <div className="flex gap-4">
-                <label>Match First Downstroke</label>
-                <input
-                    type="checkbox"
-                    checked={ModifierOperations.getBoolean(modifier, "matchFirstDownstroke")}
-                    onChange={e => onSetValue("matchFirstDownstroke", e.target.checked)}
-                />
-            </div>
-            <div className="flex gap-4">
-                <label>Match Group End Position</label>
-                <input
-                    type="checkbox"
-                    checked={ModifierOperations.getBoolean(modifier, "matchGroupEndPosition")}
-                    onChange={e => onSetValue("matchGroupEndPosition", e.target.checked)}
-                />
-            </div>
+        <div className="flex flex-col my-4 gap-4">
+            <p className="text-neutral-500 italic leading-none">
+                Halves the speed of a script without sacrificing sync by changing each up+down
+                stroke into a single up or down stroke.
+            </p>
+            <CheckboxField
+                label="Reset After Pause"
+                value={ModifierOperations.getBoolean(modifier, "resetAfterPause")}
+                onChange={value => onSetValue("resetAfterPause", value)}
+            />
+            <CheckboxField
+                label="Remove Short Pauses"
+                value={ModifierOperations.getBoolean(modifier, "removeShortPauses")}
+                onChange={value => onSetValue("removeShortPauses", value)}
+            />
+            <NumberField
+                label="Short Pause Duration"
+                value={ModifierOperations.getNumber(modifier, "shortPauseDuration")}
+                onChange={value => onSetValue("shortPauseDuration", value)}
+            />
+            <CheckboxField
+                label="Match First Downstroke"
+                value={ModifierOperations.getBoolean(modifier, "matchFirstDownstroke")}
+                onChange={value => onSetValue("matchFirstDownstroke", value)}
+            />
+            <CheckboxField
+                label="Match Group End Position"
+                value={ModifierOperations.getBoolean(modifier, "matchGroupEndPosition")}
+                onChange={value => onSetValue("matchGroupEndPosition", value)}
+            />
         </div>
     );
 };

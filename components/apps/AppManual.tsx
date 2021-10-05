@@ -11,6 +11,7 @@ import Handy from "lib/thehandy";
 import { HampState, HandyMode } from "lib/thehandy/types";
 import RateLimitedSlider from "components/molecules/RateLimitedSlider";
 import RateLimitedMinMaxSlider from "components/molecules/RateLimitedMinMaxSlider";
+import IconButton from "components/atoms/IconButton";
 
 enum SlideIntervalMode {
     min = 0,
@@ -178,65 +179,55 @@ const AppManual = ({ handy }: { handy: Handy }): JSX.Element => {
                 <div className="flex w-full h-60 justify-center gap-5">
                     <div className="grid grid-rows-3 grid-cols-3 w-60 gap-4 text-4xl text-neutral-900">
                         <div className="col-start-2 row-start-1 grid place-items-center">
-                            <button
+                            <IconButton
                                 disabled={loading}
                                 onClick={() => tryIncrementSlide(1)}
-                                className={`w-12 h-12 grid place-items-center rounded ${
-                                    loading ? "bg-neutral-400" : "bg-primary-400"
-                                }`}
+                                className={`${loading ? "bg-neutral-400" : "bg-primary-400"}`}
                             >
                                 <MdKeyboardArrowUp />
-                            </button>
+                            </IconButton>
                             <span className="text-white text-sm">Slide +</span>
                         </div>
                         <div className="col-start-1 row-start-2 grid place-items-center">
-                            <button
+                            <IconButton
                                 disabled={loading}
                                 onClick={() => tryIncrementHampVelocity(-1)}
-                                className={`w-12 h-12 grid place-items-center rounded ${
-                                    loading ? "bg-neutral-400" : "bg-primary-400"
-                                }`}
+                                className={`${loading ? "bg-neutral-400" : "bg-primary-400"}`}
                             >
                                 <MdKeyboardArrowLeft />
-                            </button>
+                            </IconButton>
                             <span className="text-white text-sm">Speed -</span>
                         </div>
                         <div className="col-start-2 row-start-2 grid place-items-center">
-                            <button
+                            <IconButton
                                 disabled={loading}
                                 onClick={() => tryTogglePlay()}
-                                className={`w-12 h-12 grid place-items-center rounded ${
-                                    loading ? "bg-neutral-400" : "bg-primary-400"
-                                }`}
+                                className={`${loading ? "bg-neutral-400" : "bg-primary-400"}`}
                             >
                                 {hampRunning ? <MdPause /> : <MdPlayArrow />}
-                            </button>
+                            </IconButton>
                             <span className="text-white text-sm">
                                 {hampRunning ? "Stop" : "Start"}
                             </span>
                         </div>
                         <div className="col-start-3 row-start-2 grid place-items-center">
-                            <button
+                            <IconButton
                                 disabled={loading}
                                 onClick={() => tryIncrementHampVelocity(1)}
-                                className={`w-12 h-12 grid place-items-center rounded ${
-                                    loading ? "bg-neutral-400" : "bg-primary-400"
-                                }`}
+                                className={`${loading ? "bg-neutral-400" : "bg-primary-400"}`}
                             >
                                 <MdKeyboardArrowRight />
-                            </button>
+                            </IconButton>
                             <span className="text-white text-sm">Speed +</span>
                         </div>
                         <div className="col-start-2 row-start-3 grid place-items-center">
-                            <button
+                            <IconButton
                                 disabled={loading}
                                 onClick={() => tryIncrementSlide(-1)}
-                                className={`w-12 h-12 grid place-items-center rounded ${
-                                    loading ? "bg-neutral-400" : "bg-primary-400"
-                                }`}
+                                className={`${loading ? "bg-neutral-400" : "bg-primary-400"}`}
                             >
                                 <MdKeyboardArrowDown />
-                            </button>
+                            </IconButton>
                             <span className="text-white text-sm">Slide -</span>
                         </div>
                     </div>

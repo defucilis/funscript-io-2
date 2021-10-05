@@ -1,5 +1,5 @@
-import React, { useState , useEffect } from "react";
-import { MdAdd } from "react-icons/md";
+import React, { useState, useEffect } from "react";
+import { MdAdd, MdKeyboardArrowLeft } from "react-icons/md";
 import Modifier, { ModifierOperations, ModifierType } from "lib/modify/Modifier";
 import { getHalfSpeedScript } from "lib/funscript-utils/funHalver";
 import {
@@ -13,8 +13,12 @@ import FunscriptDropzone from "components/molecules/FunscriptDropzone";
 import FunscriptHeatmap from "components/molecules/FunscriptHeatmap";
 import { Funscript } from "lib/funscript-utils/types";
 import { addFunscriptMetadata } from "lib/funscript-utils/funConverter";
-import ModifierBlock from "./modify/ModifierBlock";
+import SelectField from "components/atoms/SelectField";
+import IconButton from "components/atoms/IconButton";
+import Button from "components/atoms/Button";
+import FunscriptInfo from "components/atoms/FunscriptInfo";
 import ModifierControls from "./modify/ModifierControls";
+import ModifierBlock from "./modify/ModifierBlock";
 
 const defaultFunction = `actions => {
     //applies a 100ms offset to all actions
@@ -33,9 +37,10 @@ const AppModify = (): JSX.Element => {
     const [downloadFile, setDownloadFile] = useState<{ url: string; filename: string } | null>(
         null
     );
+    const [error, setError] = useState("");
 
     const handleError = (error: string) => {
-        console.error(error);
+        setError(error);
     };
 
     const createNewModifier = (type: ModifierType | 0): void => {
@@ -52,7 +57,9 @@ const AppModify = (): JSX.Element => {
                     type,
                     id: nextId,
                     operation: getOffsetScript,
-                    ...ModifierOperations.getOptions({}),
+                    ...ModifierOperations.getOptions({
+                        offset: 0,
+                    }),
                 });
                 break;
             case ModifierType.Halver:
@@ -61,8 +68,10 @@ const AppModify = (): JSX.Element => {
                     id: nextId,
                     operation: getHalfSpeedScript,
                     ...ModifierOperations.getOptions({
+                        resetAfterPause: false,
                         removeShortPauses: true,
                         shortPauseDuration: 2000,
+                        matchFirstDownstroke: false,
                         matchGroupEndPosition: true,
                     }),
                 });
@@ -80,7 +89,10 @@ const AppModify = (): JSX.Element => {
                     type,
                     id: nextId,
                     operation: getLimitedScript,
-                    ...ModifierOperations.getOptions({ devicePreset: "handy" }),
+                    ...ModifierOperations.getOptions({
+                        devicePreset: "handy",
+                        maxSpeed: 0,
+                    }),
                 });
                 break;
             case ModifierType.Randomizer:
@@ -96,7 +108,10 @@ const AppModify = (): JSX.Element => {
                     type,
                     id: nextId,
                     operation: getRemappedScript,
-                    ...ModifierOperations.getOptions({ min: 0, max: 100 }),
+                    ...ModifierOperations.getOptions({
+                        min: 0,
+                        max: 100,
+                    }),
                 });
                 break;
             case ModifierType.Metadata:
@@ -112,8 +127,8 @@ const AppModify = (): JSX.Element => {
                     type,
                     id: nextId,
                     operation: getCustomFunctionScript,
-                    ...ModifierOperations.getOptions({ customFunction: defaultFunction }),
-                    onError: handleError,
+                    ...ModifierOperations.getOptions({ functionText: defaultFunction }),
+                    onError: error => handleError("Error in custom function block: " + error),
                 });
                 break;
             default:
@@ -131,6 +146,7 @@ const AppModify = (): JSX.Element => {
     };
 
     useEffect(() => {
+        setError("");
         if (!rawFunscript) {
             setModifiedFunscript(null);
             return;
@@ -173,11 +189,14 @@ const AppModify = (): JSX.Element => {
                         transition: "all 0.5s",
                     }}
                 >
-                    <FunscriptDropzone
-                        className="h-16 mb-5"
-                        value={rawFunscript}
-                        onChange={setRawFunscript}
-                    />
+                    <div className="mb-4">
+                        <FunscriptDropzone
+                            className="h-16"
+                            value={rawFunscript}
+                            onChange={setRawFunscript}
+                        />
+                        {rawFunscript && <FunscriptInfo funscript={rawFunscript} />}
+                    </div>
                     <div className="flex flex-col gap-4 items-center">
                         {modifiers.map((modifier, index) => (
                             <ModifierBlock
@@ -211,31 +230,40 @@ const AppModify = (): JSX.Element => {
                         ))}
                     </div>
                     <div className="w-full flex justify-center mt-4">
-                        <button
-                            onClick={() => setAddingModifier(true)}
-                            className={`bg-neutral-600 text-white rounded grid place-items-center ${
-                                modifiers.length === 0 ? "px-4 py-2 text-2xl" : "text-4xl "
-                            }`}
-                        >
-                            {modifiers.length === 0 ? "Add your first modifier" : <MdAdd />}
-                        </button>
+                        {modifiers.length === 0 ? (
+                            <Button onClick={() => setAddingModifier(true)}>
+                                Add your first modifier
+                            </Button>
+                        ) : (
+                            <IconButton onClick={() => setAddingModifier(true)}>
+                                <MdAdd />
+                            </IconButton>
+                        )}
                     </div>
-                    {modifiedFunscript && downloadFile && (
-                        <a
-                            href={downloadFile.url}
-                            download={downloadFile.filename}
-                            className="h-16 mt-4 relative block"
-                        >
-                            <div className="relative w-full h-full">
-                                <div className="relative z-10 bg-black bg-opacity-20 grid place-items-center w-full h-full">
-                                    Save modified script
+                    {error && (
+                        <p className="text-neutral-900 bg-red-500 rounded font-bold text-sm w-full grid place-items-center p-2 my-2 text-center">
+                            {error}
+                        </p>
+                    )}
+                    {modifiedFunscript && downloadFile && modifiers.length > 0 && (
+                        <>
+                            <a
+                                href={downloadFile.url}
+                                download={downloadFile.filename}
+                                className="h-16 mt-4 relative block"
+                            >
+                                <div className="relative w-full h-full">
+                                    <div className="relative z-10 bg-black bg-opacity-20 grid place-items-center w-full h-full">
+                                        Save modified script
+                                    </div>
+                                    <FunscriptHeatmap
+                                        className="absolute w-full h-full left-0 top-0 z-0"
+                                        funscript={modifiedFunscript}
+                                    />
                                 </div>
-                                <FunscriptHeatmap
-                                    className="absolute w-full h-full left-0 top-0 z-0"
-                                    funscript={modifiedFunscript}
-                                />
-                            </div>
-                        </a>
+                            </a>
+                            <FunscriptInfo funscript={modifiedFunscript} />
+                        </>
                     )}
                 </div>
                 <div
@@ -246,30 +274,32 @@ const AppModify = (): JSX.Element => {
                         transition: "all 0.5s",
                     }}
                 >
-                    <button
-                        onClick={() => {
-                            setAddingModifier(false);
-                            setNewModifierType(0);
-                        }}
-                    >
-                        Cancel
-                    </button>
-                    <h1>Add modifier</h1>
-                    <select
+                    <div className="flex gap-4 items-center mb-4">
+                        <IconButton
+                            onClick={() => {
+                                setAddingModifier(false);
+                                setNewModifierType(0);
+                            }}
+                        >
+                            <MdKeyboardArrowLeft />
+                        </IconButton>
+                        <h1 className="text-2xl">Add modifier</h1>
+                    </div>
+                    <SelectField
                         value={newModifierType}
-                        onChange={e => createNewModifier(Number(e.target.value))}
-                        className="bg-neutral-700"
-                    >
-                        <option value="0">Select Modifier Type</option>
-                        <option value={ModifierType.Offset}>Offset</option>
-                        <option value={ModifierType.Halver}>Halver</option>
-                        <option value={ModifierType.Doubler}>Doubler</option>
-                        <option value={ModifierType.Limiter}>Limiter</option>
-                        <option value={ModifierType.Remapper}>Remapper</option>
-                        <option value={ModifierType.Randomizer}>Randomizer</option>
-                        <option value={ModifierType.Metadata}>Metadata</option>
-                        <option value={ModifierType.Custom}>Custom</option>
-                    </select>
+                        onChange={createNewModifier}
+                        options={[
+                            { value: 0, label: "Select Modifier Type" },
+                            { value: ModifierType.Offset, label: "Offset" },
+                            { value: ModifierType.Halver, label: "Halver" },
+                            { value: ModifierType.Doubler, label: "Doubler" },
+                            { value: ModifierType.Limiter, label: "Limiter" },
+                            { value: ModifierType.Remapper, label: "Remapper" },
+                            { value: ModifierType.Randomizer, label: "Randomizer" },
+                            { value: ModifierType.Metadata, label: "Metadata" },
+                            { value: ModifierType.Custom, label: "Custom" },
+                        ]}
+                    />
                     {newModifier && newModifierType !== 0 && (
                         <ModifierControls
                             modifier={newModifier}
@@ -280,9 +310,13 @@ const AppModify = (): JSX.Element => {
                             }}
                         />
                     )}
-                    <button disabled={!newModifier} onClick={() => addNewModifier()}>
-                        Confirm
-                    </button>
+                    {newModifier &&
+                        newModifier.type !== ModifierType.Randomizer &&
+                        newModifier.type !== ModifierType.Doubler && (
+                            <Button onClick={() => addNewModifier()} className="bg-green-700">
+                                Confirm
+                            </Button>
+                        )}
                 </div>
                 <div
                     className="absolute w-full"
@@ -294,7 +328,19 @@ const AppModify = (): JSX.Element => {
                 >
                     {newModifier && (
                         <>
-                            <h1>{ModifierType[newModifier.type]}</h1>
+                            <div className="flex gap-4 items-center mb-4">
+                                <IconButton
+                                    onClick={() => {
+                                        setEditingModifier(-1);
+                                        setNewModifierType(0);
+                                    }}
+                                >
+                                    <MdKeyboardArrowLeft />
+                                </IconButton>
+                                <h1 className="text-2xl">
+                                    {ModifierType[newModifier.type]} #{newModifier.id}
+                                </h1>
+                            </div>
                             <ModifierControls
                                 modifier={newModifier}
                                 onSetValue={(key, value) => {
@@ -311,14 +357,6 @@ const AppModify = (): JSX.Element => {
                             />
                         </>
                     )}
-                    <button
-                        onClick={() => {
-                            setEditingModifier(-1);
-                            setNewModifierType(0);
-                        }}
-                    >
-                        Back
-                    </button>
                 </div>
             </div>
         </div>

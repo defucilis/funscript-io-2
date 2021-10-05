@@ -1,4 +1,8 @@
+import NumberField from "components/atoms/NumberField";
+import SelectField from "components/atoms/SelectField";
 import Modifier, { ModifierOperations } from "lib/modify/Modifier";
+
+const devicePresets = ["handy", "launch", "custom"];
 
 const ModifierControlsLimiter = ({
     modifier,
@@ -9,28 +13,28 @@ const ModifierControlsLimiter = ({
 }): JSX.Element => {
     return (
         <div className="flex flex-col gap-4 my-4">
-            <div className="flex gap-4">
-                <label>Device Mode</label>
-                <select
-                    value={ModifierOperations.getString(modifier, "devicePreset")}
-                    onChange={e => onSetValue("devicePreset", e.target.value)}
-                    className="bg-neutral-700 text-white p-1 rounded"
-                >
-                    <option value="handy">Handy</option>
-                    <option value="launch">Launch</option>
-                    <option value="custom">Custom</option>
-                </select>
-            </div>
+            <p className="text-neutral-500 italic leading-none">
+                Changes position values to ensure that all actions within a script are below a speed
+                threshold. Useful to ensure a script will function on a particular device.
+            </p>
+            <SelectField
+                label="Device Mode"
+                value={devicePresets.indexOf(
+                    ModifierOperations.getString(modifier, "devicePreset")
+                )}
+                onChange={value => onSetValue("devicePreset", devicePresets[value])}
+                options={[
+                    { label: "Handy", value: 0 },
+                    { label: "Launch", value: 1 },
+                    { label: "Custom", value: 2 },
+                ]}
+            />
             {ModifierOperations.getString(modifier, "devicePreset") === "custom" && (
-                <div className="flex gap-4">
-                    <label>Max Speed</label>
-                    <input
-                        type="number"
-                        value={ModifierOperations.getNumber(modifier, "customSpeed")}
-                        onChange={e => onSetValue("customSpeed", parseInt(e.target.value))}
-                        className="bg-neutral-700 text-white p-1 rounded"
-                    />
-                </div>
+                <NumberField
+                    label="Max Speed"
+                    value={ModifierOperations.getNumber(modifier, "customSpeed")}
+                    onChange={value => onSetValue("customSpeed", value)}
+                />
             )}
         </div>
     );

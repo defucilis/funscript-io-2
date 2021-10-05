@@ -12,6 +12,14 @@
     html {
         -webkit-tap-highlight-color: transparent;
     }
+
+    input[type="number"]::-webkit-outer-spin-button,
+    input[type="number"]::-webkit-inner-spin-button {
+        appearance: none;
+    }
+    input[type="number"] {
+        -moz-appearance: textfield;
+    }
 }
 
 @layer components {
@@ -29,5 +37,13 @@
 
     .fsio-field-text-disabled {
         @apply bg-neutral-800 text-neutral-200 px-2 py-1 rounded;
+    }
+
+    .fsio-btn {
+        @apply text-lg grid place-items-center px-2 py-1 rounded mt-4 bg-neutral-700 text-white;
+    }
+
+    .fsio-btn-icon {
+        @apply w-12 h-12 grid place-items-center rounded text-4xl text-neutral-900 bg-neutral-300;
     }
 }

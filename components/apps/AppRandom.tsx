@@ -7,6 +7,7 @@ import RateLimitedMinMaxSlider from "components/molecules/RateLimitedMinMaxSlide
 import ProgressRing from "components/atoms/CircularProgress";
 import useAnim from "lib/hooks/useAnim";
 import Mathf from "lib/Mathf";
+import IconButton from "components/atoms/IconButton";
 
 type Range = {
     min: number;
@@ -241,15 +242,13 @@ const AppRandom = ({ handy }: { handy: Handy }): JSX.Element => {
             </div>
             <div className="flex justify-around items-center">
                 <div className="flex flex-col items-center">
-                    <button
+                    <IconButton
                         disabled={loading}
-                        className={`w-12 h-12 grid place-items-center rounded text-4xl text-neutral-900 ${
-                            loading ? "bg-neutral-400" : "bg-primary-400"
-                        }`}
+                        className={`${loading ? "bg-neutral-400" : "bg-primary-400"}`}
                         onClick={tryTogglePlay}
                     >
                         {hampRunning ? <MdPause /> : <MdPlayArrow />}
-                    </button>
+                    </IconButton>
                     <span className="text-sm">{hampRunning ? "Stop" : "Start"}</span>
                 </div>
                 <div className="h-40 flex flex-col justify-center items-center">
@@ -275,15 +274,13 @@ const AppRandom = ({ handy }: { handy: Handy }): JSX.Element => {
                     </p>
                 </div>
                 <div className="flex flex-col items-center">
-                    <button
+                    <IconButton
                         disabled={loading}
-                        className={`w-12 h-12 grid place-items-center rounded text-4xl text-neutral-900 ${
-                            loading ? "bg-neutral-400" : "bg-primary-400"
-                        }`}
+                        className={`${loading ? "bg-neutral-400" : "bg-primary-400"}`}
                         onClick={() => setSkip(true)}
                     >
                         <MdSkipNext />
-                    </button>
+                    </IconButton>
                     <span className="text-sm">Skip</span>
                 </div>
             </div>

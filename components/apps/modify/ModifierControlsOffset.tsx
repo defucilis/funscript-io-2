@@ -1,3 +1,4 @@
+import NumberField from "components/atoms/NumberField";
 import Modifier, { ModifierOperations } from "lib/modify/Modifier";
 
 const ModifierControlsOffset = ({
@@ -7,18 +8,16 @@ const ModifierControlsOffset = ({
     modifier: Modifier;
     onSetValue: (key: string, value: any) => void;
 }): JSX.Element => {
-    console.log(modifier);
     return (
         <div className="flex flex-col gap-4 my-4">
-            <div className="flex gap-4">
-                <label>Offset Amount (ms)</label>
-                <input
-                    type="number"
-                    value={ModifierOperations.getNumber(modifier, "offsetAmount")}
-                    onChange={e => onSetValue("offsetAmount", parseInt(e.target.value))}
-                    className="bg-neutral-700 text-white p-1 rounded"
-                />
-            </div>
+            <p className="text-neutral-500 italic leading-none">
+                Add a fixed time offset to all actions in a script to ensure proper synchronization
+            </p>
+            <NumberField
+                label="Offset Amount (ms)"
+                value={ModifierOperations.getNumber(modifier, "offset")}
+                onChange={value => onSetValue("offset", value)}
+            />
         </div>
     );
 };

@@ -9,9 +9,12 @@ const ModifierControlsMetadata = ({
     modifier: Modifier;
     onSetValue: (key: string, value: any) => void;
 }): JSX.Element => {
-    console.log(modifier);
     return (
         <div className="flex flex-col gap-4 my-4">
+            <p className="text-neutral-500 italic leading-none">
+                Adds custom metadata to the funscript file, for display in various player
+                applications.
+            </p>
             <TextField
                 value={ModifierOperations.getString(modifier, "title")}
                 onChange={val => onSetValue("title", val)}

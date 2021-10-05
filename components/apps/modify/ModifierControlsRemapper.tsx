@@ -1,3 +1,4 @@
+import NumberField from "components/atoms/NumberField";
 import Modifier, { ModifierOperations } from "lib/modify/Modifier";
 
 const ModifierControlsRemapper = ({
@@ -9,24 +10,19 @@ const ModifierControlsRemapper = ({
 }): JSX.Element => {
     return (
         <div className="flex flex-col gap-4 my-4">
-            <div className="flex gap-4">
-                <label>Min</label>
-                <input
-                    type="number"
-                    value={ModifierOperations.getNumber(modifier, "min")}
-                    onChange={e => onSetValue("min", parseInt(e.target.value))}
-                    className="bg-neutral-700 text-white p-1 rounded"
-                />
-            </div>
-            <div className="flex gap-4">
-                <label>Max</label>
-                <input
-                    type="number"
-                    value={ModifierOperations.getNumber(modifier, "max")}
-                    onChange={e => onSetValue("max", parseInt(e.target.value))}
-                    className="bg-neutral-700 text-white p-1 rounded"
-                />
-            </div>
+            <p className="text-neutral-500 italic leading-none">
+                Changes the minimum and maximum position values of a script to new values.
+            </p>
+            <NumberField
+                label="Min Position"
+                value={ModifierOperations.getNumber(modifier, "min")}
+                onChange={value => onSetValue("min", value)}
+            />
+            <NumberField
+                label="Max Position"
+                value={ModifierOperations.getNumber(modifier, "max")}
+                onChange={value => onSetValue("max", value)}
+            />
         </div>
     );
 };

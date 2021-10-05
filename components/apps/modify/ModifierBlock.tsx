@@ -27,7 +27,7 @@ const ModifierBlock = ({
     };
 
     return (
-        <div className="flex justify-between h-20 bg-primary-400 w-full rounded p-2 pl-4 hover:bg-primary-500 transition-all">
+        <div className="flex justify-between h-20 bg-primary-400 w-full rounded p-2 pl-4 hover:bg-primary-500 transition-all gap-2">
             <div className="h-full cursor-pointer flex-grow" onClick={onOpen}>
                 <h2 className="text-xl font-bold text-neutral-900">
                     {ModifierType[modifier.type]} #{modifier.id}
