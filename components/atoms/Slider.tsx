@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
+import Mathf from "lib/Mathf";
 
 const isMouseEvent = (
     e: MouseEvent | TouchEvent | React.MouseEvent | React.TouchEvent
@@ -12,6 +13,9 @@ const isTouchEvent = (
 };
 
 const Slider = ({
+    label,
+    valueUnit,
+    zeroValue,
     min,
     max,
     value,
@@ -21,7 +25,11 @@ const Slider = ({
     className,
     disabled,
     vertical,
+    ticks = 4,
 }: {
+    label?: string;
+    valueUnit?: string;
+    zeroValue?: string;
     min: number;
     max: number;
     value: number;
@@ -31,6 +39,7 @@ const Slider = ({
     className?: string;
     disabled?: boolean;
     vertical?: boolean;
+    ticks?: number;
 }): JSX.Element => {
     const trackDiv = useRef<HTMLDivElement>(null);
     const [dragging, setDragging] = useState(false);
@@ -92,54 +101,89 @@ const Slider = ({
     }, [dragging, trackDiv]);
 
     return (
-        <div
-            className={`relative select-none grid place-items-center ${
-                vertical ? "w-6 h-full" : "w-full h-6"
-            } ${className || ""}`}
-        >
+        <div className={`flex flex-col select-none  ${vertical ? "h-full" : "w-full"}`}>
+            {!vertical && (
+                <div className="flex justify-between text-sm">
+                    {label ? <p>{label}</p> : <div />}
+                    <p>
+                        {zeroValue && value === min
+                            ? zeroValue
+                            : `${Math.round(value)}${valueUnit || ""}`}
+                    </p>
+                </div>
+            )}
             <div
-                ref={trackDiv}
-                className={`bg-neutral-500 rounded cursor-pointer ${
-                    vertical ? "h-full w-2" : "h-2 w-full"
-                }`}
-                style={{
-                    backgroundImage: `linear-gradient(${vertical ? "to top" : "to right"}, ${
-                        disabled ? "rgb(200,200,200)" : "rgb(244,63,94)"
-                    } ${getPercentage(value, true)}%, rgba(0, 0, 0, 0) ${getPercentage(
-                        value,
-                        true
-                    )}% 100%)`,
-                }}
-                onMouseDown={(e: React.MouseEvent) => {
-                    console.log(e);
-                    setDragging(true && !disabled);
-                    if (onStartEdit && !disabled) onStartEdit();
-                    handleMouse(e, false);
-                }}
-            />
-            <div
-                className={`absolute rounded-full h-6 w-6 cursor-pointer shadow-md border-2 ${
-                    disabled
-                        ? "bg-neutral-500 border-neutral-900"
-                        : "bg-primary-500 border-primary-900"
-                }`}
-                style={{
-                    left: vertical
-                        ? undefined
-                        : `calc(${(value - min) / (max - min)} * (100% - 1.5rem))`,
-                    bottom: vertical
-                        ? `calc(${(value - min) / (max - min)} * (100% - 1.5rem))`
-                        : undefined,
-                }}
-                onMouseDown={() => {
-                    setDragging(true && !disabled);
-                    if (onStartEdit && !disabled) onStartEdit();
-                }}
-                onTouchStart={() => {
-                    setDragging(true && !disabled);
-                    if (onStartEdit && !disabled) onStartEdit();
-                }}
-            />
+                className={`relative grid place-items-center ${
+                    vertical ? "w-6 h-full" : "w-full h-6"
+                } ${ticks && ticks > 0 ? (vertical ? "mr-4" : "mb-4") : ""} ${className || ""}`}
+            >
+                <div
+                    ref={trackDiv}
+                    className={`relative z-10 bg-neutral-500 rounded cursor-pointer ${
+                        vertical ? "h-full w-2" : "h-2 w-full"
+                    }`}
+                    style={{
+                        backgroundImage: `linear-gradient(${vertical ? "to top" : "to right"}, ${
+                            disabled ? "rgb(200,200,200)" : "rgb(244,63,94)"
+                        } ${getPercentage(value, true)}%, rgba(0, 0, 0, 0) ${getPercentage(
+                            value,
+                            true
+                        )}% 100%)`,
+                    }}
+                    onMouseDown={(e: React.MouseEvent) => {
+                        setDragging(true && !disabled);
+                        if (onStartEdit && !disabled) onStartEdit();
+                        handleMouse(e, false);
+                    }}
+                />
+                <div
+                    className={`absolute z-10 rounded-full h-6 w-6 cursor-pointer shadow-md border-2 ${
+                        disabled
+                            ? "bg-neutral-500 border-neutral-900"
+                            : "bg-primary-500 border-primary-900"
+                    }`}
+                    style={{
+                        left: vertical
+                            ? undefined
+                            : `calc(${(value - min) / (max - min)} * (100% - 1.5rem))`,
+                        bottom: vertical
+                            ? `calc(${(value - min) / (max - min)} * (100% - 1.5rem))`
+                            : undefined,
+                    }}
+                    onMouseDown={() => {
+                        setDragging(true && !disabled);
+                        if (onStartEdit && !disabled) onStartEdit();
+                    }}
+                    onTouchStart={() => {
+                        setDragging(true && !disabled);
+                        if (onStartEdit && !disabled) onStartEdit();
+                    }}
+                />
+                {ticks && ticks > 0 && (
+                    <div
+                        className={`absolute w-full h-full left-0 bottom-0.5 flex justify-between z-0 text-neutral-500 ${
+                            vertical ? "flex-col pl-1" : "pl-2"
+                        }`}
+                    >
+                        {Array.from(Array(ticks + 2)).map((_, i) => {
+                            const value = Mathf.lerp(
+                                min,
+                                max,
+                                vertical ? 1.0 - i / (ticks + 1) : i / (ticks + 1)
+                            );
+                            return (
+                                <div
+                                    className={`flex items-center ${vertical ? "" : "flex-col"}`}
+                                    key={"slider_" + i}
+                                >
+                                    <span>{vertical ? "—" : "|"}</span>
+                                    <span>{Math.round(value)}</span>
+                                </div>
+                            );
+                        })}
+                    </div>
+                )}
+            </div>
         </div>
     );
 };

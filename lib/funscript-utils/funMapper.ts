@@ -40,7 +40,6 @@ const getAverageColor = (colors: ColorGroup[]) => {
  * @returns Three-element array of R, G and B color values (0-255)
  */
 export const getColor = (intensity: number): ColorGroup => {
-    //console.log(intensity);
     const stepSize = 120;
     if (intensity <= 0) return heatmapColors[0];
     if (intensity > 5 * stepSize) return heatmapColors[6];

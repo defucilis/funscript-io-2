@@ -3,6 +3,8 @@ import useInterval from "lib/hooks/useInterval";
 import Slider from "components/atoms/Slider";
 
 const RateLimitedSlider = ({
+    label,
+    valueUnit,
     className,
     value,
     min,
@@ -11,7 +13,10 @@ const RateLimitedSlider = ({
     onLimitedChange,
     disabled,
     vertical,
+    ticks,
 }: {
+    label?: string;
+    valueUnit?: string;
     className?: string;
     min: number;
     max: number;
@@ -20,6 +25,7 @@ const RateLimitedSlider = ({
     onLimitedChange?: (value: number) => void;
     disabled?: boolean;
     vertical?: boolean;
+    ticks?: number;
 }): JSX.Element => {
     const [lastSentValue, setLastSentValue] = useState<number>(-100000);
     const [active, setActive] = useState(false);
@@ -43,6 +49,8 @@ const RateLimitedSlider = ({
 
     return (
         <Slider
+            label={label}
+            valueUnit={valueUnit}
             className={className || ""}
             min={min}
             max={max}
@@ -52,6 +60,7 @@ const RateLimitedSlider = ({
             onStopEdit={stopEditing}
             disabled={disabled || false}
             vertical={vertical || false}
+            ticks={ticks}
         />
     );
 };

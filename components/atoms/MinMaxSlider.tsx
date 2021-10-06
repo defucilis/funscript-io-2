@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
+import Mathf from "lib/Mathf";
 
 const isMouseEvent = (
     e: MouseEvent | TouchEvent | React.MouseEvent | React.TouchEvent
@@ -12,6 +13,8 @@ const isTouchEvent = (
 };
 
 const MinMaxSlider = ({
+    label,
+    valueUnit,
     min,
     max,
     valueMin,
@@ -25,7 +28,10 @@ const MinMaxSlider = ({
     className,
     disabled,
     vertical,
+    ticks = 4,
 }: {
+    label?: string;
+    valueUnit?: string;
     min: number;
     max: number;
     valueMin: number;
@@ -39,6 +45,7 @@ const MinMaxSlider = ({
     className?: string;
     disabled?: boolean;
     vertical?: boolean;
+    ticks?: number;
 }): JSX.Element => {
     const trackDiv = useRef<HTMLDivElement>(null);
     const [draggingMin, setDraggingMin] = useState(false);
@@ -119,13 +126,17 @@ const MinMaxSlider = ({
         if (disabled) return;
 
         const val = getValFromPos(getPos(e));
-        if (Math.abs(val - valueMin) < Math.abs(val - valueMax)) {
+        const minDiff = Math.abs(val - valueMin);
+        const maxDiff = Math.abs(val - valueMax);
+        if (minDiff < maxDiff) {
             onChangeMin(val);
             setDraggingMin(true);
+            setDraggingMax(false);
             if (onStartEditMin && !disabled) onStartEditMin();
             dragMin(e);
         } else {
             onChangeMax(val);
+            setDraggingMin(false);
             setDraggingMax(true);
             if (onStartEditMax && !disabled) onStartEditMax();
             dragMax(e);
@@ -157,74 +168,110 @@ const MinMaxSlider = ({
     }, [draggingMin, draggingMax, trackDiv]);
 
     return (
-        <div
-            className={`relative select-none grid place-items-center ${
-                vertical ? "h-full w-6" : "h-6 w-full"
-            } ${className || ""}`}
-        >
+        <div className={`flex flex-col select-none  ${vertical ? "h-full" : "w-full"}`}>
+            {!vertical && (
+                <div className="flex justify-between text-sm">
+                    {label ? <p>{label}</p> : <div />}
+                    <p>
+                        {Math.round(valueMin)}
+                        {valueUnit || ""} - {Math.round(valueMax)}
+                        {valueUnit || ""}
+                    </p>
+                </div>
+            )}
             <div
-                ref={trackDiv}
-                className={`bg-neutral-500 rounded cursor-pointer ${
-                    vertical ? "h-full w-2" : "h-2 w-full"
-                }`}
-                style={{
-                    backgroundImage: `linear-gradient(${
-                        vertical ? "to top" : "to right"
-                    }, rgba(0,0,0,0) ${getPercentage(valueMin, true)}%, ${
-                        disabled ? "rgb(200,200,200)" : "rgb(244,63,94)"
-                    } ${getPercentage(valueMin, true)}% ${getPercentage(
-                        valueMax,
-                        true
-                    )}%, rgba(0,0,0,0) ${getPercentage(valueMax, true)}%)`,
-                }}
-                onMouseDown={handleMouseClicked}
-            />
-            <div
-                className={`absolute rounded-full h-6 w-6 cursor-pointer shadow-md border-2 ${
-                    disabled
-                        ? "bg-neutral-500 border-neutral-900"
-                        : "bg-primary-500 border-primary-900"
-                }`}
-                style={{
-                    left: vertical
-                        ? undefined
-                        : `calc(${(valueMin - min) / (max - min)} * (100% - 1.5rem))`,
-                    bottom: vertical
-                        ? `calc(${(valueMin - min) / (max - min)} * (100% - 1.5rem))`
-                        : undefined,
-                }}
-                onMouseDown={() => {
-                    setDraggingMin(true && !disabled);
-                    if (onStartEditMin && !disabled) onStartEditMin();
-                }}
-                onTouchStart={() => {
-                    setDraggingMin(true && !disabled);
-                    if (onStartEditMin && !disabled) onStartEditMin();
-                }}
-            />
-            <div
-                className={`absolute rounded-full h-6 w-6 cursor-pointer shadow-md border-2 ${
-                    disabled
-                        ? "bg-neutral-500 border-neutral-900"
-                        : "bg-primary-500 border-primary-900"
-                }`}
-                style={{
-                    left: vertical
-                        ? undefined
-                        : `calc(${(valueMax - min) / (max - min)} * (100% - 1.5rem))`,
-                    bottom: vertical
-                        ? `calc(${(valueMax - min) / (max - min)} * (100% - 1.5rem))`
-                        : undefined,
-                }}
-                onMouseDown={() => {
-                    setDraggingMax(true && !disabled);
-                    if (onStartEditMax && !disabled) onStartEditMax();
-                }}
-                onTouchStart={() => {
-                    setDraggingMax(true && !disabled);
-                    if (onStartEditMax && !disabled) onStartEditMax();
-                }}
-            />
+                className={`relative select-none grid place-items-center ${
+                    vertical ? "h-full w-6" : "h-6 w-full"
+                } ${ticks && ticks > 0 ? (vertical ? "mr-4" : "mb-4") : ""} ${className || ""}`}
+            >
+                <div
+                    ref={trackDiv}
+                    className={`relative z-10 bg-neutral-500 rounded cursor-pointer ${
+                        vertical ? "h-full w-2" : "h-2 w-full"
+                    }`}
+                    style={{
+                        backgroundImage: `linear-gradient(${
+                            vertical ? "to top" : "to right"
+                        }, rgba(0,0,0,0) ${getPercentage(valueMin, true)}%, ${
+                            disabled ? "rgb(200,200,200)" : "rgb(244,63,94)"
+                        } ${getPercentage(valueMin, true)}% ${getPercentage(
+                            valueMax,
+                            true
+                        )}%, rgba(0,0,0,0) ${getPercentage(valueMax, true)}%)`,
+                    }}
+                    onMouseDown={handleMouseClicked}
+                />
+                <div
+                    className={`absolute z-10 rounded-full h-6 w-6 cursor-pointer shadow-md border-2 ${
+                        disabled
+                            ? "bg-neutral-500 border-neutral-900"
+                            : "bg-primary-500 border-primary-900"
+                    }`}
+                    style={{
+                        left: vertical
+                            ? undefined
+                            : `calc(${(valueMin - min) / (max - min)} * (100% - 1.5rem))`,
+                        bottom: vertical
+                            ? `calc(${(valueMin - min) / (max - min)} * (100% - 1.5rem))`
+                            : undefined,
+                    }}
+                    onMouseDown={() => {
+                        setDraggingMin(true && !disabled);
+                        if (onStartEditMin && !disabled) onStartEditMin();
+                    }}
+                    onTouchStart={() => {
+                        setDraggingMin(true && !disabled);
+                        if (onStartEditMin && !disabled) onStartEditMin();
+                    }}
+                />
+                <div
+                    className={`absolute z-10 rounded-full h-6 w-6 cursor-pointer shadow-md border-2 ${
+                        disabled
+                            ? "bg-neutral-500 border-neutral-900"
+                            : "bg-primary-500 border-primary-900"
+                    }`}
+                    style={{
+                        left: vertical
+                            ? undefined
+                            : `calc(${(valueMax - min) / (max - min)} * (100% - 1.5rem))`,
+                        bottom: vertical
+                            ? `calc(${(valueMax - min) / (max - min)} * (100% - 1.5rem))`
+                            : undefined,
+                    }}
+                    onMouseDown={() => {
+                        setDraggingMax(true && !disabled);
+                        if (onStartEditMax && !disabled) onStartEditMax();
+                    }}
+                    onTouchStart={() => {
+                        setDraggingMax(true && !disabled);
+                        if (onStartEditMax && !disabled) onStartEditMax();
+                    }}
+                />
+                {ticks && ticks > 0 && (
+                    <div
+                        className={`absolute w-full h-full left-0 bottom-0.5 flex justify-between z-0 text-neutral-500 ${
+                            vertical ? "flex-col pl-1" : "pl-2"
+                        }`}
+                    >
+                        {Array.from(Array(ticks + 2)).map((_, i) => {
+                            const value = Mathf.lerp(
+                                min,
+                                max,
+                                vertical ? 1.0 - i / (ticks + 1) : i / (ticks + 1)
+                            );
+                            return (
+                                <div
+                                    className={`flex items-center ${vertical ? "" : "flex-col"}`}
+                                    key={"slider_" + i}
+                                >
+                                    <span>{vertical ? "—" : "|"}</span>
+                                    <span>{Math.round(value)}</span>
+                                </div>
+                            );
+                        })}
+                    </div>
+                )}
+            </div>
         </div>
     );
 };

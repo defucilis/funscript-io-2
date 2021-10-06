@@ -7,11 +7,13 @@ import AppManual from "components/apps/AppManual";
 import AppRandom from "components/apps/AppRandom";
 import AppCycler from "components/apps/AppCycler";
 import AppModify from "components/apps/AppModify";
+import AppCreate from "components/apps/AppCreate";
+import AppPlay from "components/apps/AppPlay";
 
 const GetApp = (app: string, handy: Handy) => {
     switch (app) {
-        // case "play":
-        //     return <MdOndemandVideo className={iconClassName} />;
+        case "play":
+            return <AppPlay handy={handy} />;
         case "manual":
             return <AppManual handy={handy} />;
         case "random":
@@ -20,8 +22,8 @@ const GetApp = (app: string, handy: Handy) => {
             return <AppCycler handy={handy} />;
         case "modify":
             return <AppModify />;
-        // case "create":
-        //     return <MdTimeline className={iconClassName} />;
+        case "create":
+            return <AppCreate />;
         case "debug":
             return <AppDebug handy={handy} />;
     }

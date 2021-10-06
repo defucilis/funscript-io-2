@@ -16,7 +16,7 @@ import {
     MdShuffle,
     MdRepeat,
 } from "react-icons/md";
-import EroScriptsIcon from "./EroScriptsIcon";
+import EroScriptsIcon from "../atoms/EroScriptsIcon";
 
 const GetIcon = (path: string): JSX.Element => {
     const iconClassName = "text-white text-3xl";

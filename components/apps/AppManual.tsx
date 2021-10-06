@@ -1,17 +1,8 @@
-import { useEffect, useState } from "react";
-import {
-    MdKeyboardArrowDown,
-    MdKeyboardArrowLeft,
-    MdKeyboardArrowRight,
-    MdKeyboardArrowUp,
-    MdPause,
-    MdPlayArrow,
-} from "react-icons/md";
+import React, { useEffect, useState } from "react";
 import Handy from "lib/thehandy";
 import { HampState, HandyMode } from "lib/thehandy/types";
 import RateLimitedSlider from "components/molecules/RateLimitedSlider";
-import RateLimitedMinMaxSlider from "components/molecules/RateLimitedMinMaxSlider";
-import IconButton from "components/atoms/IconButton";
+import ManualControls from "./manual/ManualControls";
 
 enum SlideIntervalMode {
     min = 0,
@@ -174,120 +165,42 @@ const AppManual = ({ handy }: { handy: Handy }): JSX.Element => {
     };
 
     return (
-        <div className="flex min-h-mobilemain md:min-h-main flex-col md:flex-row justify-between -mt-4 pb-5 pt-5">
-            <div>
-                <div className="flex w-full h-60 justify-center gap-5">
-                    <div className="grid grid-rows-3 grid-cols-3 w-60 gap-4 text-4xl text-neutral-900">
-                        <div className="col-start-2 row-start-1 grid place-items-center">
-                            <IconButton
-                                disabled={loading}
-                                onClick={() => tryIncrementSlide(1)}
-                                className={`${loading ? "bg-neutral-400" : "bg-primary-400"}`}
-                            >
-                                <MdKeyboardArrowUp />
-                            </IconButton>
-                            <span className="text-white text-sm">Slide +</span>
-                        </div>
-                        <div className="col-start-1 row-start-2 grid place-items-center">
-                            <IconButton
-                                disabled={loading}
-                                onClick={() => tryIncrementHampVelocity(-1)}
-                                className={`${loading ? "bg-neutral-400" : "bg-primary-400"}`}
-                            >
-                                <MdKeyboardArrowLeft />
-                            </IconButton>
-                            <span className="text-white text-sm">Speed -</span>
-                        </div>
-                        <div className="col-start-2 row-start-2 grid place-items-center">
-                            <IconButton
-                                disabled={loading}
-                                onClick={() => tryTogglePlay()}
-                                className={`${loading ? "bg-neutral-400" : "bg-primary-400"}`}
-                            >
-                                {hampRunning ? <MdPause /> : <MdPlayArrow />}
-                            </IconButton>
-                            <span className="text-white text-sm">
-                                {hampRunning ? "Stop" : "Start"}
-                            </span>
-                        </div>
-                        <div className="col-start-3 row-start-2 grid place-items-center">
-                            <IconButton
-                                disabled={loading}
-                                onClick={() => tryIncrementHampVelocity(1)}
-                                className={`${loading ? "bg-neutral-400" : "bg-primary-400"}`}
-                            >
-                                <MdKeyboardArrowRight />
-                            </IconButton>
-                            <span className="text-white text-sm">Speed +</span>
-                        </div>
-                        <div className="col-start-2 row-start-3 grid place-items-center">
-                            <IconButton
-                                disabled={loading}
-                                onClick={() => tryIncrementSlide(-1)}
-                                className={`${loading ? "bg-neutral-400" : "bg-primary-400"}`}
-                            >
-                                <MdKeyboardArrowDown />
-                            </IconButton>
-                            <span className="text-white text-sm">Slide -</span>
-                        </div>
-                    </div>
-                    <div className="h-full flex flex-col items-center w-20">
-                        <label className="text-sm text-white mb-0">Slide</label>
-                        <div className="h-full">
-                            <RateLimitedMinMaxSlider
-                                min={0}
-                                max={100}
-                                valueMin={slideMin}
-                                valueMax={slideMax}
-                                onChangeMin={setSlideMin}
-                                onChangeMax={setSlideMax}
-                                onLimitedChangeMin={trySetSlideMin}
-                                onLimitedChangeMax={trySetSlideMax}
-                                vertical={true}
-                            />
-                        </div>
-                    </div>
-                </div>
-                <div className="flex justify-center">
-                    <div className="flex flex-col w-72">
-                        <div className="flex justify-between w-full">
-                            <label className="text-sm text-white mb-0">Speed</label>
-                        </div>
-                        <RateLimitedSlider
-                            min={0}
-                            max={100}
-                            value={hampVelocity}
-                            onChange={setHampVelocity}
-                            onLimitedChange={trySetHampVelocity}
-                        />
-                    </div>
-                </div>
-            </div>
-            <div className="flex flex-col gap-2 md:flex-grow md:h-72 md:justify-center w-full">
-                <div className="flex flex-col mt-4">
-                    <div className="flex justify-between">
-                        <label className="text-sm text-white mb-0">Speed Interval</label>
-                        <span>{Math.round(velocityInterval)}%</span>
-                    </div>
-                    <RateLimitedSlider
-                        min={0}
-                        max={100}
-                        value={velocityInterval}
-                        onChange={setVelocityInterval}
-                    />
-                </div>
-                <div className="flex flex-col">
-                    <div className="flex justify-between">
-                        <label className="text-sm text-white mb-0">Slide Interval</label>
-                        <span>{Math.round(slideInterval)}%</span>
-                    </div>
-                    <RateLimitedSlider
-                        min={0}
-                        max={100}
-                        value={slideInterval}
-                        onChange={setSlideInterval}
-                    />
-                </div>
+        <div className="flex min-h-mobilemain md:min-h-main flex-col -mt-4 pb-5 pt-5 justify-between">
+            <ManualControls
+                loading={loading}
+                running={hampRunning}
+                onButtonUp={() => tryIncrementSlide(1)}
+                onButtonDown={() => tryIncrementSlide(-1)}
+                onButtonLeft={() => tryIncrementHampVelocity(-1)}
+                onButtonRight={() => tryIncrementHampVelocity(1)}
+                onButtonCenter={() => tryTogglePlay()}
+                slideVerticalMin={slideMin}
+                onSlideVerticalMin={setSlideMin}
+                onLimitedSlideVerticalMin={trySetSlideMin}
+                slideVerticalMax={slideMax}
+                onSlideVerticalMax={setSlideMax}
+                onLimitedSlideVerticalMax={trySetSlideMax}
+                slideHorizontal={hampVelocity}
+                onSlideHorizontal={setHampVelocity}
+                onLimitedSlideHorizontal={trySetHampVelocity}
+            />
+            <div className="flex flex-col gap-2 w-full">
+                <RateLimitedSlider
+                    label="Speed Interval"
+                    valueUnit="%"
+                    min={0}
+                    max={100}
+                    value={velocityInterval}
+                    onChange={setVelocityInterval}
+                />
+                <RateLimitedSlider
+                    label="Slide Interval"
+                    valueUnit="%"
+                    min={0}
+                    max={100}
+                    value={slideInterval}
+                    onChange={setSlideInterval}
+                />
                 <div className="flex flex-col">
                     <div className="flex justify-between">
                         <label className="text-sm text-white mb-0">Slide Interval Mode</label>

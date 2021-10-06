@@ -171,69 +171,47 @@ const AppRandom = ({ handy }: { handy: Handy }): JSX.Element => {
     return (
         <div className="flex min-h-mobilemain md:min-h-main flex-col -mt-4 pb-5 pt-5 justify-between">
             <div className="flex flex-col gap-4">
-                <div>
-                    <div className="flex justify-between w-full">
-                        <label className="text-sm text-white mb-0">Random Interval</label>
-                        <p>
-                            {Math.round(randomInterval.min)}s to {Math.round(randomInterval.max)}s
-                        </p>
-                    </div>
-                    <RateLimitedMinMaxSlider
-                        min={2}
-                        max={30}
-                        valueMin={randomInterval.min}
-                        valueMax={randomInterval.max}
-                        onChangeMin={val => setRandomInterval(cur => ({ ...cur, min: val }))}
-                        onChangeMax={val => setRandomInterval(cur => ({ ...cur, max: val }))}
-                    />
-                </div>
-                <div>
-                    <div className="flex justify-between w-full">
-                        <label className="text-sm text-white mb-0">Speed Range</label>
-                        <p>
-                            {Math.round(randomSpeed.min)}% to {Math.round(randomSpeed.max)}%
-                        </p>
-                    </div>
-                    <RateLimitedMinMaxSlider
-                        min={0}
-                        max={100}
-                        valueMin={randomSpeed.min}
-                        valueMax={randomSpeed.max}
-                        onChangeMin={val => setRandomSpeed(cur => ({ ...cur, min: val }))}
-                        onChangeMax={val => setRandomSpeed(cur => ({ ...cur, max: val }))}
-                    />
-                </div>
-                <div>
-                    <div className="flex justify-between w-full">
-                        <label className="text-sm text-white mb-0">Stroke Min Range</label>
-                        <p>
-                            {Math.round(randomSlide.min)}% to {Math.round(randomSlide.max)}% of
-                            Stroke Max
-                        </p>
-                    </div>
-                    <RateLimitedMinMaxSlider
-                        min={0}
-                        max={100}
-                        valueMin={randomSlide.min}
-                        valueMax={randomSlide.max}
-                        onChangeMin={val => setRandomSlide(cur => ({ ...cur, min: val }))}
-                        onChangeMax={val => setRandomSlide(cur => ({ ...cur, max: val }))}
-                    />
-                </div>
-                <div>
-                    <div className="flex justify-between w-full">
-                        <label className="text-sm text-white mb-0">Stroke Max</label>
-                        <p>{Math.round(slideMax)}%</p>
-                    </div>
-                    <RateLimitedSlider
-                        min={0}
-                        max={100}
-                        value={slideMax}
-                        disabled={loading}
-                        onChange={setSlideMax}
-                        onLimitedChange={trySetSlideMax}
-                    />
-                </div>
+                <RateLimitedMinMaxSlider
+                    label="Random Interval"
+                    valueUnit="s"
+                    min={2}
+                    max={22}
+                    valueMin={randomInterval.min}
+                    valueMax={randomInterval.max}
+                    onChangeMin={val => setRandomInterval(cur => ({ ...cur, min: val }))}
+                    onChangeMax={val => setRandomInterval(cur => ({ ...cur, max: val }))}
+                    ticks={9}
+                />
+                <RateLimitedMinMaxSlider
+                    label="Speed Range"
+                    valueUnit="%"
+                    min={0}
+                    max={100}
+                    valueMin={randomSpeed.min}
+                    valueMax={randomSpeed.max}
+                    onChangeMin={val => setRandomSpeed(cur => ({ ...cur, min: val }))}
+                    onChangeMax={val => setRandomSpeed(cur => ({ ...cur, max: val }))}
+                />
+                <RateLimitedMinMaxSlider
+                    label="Stroke Min Range"
+                    valueUnit="%"
+                    min={0}
+                    max={100}
+                    valueMin={randomSlide.min}
+                    valueMax={randomSlide.max}
+                    onChangeMin={val => setRandomSlide(cur => ({ ...cur, min: val }))}
+                    onChangeMax={val => setRandomSlide(cur => ({ ...cur, max: val }))}
+                />
+                <RateLimitedSlider
+                    label="Stroke Max"
+                    valueUnit="%"
+                    min={0}
+                    max={100}
+                    value={slideMax}
+                    disabled={loading}
+                    onChange={setSlideMax}
+                    onLimitedChange={trySetSlideMax}
+                />
                 {error && (
                     <p className="text-neutral-900 bg-red-500 rounded font-bold text-sm w-full grid place-items-center p-2 my-2 text-center">
                         {error}

@@ -70,7 +70,7 @@ const AppCycler = ({ handy }: { handy: Handy }): JSX.Element => {
         (runTime: number, deltaTime: number) => {
             if (!hampRunning) {
                 setNextCommandTime(cur => cur + deltaTime);
-                setCurrentTime(0);
+                setCurrentTime(Math.random() * 0.01);
                 return;
             }
 
@@ -94,7 +94,11 @@ const AppCycler = ({ handy }: { handy: Handy }): JSX.Element => {
     );
 
     useEffect(() => {
+        if (!canvasContainer.current) return;
         if (!previewCanvas.current) return;
+        previewCanvas.current.width = canvasContainer.current.clientWidth;
+        previewCanvas.current.height = canvasContainer.current.clientHeight;
+
         const ctx = previewCanvas.current.getContext("2d");
         if (!ctx) return;
 
@@ -138,7 +142,7 @@ const AppCycler = ({ handy }: { handy: Handy }): JSX.Element => {
         ctx.beginPath();
         ctx.ellipse(mapX(0), actualValue, 10, 10, 0, 0, Math.PI * 2.0);
         ctx.fill();
-    }, [previewCanvas, getValue, currentTime, speedBounds]);
+    }, [canvasContainer, previewCanvas, getValue, currentTime, speedBounds]);
 
     const [error, setError] = useState("");
 
@@ -239,59 +243,50 @@ const AppCycler = ({ handy }: { handy: Handy }): JSX.Element => {
     return (
         <div className="flex min-h-mobilemain md:min-h-main flex-col -mt-4 pb-5 pt-5 justify-between">
             <div className="flex flex-col gap-4">
-                <div>
-                    <div className="flex justify-between w-full">
-                        <label className="text-sm text-white mb-0">Speed Bounds</label>
-                        <p>
-                            {Math.round(speedBounds.min)}% to {Math.round(speedBounds.max)}%
-                        </p>
-                    </div>
-                    <MinMaxSlider
-                        min={0}
-                        max={100}
-                        valueMin={speedBounds.min}
-                        valueMax={speedBounds.max}
-                        onChangeMin={val => setSpeedBounds(cur => ({ ...cur, min: val }))}
-                        onChangeMax={val => setSpeedBounds(cur => ({ ...cur, max: val }))}
-                    />
-                </div>
-                <div>
-                    <div className="flex justify-between w-full">
-                        <label className="text-sm text-white mb-0">Cycle Duration</label>
-                        <p>{Math.round(cycleDuration)}s</p>
-                    </div>
-                    <Slider min={10} max={240} value={cycleDuration} onChange={setCycleDuration} />
-                </div>
-                <div>
-                    <div className="flex justify-between w-full">
-                        <label className="text-sm text-white mb-0">Session Duration</label>
-                        <p>
-                            {sessionDuration === 0
-                                ? "Unlimited"
-                                : Math.round(sessionDuration) + " min"}
-                        </p>
-                    </div>
-                    <Slider
-                        min={0}
-                        max={240}
-                        value={sessionDuration}
-                        onChange={setSessionDuration}
-                    />
-                </div>
-                <div>
-                    <div className="flex justify-between w-full">
-                        <label className="text-sm text-white mb-0">Handy Update Interval</label>
-                        <p>{Math.round(setInterval * 10) / 10}s</p>
-                    </div>
-                    <Slider min={0.5} max={5} value={setInterval} onChange={setSetInterval} />
-                </div>
-                <div>
-                    <div className="flex justify-between w-full">
-                        <label className="text-sm text-white mb-0">Easet In/Out Balance</label>
-                        <p>{Math.round(easeInLength)}%</p>
-                    </div>
-                    <Slider min={0} max={100} value={easeInLength} onChange={setEaseInLength} />
-                </div>
+                <MinMaxSlider
+                    label="Speed Bounds"
+                    valueUnit="%"
+                    min={0}
+                    max={100}
+                    valueMin={speedBounds.min}
+                    valueMax={speedBounds.max}
+                    onChangeMin={val => setSpeedBounds(cur => ({ ...cur, min: val }))}
+                    onChangeMax={val => setSpeedBounds(cur => ({ ...cur, max: val }))}
+                />
+                <Slider
+                    label="Cycle Duration"
+                    valueUnit="s"
+                    min={10}
+                    max={240}
+                    value={cycleDuration}
+                    onChange={setCycleDuration}
+                />
+                <Slider
+                    label="Session Duration"
+                    valueUnit=" min"
+                    zeroValue="Unlimited"
+                    min={0}
+                    max={240}
+                    value={sessionDuration}
+                    onChange={setSessionDuration}
+                />
+                <Slider
+                    label="Handy Update Interval"
+                    valueUnit="s"
+                    min={0.5}
+                    max={5}
+                    value={setInterval}
+                    onChange={setSetInterval}
+                />
+                <Slider
+                    label="Ease In/Out Balance"
+                    valueUnit="%"
+                    min={0}
+                    max={100}
+                    value={easeInLength}
+                    onChange={setEaseInLength}
+                />
+
                 <div className="flex flex-col items-center">
                     <IconButton
                         disabled={loading}
@@ -302,25 +297,19 @@ const AppCycler = ({ handy }: { handy: Handy }): JSX.Element => {
                     </IconButton>
                     <span className="text-sm">{hampRunning ? "Stop" : "Start"}</span>
                 </div>
-                <div>
-                    <div className="flex justify-between w-full">
-                        <label className="text-sm text-white mb-0">Stroke Range</label>
-                        <p>
-                            {Math.round(slideMin)}% - {Math.round(slideMax)}%
-                        </p>
-                    </div>
-                    <RateLimitedMinMaxSlider
-                        min={0}
-                        max={100}
-                        valueMin={slideMin}
-                        valueMax={slideMax}
-                        onChangeMin={setSlideMin}
-                        onChangeMax={setSlideMax}
-                        onLimitedChangeMin={trySetSlideMin}
-                        onLimitedChangeMax={trySetSlideMax}
-                        disabled={loading}
-                    />
-                </div>
+                <RateLimitedMinMaxSlider
+                    label="Stroke Range"
+                    valueUnit="%"
+                    min={0}
+                    max={100}
+                    valueMin={slideMin}
+                    valueMax={slideMax}
+                    onChangeMin={setSlideMin}
+                    onChangeMax={setSlideMax}
+                    onLimitedChangeMin={trySetSlideMin}
+                    onLimitedChangeMax={trySetSlideMax}
+                    disabled={loading}
+                />
                 {error && (
                     <p className="text-neutral-900 bg-red-500 rounded font-bold text-sm w-full grid place-items-center p-2 my-2 text-center">
                         {error}
@@ -329,13 +318,11 @@ const AppCycler = ({ handy }: { handy: Handy }): JSX.Element => {
             </div>
             <div className="flex justify-around items-center h-72 w-full border-t pt-4 mt-5">
                 <div className="w-full h-full" ref={canvasContainer}>
-                    {canvasContainer.current && (
-                        <canvas
-                            width={canvasContainer.current.clientWidth}
-                            height={canvasContainer.current.clientHeight}
-                            ref={previewCanvas}
-                        />
-                    )}
+                    <canvas
+                        width={canvasContainer.current?.clientWidth || 100}
+                        height={canvasContainer.current?.clientHeight || 100}
+                        ref={previewCanvas}
+                    />
                 </div>
             </div>
         </div>

@@ -91,7 +91,7 @@ const AppDebug = ({ handy }: { handy: Handy }): JSX.Element => {
             />
             <div className="h-96">
                 <Slider value={temp} min={0} max={100} onChange={setTemp} vertical={true} />
-                <MinMaxSlider
+                {/* <MinMaxSlider
                     valueMin={tempMin}
                     valueMax={tempMax}
                     min={0}
@@ -99,7 +99,7 @@ const AppDebug = ({ handy }: { handy: Handy }): JSX.Element => {
                     onChangeMin={setTempMin}
                     onChangeMax={setTempMax}
                     vertical={true}
-                />
+                /> */}
             </div>
             <pre className="text-white text-sm">{JSON.stringify(handy, null, 2)}</pre>
         </div>
