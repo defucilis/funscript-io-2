@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from "react";
-import Handy from "lib/thehandy";
+import React, { useCallback, useEffect, useState } from "react";
 import { HampState, HandyMode } from "lib/thehandy/types";
 import RateLimitedSlider from "components/molecules/RateLimitedSlider";
+import useHandy from "lib/thehandy-react";
 import ManualControls from "./manual/ManualControls";
 
 enum SlideIntervalMode {
@@ -10,9 +10,22 @@ enum SlideIntervalMode {
     offset = 2,
 }
 
-const AppManual = ({ handy }: { handy: Handy }): JSX.Element => {
-    const [loading, setLoading] = useState(false);
-    const [hampRunning, setHampRunning] = useState(false);
+const AppManual = (): JSX.Element => {
+    const {
+        loading,
+        error,
+        getSlideSettings,
+        getHampVelocity,
+        sendHampVelocity,
+        sendSlideMin,
+        sendSlideMax,
+        sendSlideSettings,
+        sendMode,
+        sendHampState,
+        handyState,
+    } = useHandy();
+
+    const [initialized, setInitialized] = useState(false);
     const [hampVelocity, setHampVelocity] = useState(0);
     const [slideMin, setSlideMin] = useState(0);
     const [slideMax, setSlideMax] = useState(100);
@@ -20,155 +33,89 @@ const AppManual = ({ handy }: { handy: Handy }): JSX.Element => {
     const [slideInterval, setSlideInterval] = useState(10);
     const [slideIntervalMode, setSlideIntervalMode] = useState(SlideIntervalMode.min);
 
-    const [error, setError] = useState("");
-
     useEffect(() => {
         const initialization = async () => {
-            try {
-                setLoading(true);
-                await handy.setMode(HandyMode.hamp);
-                setHampVelocity(await handy.getHampVelocity());
-                const slideSettings = await handy.getSlideSettings();
+            setInitialized(true);
+            if (handyState.currentMode !== HandyMode.hamp) {
+                await sendHampState(HampState.stopped);
+                const slideSettings = await getSlideSettings();
+                const hampVelocity = await getHampVelocity();
                 setSlideMin(slideSettings.min);
                 setSlideMax(slideSettings.max);
-                setHampRunning((await handy.getStatus()).state === HampState.moving);
-                setLoading(false);
-            } catch (error: any) {
-                setError(error.message);
+                setHampVelocity(hampVelocity);
+            } else {
+                setSlideMin(handyState.slideMin);
+                setSlideMax(handyState.slideMax);
+                setHampVelocity(handyState.hampVelocity);
             }
         };
 
-        initialization();
-    }, [handy]);
+        if (!initialized) initialization();
+    }, [
+        sendMode,
+        sendHampState,
+        handyState.currentMode,
+        handyState.slideMin,
+        handyState.slideMax,
+        handyState.hampVelocity,
+        initialized,
+        getSlideSettings,
+        getHampVelocity,
+    ]);
 
-    const trySetHampVelocity = (value: number, fromSlider = true): void => {
-        setError("");
-        if (!fromSlider) setLoading(true);
-        handy
-            .setHampVelocity(value)
-            .then(() => {
-                if (fromSlider) return;
-                setLoading(false);
-                setHampVelocity(handy.hampVelocity);
-            })
-            .catch(err => {
-                setError(err.message);
-                setLoading(false);
-            });
-    };
-
-    const trySetSlideMin = (value: number, fromSlider = true): void => {
-        setError("");
-        if (!fromSlider) setLoading(true);
-        handy
-            .setSlideMin(value)
-            .then(() => {
-                if (fromSlider) return;
-                setLoading(false);
-                setSlideMin(handy.slideMin);
-            })
-            .catch(err => {
-                setError(err.message);
-                setLoading(false);
-            });
-    };
-
-    const trySetSlideMax = (value: number, fromSlider = true): void => {
-        setError("");
-        if (!fromSlider) setLoading(true);
-        handy
-            .setSlideMax(value)
-            .then(() => {
-                if (fromSlider) return;
-                setLoading(false);
-                setSlideMax(handy.slideMax);
-            })
-            .catch(err => {
-                setError(err.message);
-                setLoading(false);
-            });
-    };
-
-    const trySetSlide = (min: number, max: number, fromSlider = true): void => {
-        setError("");
-        if (!fromSlider) setLoading(true);
-        handy
-            .setSlideSettings(min, max)
-            .then(() => {
-                if (fromSlider) return;
-                setLoading(false);
-                setSlideMin(handy.slideMin);
-                setSlideMax(handy.slideMax);
-            })
-            .catch(err => {
-                setError(err.message);
-                setLoading(false);
-            });
-    };
-
-    const tryIncrementHampVelocity = (increment: -1 | 1): void => {
-        setError("");
-        const newVelocity = Math.round(
-            Math.min(100, Math.max(0, hampVelocity + increment * velocityInterval))
-        );
-        if (newVelocity === hampVelocity) return;
-        trySetHampVelocity(newVelocity, false);
-    };
-
-    const tryIncrementSlide = (increment: -1 | 1): void => {
-        setError("");
-        if (slideIntervalMode === SlideIntervalMode.min) {
-            const newMin = Math.round(
-                Math.min(slideMax, Math.max(0, slideMin + increment * slideInterval))
+    const tryIncrementHampVelocity = useCallback(
+        (increment: -1 | 1): void => {
+            const newVelocity = Math.round(
+                Math.min(100, Math.max(0, hampVelocity + increment * velocityInterval))
             );
-            if (newMin === slideMin) return;
-            trySetSlideMin(newMin, false);
-        } else if (slideIntervalMode === SlideIntervalMode.max) {
-            const newMax = Math.round(
-                Math.min(100, Math.max(0, slideMax + increment * slideInterval))
-            );
-            if (newMax === slideMax) return;
-            trySetSlideMax(newMax, false);
-        } else if (slideIntervalMode === SlideIntervalMode.offset) {
-            const newMin = Math.round(slideMin + increment * slideInterval);
-            const newMax = Math.round(slideMax + increment * slideInterval);
-            if (newMin < 0 || newMin > 100 || newMax < 0 || newMax > 100) return;
-            trySetSlide(newMin, newMax, false);
+            if (newVelocity === hampVelocity) return;
+            setHampVelocity(newVelocity);
+            sendHampVelocity(newVelocity);
+        },
+        [sendHampVelocity, hampVelocity]
+    );
+
+    const tryIncrementSlide = useCallback(
+        (increment: -1 | 1): void => {
+            if (slideIntervalMode === SlideIntervalMode.min) {
+                const newMin = Math.round(
+                    Math.min(slideMax, Math.max(0, slideMin + increment * slideInterval))
+                );
+                if (newMin === slideMin) return;
+                setSlideMin(newMin);
+                sendSlideMin(newMin);
+            } else if (slideIntervalMode === SlideIntervalMode.max) {
+                const newMax = Math.round(
+                    Math.min(100, Math.max(0, slideMax + increment * slideInterval))
+                );
+                if (newMax === slideMax) return;
+                setSlideMax(newMax);
+                sendSlideMax(newMax);
+            } else if (slideIntervalMode === SlideIntervalMode.offset) {
+                const newMin = Math.round(slideMin + increment * slideInterval);
+                const newMax = Math.round(slideMax + increment * slideInterval);
+                if (newMin < 0 || newMin > 100 || newMax < 0 || newMax > 100) return;
+                setSlideMin(newMin);
+                setSlideMax(newMax);
+                sendSlideSettings(newMin, newMax);
+            }
+        },
+        [sendSlideMin, sendSlideMax, sendSlideSettings, slideMin, slideMax, slideIntervalMode]
+    );
+
+    const tryTogglePlay = useCallback(() => {
+        if (handyState.hampState === HampState.stopped) {
+            sendHampState(HampState.moving);
+        } else {
+            sendHampState(HampState.stopped);
         }
-    };
-
-    const tryTogglePlay = () => {
-        setError("");
-        setLoading(true);
-        if (hampRunning)
-            handy
-                .setHampStop()
-                .then(() => {
-                    setHampRunning(false);
-                    setLoading(false);
-                })
-                .catch(err => {
-                    setError(err.message);
-                    setLoading(false);
-                });
-        else
-            handy
-                .setHampStart()
-                .then(() => {
-                    setHampRunning(true);
-                    setLoading(false);
-                })
-                .catch(err => {
-                    setError(err.message);
-                    setLoading(false);
-                });
-    };
+    }, [handyState.hampState, sendHampState]);
 
     return (
         <div className="flex min-h-mobilemain md:min-h-main flex-col -mt-4 pb-5 pt-5 justify-between">
             <ManualControls
                 loading={loading}
-                running={hampRunning}
+                running={handyState.hampState === HampState.moving}
                 onButtonUp={() => tryIncrementSlide(1)}
                 onButtonDown={() => tryIncrementSlide(-1)}
                 onButtonLeft={() => tryIncrementHampVelocity(-1)}
@@ -176,13 +123,13 @@ const AppManual = ({ handy }: { handy: Handy }): JSX.Element => {
                 onButtonCenter={() => tryTogglePlay()}
                 slideVerticalMin={slideMin}
                 onSlideVerticalMin={setSlideMin}
-                onLimitedSlideVerticalMin={trySetSlideMin}
+                onLimitedSlideVerticalMin={sendSlideMin}
                 slideVerticalMax={slideMax}
                 onSlideVerticalMax={setSlideMax}
-                onLimitedSlideVerticalMax={trySetSlideMax}
+                onLimitedSlideVerticalMax={sendSlideMax}
                 slideHorizontal={hampVelocity}
                 onSlideHorizontal={setHampVelocity}
-                onLimitedSlideHorizontal={trySetHampVelocity}
+                onLimitedSlideHorizontal={sendHampVelocity}
             />
             <div className="flex flex-col gap-2 w-full">
                 <RateLimitedSlider

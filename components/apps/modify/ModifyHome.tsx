@@ -42,7 +42,7 @@ const ModifyHome = ({
         <div
             className="relative w-full"
             style={{
-                left: active ? "0" : "-100%",
+                left: active ? "0" : "calc(-100% - 16px)",
                 transition: "all 0.5s",
             }}
         >

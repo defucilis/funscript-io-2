@@ -22,6 +22,8 @@ class Handy {
     /** If true, will log all HTTP requests to the console */
     verbose: boolean;
 
+    /** Whether the Handy is currecntly connected. Updated whenever a request succeeds (or fails), or when getConnected is called. */
+    connected = false;
     /** Hardware and Firmware info of the Handy. Undefined until you call getInfo */
     info: HandyInfo | undefined = undefined;
     /** Current mode of the Handy. Not guaranteed to be accurate as this may change from other sources than this API */
@@ -88,6 +90,7 @@ class Handy {
             "mode"
         );
         this.currentMode = json.mode;
+        this.connected = true;
         return json.mode;
     }
 
@@ -95,6 +98,7 @@ class Handy {
     async setMode(mode: HandyMode): Promise<SetModeResult> {
         const json: { result: SetModeResult } = await this.putJson("mode", { mode });
         this.currentMode = mode;
+        this.connected = true;
         return json.result;
     }
 
@@ -102,6 +106,7 @@ class Handy {
     async getConnected(): Promise<boolean> {
         try {
             const json = await this.getJson("connected");
+            this.connected = !!json.connected;
             return !!json.connected;
         } catch {
             return false;
@@ -111,6 +116,7 @@ class Handy {
     /** Returns information about the device; hardware version, firmware version, firmware status, firmware branch and device model. */
     async getInfo(): Promise<HandyInfo> {
         const json: HandyInfo = await this.getJson("info");
+        this.connected = true;
         return json;
     }
 
@@ -119,6 +125,7 @@ class Handy {
         const json: HandySettings = await this.getJson("settings");
         this.slideMin = json.slideMin;
         this.slideMax = json.slideMax;
+        this.connected = true;
         return json;
     }
 
@@ -137,6 +144,7 @@ class Handy {
                 this.hsspState = json.state;
                 break;
         }
+        this.connected = true;
         return json;
     }
 
@@ -146,19 +154,23 @@ class Handy {
 
     /** Starts HAMP movement - puts the Handy in HAMP mode first, if it isn't already in HAMP mode. */
     async setHampStart(): Promise<SetHampStateResult> {
+        console.log(HandyMode[this.currentMode]);
         if (this.currentMode !== HandyMode.hamp) await this.setMode(HandyMode.hamp);
         const json: { result: SetHampStateResult } = await this.putJson("hamp/start", {});
 
         this.hampState = HampState.moving;
+        this.connected = true;
         return json.result;
     }
 
     /** Stops HAMP movement - puts the Handy in HAMP mode first, if it isn't already in HAMP mode. */
     async setHampStop(): Promise<SetHampStateResult> {
+        console.log(HandyMode[this.currentMode]);
         if (this.currentMode !== HandyMode.hamp) await this.setMode(HandyMode.hamp);
         const json: { result: SetHampStateResult } = await this.putJson("hamp/stop", {});
         this.hampState = HampState.stopped;
 
+        this.connected = true;
         return json.result;
     }
 
@@ -168,6 +180,7 @@ class Handy {
         const json: { result: GenericResult; state: HampState } = await this.getJson("hamp/state");
 
         this.hampState = json.state;
+        this.connected = true;
         return json;
     }
 
@@ -180,6 +193,7 @@ class Handy {
         );
 
         this.hampVelocity = json.velocity;
+        this.connected = true;
         return json.velocity;
     }
 
@@ -192,6 +206,7 @@ class Handy {
         const json: { result: GenericResult } = await this.putJson("hamp/velocity", { velocity });
 
         this.hampVelocity = velocity;
+        this.connected = true;
         return json.result;
     }
 
@@ -218,6 +233,7 @@ class Handy {
         });
 
         this.hdspPosition = positionAbsolute / 110;
+        this.connected = true;
         return json.result;
     }
 
@@ -240,6 +256,7 @@ class Handy {
         });
 
         this.hdspPosition = positionPercentage;
+        this.connected = true;
         return json.result;
     }
 
@@ -262,6 +279,7 @@ class Handy {
         });
 
         this.hdspPosition = positionPercentage;
+        this.connected = true;
         return json.result;
     }
 
@@ -284,6 +302,7 @@ class Handy {
         });
 
         this.hdspPosition = positionAbsolute / 110;
+        this.connected = true;
         return json.result;
     }
 
@@ -306,6 +325,7 @@ class Handy {
         });
 
         this.hdspPosition = positionPercentage;
+        this.connected = true;
         return json.result;
     }
 
@@ -327,6 +347,7 @@ class Handy {
         });
 
         this.hsspState = HsspState.playing;
+        this.connected = true;
         return json.result;
     }
 
@@ -341,6 +362,7 @@ class Handy {
         const json: { result: GenericResult } = await this.putJson("hssp/stop", {});
 
         this.hsspState = HsspState.stopped;
+        this.connected = true;
         return json.result;
     }
 
@@ -357,6 +379,7 @@ class Handy {
         const json: { result: HsspSetupResult } = await this.putJson("hssp/setup", data);
 
         this.hsspPreparedUrl = url;
+        this.connected = true;
         return json.result;
     }
 
@@ -367,6 +390,7 @@ class Handy {
         const json: { result: GenericResult; activated: boolean } = await this.getJson("hssp/loop");
 
         this.hsspLoop = json.activated;
+        this.connected = true;
         return json.activated;
     }
 
@@ -379,6 +403,7 @@ class Handy {
         });
 
         this.hsspLoop = loop;
+        this.connected = true;
         return json.result;
     }
 
@@ -389,6 +414,7 @@ class Handy {
         const json: { result: GenericResult; state: HsspState } = await this.getJson("hssp/state");
 
         this.hsspState = json.state;
+        this.connected = true;
         return json.state;
     }
 
@@ -399,6 +425,7 @@ class Handy {
     async getHstpTime(): Promise<number> {
         const json: { result: GenericResult; time: number } = await this.getJson("hstp/time");
         this.hstpTime = json.time;
+        this.connected = true;
         return json.time;
     }
 
@@ -408,6 +435,7 @@ class Handy {
     async getHstpOffset(): Promise<number> {
         const json: { result: GenericResult; offset: number } = await this.getJson("hstp/time");
         this.hstpOffset = json.offset;
+        this.connected = true;
         return json.offset;
     }
 
@@ -419,6 +447,7 @@ class Handy {
             offset: offset,
         });
         this.hstpOffset = offset;
+        this.connected = true;
         return json.result;
     }
 
@@ -426,6 +455,7 @@ class Handy {
     async getHstpRtd(): Promise<number> {
         const json: { result: GenericResult; rtd: number } = await this.getJson("hstp/rtd");
         this.hstpRtd = json.rtd;
+        this.connected = true;
         return json.rtd;
     }
 
@@ -439,6 +469,7 @@ class Handy {
             body: formData,
         });
         const newUrl = await response.json();
+        this.connected = true;
         return newUrl;
     }
 
@@ -450,6 +481,7 @@ class Handy {
         const json: SlideInfo = await this.getJson("slide");
         this.slideMin = json.min;
         this.slideMax = json.max;
+        this.connected = true;
         return json;
     }
 
@@ -459,6 +491,7 @@ class Handy {
             "slide/position/absolute"
         );
         this.slidePositionAbsolute = json.position;
+        this.connected = true;
         return json.position;
     }
 
@@ -473,6 +506,7 @@ class Handy {
         const json = await this.putJson("slide", { min, max });
         this.slideMin = min;
         this.slideMax = max;
+        this.connected = true;
         return json.result;
     }
 
@@ -491,6 +525,7 @@ class Handy {
             this.slideMax += offset;
             this.slideMax = Math.max(0, Math.min(100, this.slideMax));
         }
+        this.connected = true;
         return json.result;
     }
 
@@ -509,6 +544,7 @@ class Handy {
             this.slideMin += offset;
             this.slideMin = Math.max(0, Math.min(100, this.slideMin));
         }
+        this.connected = true;
         return json.result;
     }
 
@@ -557,7 +593,10 @@ class Handy {
     //                  UTILS
     //---------------------------------------------
     private enforceConnectionKey(): void {
-        if (!this.connectionKey) throw new Error("connection key not set");
+        if (!this.connectionKey) {
+            this.connected = false;
+            throw new Error("connection key not set");
+        }
     }
 
     private getUrl(cmd: string): string {
@@ -566,11 +605,22 @@ class Handy {
 
     private async catchHttpErrors(response: Response): Promise<any> {
         if (response.status === 400) throw new Error("Bad request");
-        if (response.status === 502) throw new Error("Machine not connected");
-        if (response.status === 504) throw new Error("Machine timeout");
+        if (response.status === 502) {
+            this.connected = false;
+            throw new Error("Machine not connected");
+        }
+        if (response.status === 504) {
+            this.connected = false;
+            throw new Error("Machine timeout");
+        }
         const json = await response.json();
         if (json.result === -1) throw new Error("Unknown response error");
         if (json.error) {
+            if (json.error.code == 1000 || json.error.code == 1001 || json.error.code == 1002) {
+                this.connected = false;
+            } else if (json.error.code) {
+                this.connected = true;
+            }
             throw new Error(json.error.message);
         }
         return json;
@@ -586,7 +636,8 @@ class Handy {
                     .map(key => key + "=" + params[key])
                     .join("&");
         }
-        if (this.verbose) console.log("GET " + url);
+        // eslint-disable-next-line no-console
+        if (this.verbose) console.group("GET " + url);
         const response = await fetch(url, {
             method: "GET",
             headers: {
@@ -595,14 +646,19 @@ class Handy {
         });
 
         const json = await this.catchHttpErrors(response);
-        if (this.verbose) console.log("Response for GET " + url + ": ", json);
+        if (this.verbose) {
+            console.log("Response for GET " + url + ": ", json);
+            // eslint-disable-next-line no-console
+            console.groupEnd();
+        }
         return json;
     }
 
     private async putJson(path: string, data: unknown): Promise<any> {
         this.enforceConnectionKey();
         const url = this.getUrl(path);
-        if (this.verbose) console.log("PUT " + url, data);
+        // eslint-disable-next-line no-console
+        if (this.verbose) console.group("PUT " + url, data);
         const response = await fetch(url, {
             method: "PUT",
             headers: {
@@ -612,7 +668,11 @@ class Handy {
             body: JSON.stringify(data),
         });
         const json = await this.catchHttpErrors(response);
-        if (this.verbose) console.log("Response for PUT " + url + ": ", json);
+        if (this.verbose) {
+            console.log("Response for PUT " + url + ": ", json);
+            // eslint-disable-next-line no-console
+            console.groupEnd();
+        }
         return json;
     }
 }

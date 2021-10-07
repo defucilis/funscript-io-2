@@ -12,7 +12,11 @@ const Button = ({
     disabled?: boolean;
 }): JSX.Element => {
     return (
-        <button disabled={disabled} className={`fsio-btn ${className || ""}`} onClick={onClick}>
+        <button
+            disabled={disabled}
+            className={`${disabled ? "fsio-btn-disabled" : "fsio-btn"} ${className || ""}`}
+            onClick={onClick}
+        >
             {children}
         </button>
     );

@@ -4,9 +4,7 @@ class MyDocument extends Document {
     render(): JSX.Element {
         return (
             <Html>
-                <Head>
-                    <title>Funscript.io</title>
-                </Head>
+                <Head></Head>
                 <body style={{ marginTop: 0, marginBottom: 0 }}>
                     <Main />
                     <NextScript />

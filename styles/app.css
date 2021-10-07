@@ -40,11 +40,11 @@
     }
 
     .fsio-btn {
-        @apply text-lg grid place-items-center px-2 py-1 rounded mt-4 bg-primary-700 text-white;
+        @apply text-lg grid place-items-center px-4 py-1 rounded mt-4 bg-primary-400 text-neutral-900 font-bold;
     }
 
     .fsio-btn-disabled {
-        @apply text-lg grid place-items-center px-2 py-1 rounded mt-4 bg-neutral-700 text-white;
+        @apply text-lg grid place-items-center px-4 py-1 rounded mt-4 bg-neutral-700 text-neutral-400 font-bold;
     }
 
     .fsio-btn-icon {

@@ -16,7 +16,9 @@ const IconButton = ({
     return (
         <button
             disabled={disabled}
-            className={`${disabled ? "fsio-btn-icon-disabled" : "fsio-btn-icon"} ${className || ""}`}
+            className={`${disabled ? "fsio-btn-icon-disabled" : "fsio-btn-icon"} ${
+                className || ""
+            }`}
             onClick={onClick}
             style={style || {}}
         >

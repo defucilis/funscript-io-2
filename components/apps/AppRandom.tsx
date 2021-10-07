@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { MdPause, MdPlayArrow, MdSkipNext } from "react-icons/md";
-import Handy from "lib/thehandy";
 import { HampState, HandyMode } from "lib/thehandy/types";
 import RateLimitedSlider from "components/molecules/RateLimitedSlider";
 import RateLimitedMinMaxSlider from "components/molecules/RateLimitedMinMaxSlider";
@@ -8,17 +7,28 @@ import ProgressRing from "components/atoms/CircularProgress";
 import useAnim from "lib/hooks/useAnim";
 import Mathf from "lib/Mathf";
 import IconButton from "components/atoms/IconButton";
+import useHandy from "lib/thehandy-react";
 
 type Range = {
     min: number;
     max: number;
 };
 
-const AppRandom = ({ handy }: { handy: Handy }): JSX.Element => {
-    const [loading, setLoading] = useState(false);
-    const [hampRunning, setHampRunning] = useState(false);
-    const [hampVelocity, setHampVelocity] = useState(0);
-    const [slideMin, setSlideMin] = useState(0);
+const AppRandom = (): JSX.Element => {
+    const {
+        loading,
+        error,
+        getSlideSettings,
+        getHampVelocity,
+        sendHampVelocity,
+        sendSlideMin,
+        sendSlideMax,
+        sendMode,
+        sendHampState,
+        handyState,
+    } = useHandy();
+
+    const [initialized, setInitialized] = useState(false);
     const [slideMax, setSlideMax] = useState(100);
 
     const [nextRandomTime, setNextRandomTime] = useState(0);
@@ -41,7 +51,7 @@ const AppRandom = ({ handy }: { handy: Handy }): JSX.Element => {
 
     useAnim(
         (runTime: number, deltaTime: number) => {
-            if (!hampRunning) {
+            if (!(handyState.hampState === HampState.moving)) {
                 setLastRandomTime(cur => cur + deltaTime);
                 setNextRandomTime(runTime + deltaTime);
                 setProgress(0);
@@ -53,10 +63,14 @@ const AppRandom = ({ handy }: { handy: Handy }): JSX.Element => {
                     runTime + Mathf.randomRange(randomInterval.min, randomInterval.max)
                 );
                 const newVelocity = Math.round(Mathf.randomRange(randomSpeed.min, randomSpeed.max));
-                const newSlideMin = slideMax - Math.round(Mathf.randomRange(randomSlide.min, randomSlide.max) * 0.01 * slideMax)
-                console.log({newVelocity, newSlideMin});
-                trySetHampVelocity(newVelocity);
-                trySetSlideMin(newSlideMin);
+                const newSlideMin =
+                    slideMax -
+                    Math.round(
+                        Mathf.randomRange(randomSlide.min, randomSlide.max) * 0.01 * slideMax
+                    );
+                console.log({ newVelocity, newSlideMin });
+                sendHampVelocity(newVelocity);
+                sendSlideMin(newSlideMin);
                 setSkip(false);
             }
             setProgress((runTime - lastRandomTime) / (nextRandomTime - lastRandomTime));
@@ -68,120 +82,39 @@ const AppRandom = ({ handy }: { handy: Handy }): JSX.Element => {
             randomSpeed,
             randomSlide,
             slideMax,
-            hampRunning,
+            handyState.hampState,
         ]
     );
 
-    const [error, setError] = useState("");
-
     useEffect(() => {
         const initialization = async () => {
-            try {
-                setLoading(true);
-                await handy.setMode(HandyMode.hamp);
-                setHampVelocity(await handy.getHampVelocity());
-                const slideSettings = await handy.getSlideSettings();
-                setSlideMin(slideSettings.min);
+            setInitialized(true);
+            if (handyState.currentMode !== HandyMode.hamp) {
+                await sendHampState(HampState.stopped);
+                const slideSettings = await getSlideSettings();
+                await getHampVelocity();
                 setSlideMax(slideSettings.max);
-                setHampRunning((await handy.getStatus()).state === HampState.moving);
-                setLoading(false);
-            } catch (error: any) {
-                setError(error.message);
+            } else {
+                setSlideMax(handyState.slideMax);
             }
         };
 
-        initialization();
-    }, [handy]);
-
-    const trySetHampVelocity = (value: number, fromSlider = true): void => {
-        setError("");
-        if (!fromSlider) setLoading(true);
-        handy
-            .setHampVelocity(value)
-            .then(() => {
-                if (fromSlider) return;
-                setLoading(false);
-                setHampVelocity(handy.hampVelocity);
-            })
-            .catch(err => {
-                setError(err.message);
-                setLoading(false);
-            });
-    };
-
-    const trySetSlideMin = (value: number, fromSlider = true): void => {
-        setError("");
-        if (!fromSlider) setLoading(true);
-        handy
-            .setSlideMin(value)
-            .then(() => {
-                if (fromSlider) return;
-                setLoading(false);
-                setSlideMin(handy.slideMin);
-            })
-            .catch(err => {
-                setError(err.message);
-                setLoading(false);
-            });
-    };
-
-    const trySetSlideMax = (value: number, fromSlider = true): void => {
-        setError("");
-        if (!fromSlider) setLoading(true);
-        handy
-            .setSlideMax(value)
-            .then(() => {
-                if (fromSlider) return;
-                setLoading(false);
-                setSlideMax(handy.slideMax);
-            })
-            .catch(err => {
-                setError(err.message);
-                setLoading(false);
-            });
-    };
-
-    const tryTogglePlay = () => {
-        setError("");
-        setLoading(true);
-        if (hampRunning)
-            handy
-                .setHampStop()
-                .then(() => {
-                    setHampRunning(false);
-                    setLoading(false);
-                })
-                .catch(err => {
-                    setError(err.message);
-                    setLoading(false);
-                });
-        else
-            handy
-                .setHampStart()
-                .then(() => {
-                    setHampRunning(true);
-                    setLoading(false);
-                })
-                .catch(err => {
-                    setError(err.message);
-                    setLoading(false);
-                });
-    };
+        if (!initialized) initialization();
+    }, [
+        sendMode,
+        sendHampState,
+        handyState.currentMode,
+        handyState.slideMin,
+        handyState.slideMax,
+        handyState.hampVelocity,
+        initialized,
+        getSlideSettings,
+        getHampVelocity,
+    ]);
 
     return (
         <div className="flex min-h-mobilemain md:min-h-main flex-col -mt-4 pb-5 pt-5 justify-between">
             <div className="flex flex-col gap-4">
-                <div>
-                    <pre>{JSON.stringify({
-                        nextRandomTime,
-                        lastRandomTime,
-                        randomInterval,
-                        randomSpeed,
-                        randomSlide,
-                        slideMax,
-                        hampRunning,
-                    }, null, 2)}</pre>
-                </div>
                 <RateLimitedMinMaxSlider
                     label="Random Interval"
                     valueUnit="s"
@@ -221,7 +154,7 @@ const AppRandom = ({ handy }: { handy: Handy }): JSX.Element => {
                     value={slideMax}
                     disabled={loading}
                     onChange={setSlideMax}
-                    onLimitedChange={trySetSlideMax}
+                    onLimitedChange={sendSlideMax}
                 />
                 {error && (
                     <p className="text-neutral-900 bg-red-500 rounded font-bold text-sm w-full grid place-items-center p-2 my-2 text-center">
@@ -232,26 +165,34 @@ const AppRandom = ({ handy }: { handy: Handy }): JSX.Element => {
             <div className="flex justify-around items-center">
                 <div className="flex flex-col items-center">
                     <IconButton
-                        disabled={loading}
-                        className={`${loading ? "bg-neutral-400" : "bg-primary-400"}`}
-                        onClick={tryTogglePlay}
+                        onClick={() =>
+                            sendHampState(
+                                handyState.hampState === HampState.moving
+                                    ? HampState.stopped
+                                    : HampState.moving
+                            )
+                        }
                     >
-                        {hampRunning ? <MdPause /> : <MdPlayArrow />}
+                        {handyState.hampState === HampState.moving ? <MdPause /> : <MdPlayArrow />}
                     </IconButton>
-                    <span className="text-sm">{hampRunning ? "Stop" : "Start"}</span>
+                    <span className="text-sm">
+                        {handyState.hampState === HampState.moving ? "Stop" : "Start"}
+                    </span>
                 </div>
                 <div className="h-40 flex flex-col justify-center items-center">
-                    <p className="text-sm text-neutral-400">Speed {hampVelocity}%</p>
+                    <p className="text-sm text-neutral-400">Speed {handyState.hampVelocity}%</p>
                     <div className="relative grid place-items-center flex-grow">
                         <ProgressRing
                             className="absolute"
                             radius={60}
                             stroke={4}
-                            progress={hampRunning ? progress * 100 : 100}
+                            progress={
+                                handyState.hampState === HampState.moving ? progress * 100 : 100
+                            }
                             color="rgb(244,63,94)"
                         />
                         <p className="text-4xl">
-                            {hampRunning
+                            {handyState.hampState === HampState.moving
                                 ? Math.floor(
                                       (1.0 - progress) * (nextRandomTime - lastRandomTime) + 1
                                   )
@@ -259,15 +200,11 @@ const AppRandom = ({ handy }: { handy: Handy }): JSX.Element => {
                         </p>
                     </div>
                     <p className="text-sm text-neutral-400">
-                        Stroke {slideMin}% - {slideMax}%
+                        Stroke {handyState.slideMin}% - {handyState.slideMax}%
                     </p>
                 </div>
                 <div className="flex flex-col items-center">
-                    <IconButton
-                        disabled={loading}
-                        className={`${loading ? "bg-neutral-400" : "bg-primary-400"}`}
-                        onClick={() => setSkip(true)}
-                    >
+                    <IconButton onClick={() => setSkip(true)}>
                         <MdSkipNext />
                     </IconButton>
                     <span className="text-sm">Skip</span>

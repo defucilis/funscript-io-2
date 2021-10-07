@@ -68,7 +68,7 @@ const ManualButtons = ({
             </div>
             <div className="col-start-2 row-start-2">
                 <ManualButton
-                    disabled={loading}
+                    disabled={false}
                     onClick={onButtonCenter}
                     label={running ? "Stop" : "Start"}
                     cellSize={cellSize}

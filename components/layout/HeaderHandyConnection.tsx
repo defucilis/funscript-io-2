@@ -1,83 +1,21 @@
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { MdReport, MdSync, MdWifiTethering } from "react-icons/md";
 import useHandy from "lib/thehandy-react";
 
 const HeaderHandyConnection = (): JSX.Element => {
-    const { handy } = useHandy();
+    const { refresh, connectionKey, loading, connect, disconnect, handyState, error } = useHandy();
+    const [initialized, setInitialized] = useState(false);
     const [expanded, setExpanded] = useState(false);
-    const [connected, setConnected] = useState(false);
-    const [loading, setLoading] = useState(false);
-    const [connectionKey, setConnectionKey] = useState("");
-    const [error, setError] = useState("");
+    const [newConnectionKey, setNewConnectionKey] = useState(connectionKey);
 
     useEffect(() => {
-        const checkConnection = async () => {
-            if (!handy) return;
-            if (!handy.connectionKey || handy.connectionKey !== "") return;
-            setLoading(true);
-            try {
-                const connected = await handy.getConnected();
-                if (!connected) {
-                    setConnected(false);
-                } else {
-                    await handy.getStatus();
-                    setConnected(true);
-                }
-            } catch {
-                setConnected(false);
-            }
+        if (!initialized) {
+            refresh();
+            setInitialized(true);
+        }
+    }, [refresh, initialized]);
 
-            setLoading(false);
-        };
-
-        if (!handy) return;
-
-        if (handy.connectionKey) setConnectionKey(handy.connectionKey);
-        else handy.connectionKey = connectionKey;
-        checkConnection();
-    }, [handy]);
-
-    const tryConnect = useCallback(() => {
-        const tryConnect = async () => {
-            if (!handy) return;
-            if (!connectionKey || connectionKey === "") return;
-
-            handy.connectionKey = connectionKey;
-
-            setLoading(true);
-            setError("");
-
-            for (let i = 0; i < 10; i++) {
-                try {
-                    const result = await handy.getConnected();
-                    if (result) {
-                        await handy.getStatus();
-                        setLoading(false);
-                        setConnected(true);
-                        return;
-                    }
-                } catch {
-                    continue;
-                }
-            }
-            setLoading(false);
-            setConnected(false);
-            setError(
-                "Failed to connect. Ensure you have the connection key correct and that your Handy is online"
-            );
-        };
-
-        if (!handy) return;
-        tryConnect();
-    }, [handy, connectionKey]);
-
-    const disconnect = useCallback(() => {
-        if (!handy) return;
-
-        setConnected(false);
-        handy.connectionKey = "";
-        setConnectionKey("");
-    }, [handy]);
+    useEffect(() => setNewConnectionKey(connectionKey), [connectionKey]);
 
     return (
         <>
@@ -87,7 +25,7 @@ const HeaderHandyConnection = (): JSX.Element => {
                 } -mr-5 pr-5 -my-2 py-2`}
                 onClick={() => setExpanded(!expanded)}
             >
-                {connected ? (
+                {handyState.connected ? (
                     <MdWifiTethering className="text-2xl text-green-400" />
                 ) : loading ? (
                     <MdSync className="text-2xl text-yellow-400 animate-spin" />
@@ -105,12 +43,12 @@ const HeaderHandyConnection = (): JSX.Element => {
                 <input
                     type="text"
                     className="w-full bg-neutral-700 rounded px-2 text-white"
-                    value={connectionKey}
+                    value={newConnectionKey}
                     onChange={e => {
-                        setConnectionKey(e.target.value);
+                        setNewConnectionKey(e.target.value);
                     }}
                 />
-                {connected ? (
+                {handyState.connected ? (
                     <button
                         className="bg-red-900 grid place-items-center text-white font-bold rounded px-4 mt-2"
                         onClick={disconnect}
@@ -120,7 +58,6 @@ const HeaderHandyConnection = (): JSX.Element => {
                 ) : loading ? (
                     <button
                         className="bg-neutral-800 grid place-items-center text-white font-bold rounded px-4 mt-2"
-                        onClick={tryConnect}
                         disabled={true}
                     >
                         Connecting
@@ -128,12 +65,16 @@ const HeaderHandyConnection = (): JSX.Element => {
                 ) : (
                     <button
                         className="bg-green-800 grid place-items-center text-white font-bold rounded px-4 mt-2"
-                        onClick={tryConnect}
+                        onClick={() => connect(newConnectionKey)}
                     >
                         Connect
                     </button>
                 )}
-                {error && <p className="text-red-300 text-sm leading-none mt-2">{error}</p>}
+                {error && (
+                    <p className="text-red-300 text-sm leading-none mt-2">
+                        {JSON.stringify(error, null, 2)}
+                    </p>
+                )}
             </div>
         </>
     );
