@@ -48,26 +48,26 @@ const RateLimitedMinMaxSlider = ({
             if (onLimitedChangeMin) onLimitedChangeMin(Math.round(valueMin));
             setLastSentValueMin(valueMin);
         }
-    }, [valueMin, lastSentValueMin, onChangeMin]);
+    }, [valueMin, lastSentValueMin, onChangeMin, onLimitedChangeMin]);
 
     const trySendValueMax = useCallback(() => {
         if (Math.round(lastSentValueMax) !== Math.round(valueMax)) {
             if (onLimitedChangeMax) onLimitedChangeMax(Math.round(valueMax));
             setLastSentValueMax(valueMax);
         }
-    }, [valueMin, lastSentValueMin, onChangeMin]);
+    }, [valueMax, lastSentValueMax, onChangeMax, onLimitedChangeMax]);
 
     const startEditingMin = () => setActiveMin(true);
-    const stopEditingMin = () => {
+    const stopEditingMin = useCallback(() => {
         setActiveMin(false);
         trySendValueMin();
-    };
+    }, [trySendValueMin, valueMin]);
 
     const startEditingMax = () => setActiveMax(true);
-    const stopEditingMax = () => {
+    const stopEditingMax = useCallback(() => {
         setActiveMax(false);
         trySendValueMax();
-    };
+    }, [trySendValueMax, valueMax]);
 
     return (
         <MinMaxSlider

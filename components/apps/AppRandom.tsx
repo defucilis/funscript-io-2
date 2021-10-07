@@ -43,7 +43,7 @@ const AppRandom = ({ handy }: { handy: Handy }): JSX.Element => {
         (runTime: number, deltaTime: number) => {
             if (!hampRunning) {
                 setLastRandomTime(cur => cur + deltaTime);
-                setNextRandomTime(cur => cur + deltaTime);
+                setNextRandomTime(runTime + deltaTime);
                 setProgress(0);
                 return;
             }
@@ -52,11 +52,11 @@ const AppRandom = ({ handy }: { handy: Handy }): JSX.Element => {
                 setNextRandomTime(
                     runTime + Mathf.randomRange(randomInterval.min, randomInterval.max)
                 );
-                trySetHampVelocity(Math.round(Mathf.randomRange(randomSpeed.min, randomSpeed.max)));
-                trySetSlideMin(
-                    slideMax -
-                        Math.round(Mathf.randomRange(randomSlide.min, randomSlide.max) * slideMax)
-                );
+                const newVelocity = Math.round(Mathf.randomRange(randomSpeed.min, randomSpeed.max));
+                const newSlideMin = slideMax - Math.round(Mathf.randomRange(randomSlide.min, randomSlide.max) * 0.01 * slideMax)
+                console.log({newVelocity, newSlideMin});
+                trySetHampVelocity(newVelocity);
+                trySetSlideMin(newSlideMin);
                 setSkip(false);
             }
             setProgress((runTime - lastRandomTime) / (nextRandomTime - lastRandomTime));
@@ -171,6 +171,17 @@ const AppRandom = ({ handy }: { handy: Handy }): JSX.Element => {
     return (
         <div className="flex min-h-mobilemain md:min-h-main flex-col -mt-4 pb-5 pt-5 justify-between">
             <div className="flex flex-col gap-4">
+                <div>
+                    <pre>{JSON.stringify({
+                        nextRandomTime,
+                        lastRandomTime,
+                        randomInterval,
+                        randomSpeed,
+                        randomSlide,
+                        slideMax,
+                        hampRunning,
+                    }, null, 2)}</pre>
+                </div>
                 <RateLimitedMinMaxSlider
                     label="Random Interval"
                     valueUnit="s"

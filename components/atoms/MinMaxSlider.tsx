@@ -165,7 +165,7 @@ const MinMaxSlider = ({
             document.removeEventListener("mouseup", handleMouseUp);
             document.addEventListener("touchend", handleMouseUp);
         };
-    }, [draggingMin, draggingMax, trackDiv]);
+    }, [draggingMin, draggingMax, trackDiv, onStopEditMin, onStopEditMax]);
 
     return (
         <div className={`flex flex-col select-none  ${vertical ? "h-full" : "w-full"}`}>

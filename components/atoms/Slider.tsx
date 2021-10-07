@@ -98,7 +98,7 @@ const Slider = ({
             document.removeEventListener("mouseup", handleMouseUp);
             document.addEventListener("touchend", handleMouseUp);
         };
-    }, [dragging, trackDiv]);
+    }, [dragging, trackDiv, onStopEdit]);
 
     return (
         <div className={`flex flex-col select-none  ${vertical ? "h-full" : "w-full"}`}>

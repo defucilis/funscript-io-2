@@ -42,10 +42,10 @@ const RateLimitedSlider = ({
     }, [value, lastSentValue, onChange]);
 
     const startEditing = () => setActive(true);
-    const stopEditing = () => {
+    const stopEditing = useCallback(() => {
         setActive(false);
         trySendValue();
-    };
+    }, [trySendValue]);
 
     return (
         <Slider
