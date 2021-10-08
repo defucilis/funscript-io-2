@@ -14,7 +14,7 @@ const Sidebar = ({ open }: { open: boolean }): JSX.Element => {
                     <li>
                         <SidebarLink path="" label="Home" />
                     </li>
-                    <li>
+                    {/* <li>
                         <SidebarLink path="search" label="Advanced search" />
                     </li>
                     <li>
@@ -25,7 +25,7 @@ const Sidebar = ({ open }: { open: boolean }): JSX.Element => {
                     </li>
                     <li>
                         <SidebarLink path="creators" label="Creators" />
-                    </li>
+                    </li> */}
                 </ul>
                 <hr className="border-neutral-900 my-1" />
                 <ul>
