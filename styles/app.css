@@ -65,3 +65,5 @@
     background-color: rgba(251, 113, 133) !important;
     box-shadow: 0 0 10px rgba(251, 113, 133), 0 0 5px rgba(251, 113, 133) !important;
 }
+
+@import "./markdown.css";

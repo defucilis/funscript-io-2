@@ -1,0 +1,43 @@
+.markdown {
+    @apply text-white;
+}
+
+.markdown h1 {
+    @apply text-4xl;
+}
+
+.markdown h2 {
+    @apply text-2xl font-bold;
+}
+
+.markdown h3 {
+    @apply text-lg;
+}
+
+.markdown h4 {
+    @apply text-lg font-bold;
+}
+
+.markdown h5 {
+    @apply text-neutral-400 italic text-sm -mt-1;
+}
+
+.markdown ul {
+    @apply pl-2 mb-2 text-sm;
+}
+
+.markdown ul li {
+    @apply list-disc ml-4;
+}
+
+.markdown a {
+    @apply text-primary-400 underline;
+}
+
+.markdown p {
+    @apply mb-2;
+}
+
+.markdown hr {
+    @apply bg-white my-4;
+}
