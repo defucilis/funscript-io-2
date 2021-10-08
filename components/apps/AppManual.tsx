@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
+import { toast } from "react-toastify";
 import { HampState, HandyMode } from "lib/thehandy/types";
 import RateLimitedSlider from "components/molecules/RateLimitedSlider";
 import useHandy from "lib/thehandy-react";
@@ -32,6 +33,14 @@ const AppManual = (): JSX.Element => {
     const [velocityInterval, setVelocityInterval] = useState(10);
     const [slideInterval, setSlideInterval] = useState(10);
     const [slideIntervalMode, setSlideIntervalMode] = useState(SlideIntervalMode.min);
+
+    const [lastError, setLastError] = useState("");
+    useEffect(() => {
+        if (error && error != lastError) {
+            toast.error(error);
+            setLastError(error);
+        }
+    }, [error]);
 
     useEffect(() => {
         const initialization = async () => {
@@ -162,11 +171,6 @@ const AppManual = (): JSX.Element => {
                         <option value={SlideIntervalMode.offset}>Offset</option>
                     </select>
                 </div>
-                {error && (
-                    <p className="text-neutral-900 bg-red-500 rounded font-bold text-sm w-full grid place-items-center p-2 my-2 text-center">
-                        {error}
-                    </p>
-                )}
             </div>
         </div>
     );

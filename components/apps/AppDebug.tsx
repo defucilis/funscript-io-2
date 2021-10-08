@@ -1,7 +1,9 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import { toast } from "react-toastify";
 import { HandyMode } from "lib/thehandy/types";
 import RateLimitedSlider from "components/molecules/RateLimitedSlider";
 import useHandy from "lib/thehandy-react";
+import Button from "components/atoms/Button";
 
 const AppDebug = (): JSX.Element => {
     const {
@@ -17,6 +19,10 @@ const AppDebug = (): JSX.Element => {
     const [hampVelocity, setHampVelocity] = useState(0);
     const [slideMin, setSlideMin] = useState(0);
     const [slideMax, setSlideMax] = useState(100);
+
+    useEffect(() => {
+        if (error) toast.error(error);
+    }, [error]);
 
     return (
         <div>
@@ -67,6 +73,11 @@ const AppDebug = (): JSX.Element => {
                     />
                 </div>
             </div>
+            <Button onClick={() => toast.info("This is a test")}>Info</Button>
+            <Button onClick={() => toast.warning("This is a test")}>Warning</Button>
+            <Button onClick={() => toast.success("This is a test")}>Success</Button>
+            <Button onClick={() => toast.error("This is a test")}>Error</Button>
+            <Button onClick={() => toast("This is a test")}>Default</Button>
             {error && <p className="text-red-300 text-sm">{error}</p>}
         </div>
     );

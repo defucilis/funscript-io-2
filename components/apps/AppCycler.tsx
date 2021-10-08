@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { MdPause, MdPlayArrow } from "react-icons/md";
+import { toast } from "react-toastify";
 import { HampState, HandyMode } from "lib/thehandy/types";
 import RateLimitedMinMaxSlider from "components/molecules/RateLimitedMinMaxSlider";
 import useAnim from "lib/hooks/useAnim";
@@ -77,6 +78,14 @@ const AppCycler = (): JSX.Element => {
         getSlideSettings,
         getHampVelocity,
     ]);
+
+    const [lastError, setLastError] = useState("");
+    useEffect(() => {
+        if (error && error != lastError) {
+            toast.error(error);
+            setLastError(error);
+        }
+    }, [error]);
 
     const getValue = useCallback(
         (time: number): number => {
@@ -220,9 +229,10 @@ const AppCycler = (): JSX.Element => {
                     label="Cycle Duration"
                     valueUnit="s"
                     min={10}
-                    max={240}
+                    max={250}
                     value={cycleDuration}
                     onChange={setCycleDuration}
+                    ticks={7}
                 />
                 <Slider
                     label="Session Duration"
@@ -232,6 +242,7 @@ const AppCycler = (): JSX.Element => {
                     max={240}
                     value={sessionDuration}
                     onChange={setSessionDuration}
+                    ticks={5}
                 />
                 <Slider
                     label="Handy Update Interval"
@@ -240,6 +251,8 @@ const AppCycler = (): JSX.Element => {
                     max={5}
                     value={setInterval}
                     onChange={setSetInterval}
+                    decimalPlaces={1}
+                    ticks={8}
                 />
                 <Slider
                     label="Ease In/Out Balance"
@@ -280,11 +293,6 @@ const AppCycler = (): JSX.Element => {
                     onLimitedChangeMax={sendSlideMax}
                     disabled={loading}
                 />
-                {error && (
-                    <p className="text-neutral-900 bg-red-500 rounded font-bold text-sm w-full grid place-items-center p-2 my-2 text-center">
-                        {error}
-                    </p>
-                )}
             </div>
             <div className="flex justify-around items-center h-72 w-full border-t pt-4 mt-5">
                 <div className="w-full h-full" ref={canvasContainer}>

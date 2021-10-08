@@ -31,7 +31,9 @@ const RateLimitedSlider = ({
     const [active, setActive] = useState(false);
 
     useInterval(() => {
-        if (active) trySendValue();
+        if (active) {
+            trySendValue();
+        }
     }, 500);
 
     const trySendValue = useCallback(() => {
@@ -39,7 +41,7 @@ const RateLimitedSlider = ({
             if (onLimitedChange) onLimitedChange(Math.round(value));
             setLastSentValue(value);
         }
-    }, [value, lastSentValue, onChange]);
+    }, [value, lastSentValue, onChange, onLimitedChange]);
 
     const startEditing = () => setActive(true);
     const stopEditing = useCallback(() => {

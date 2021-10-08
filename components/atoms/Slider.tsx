@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import Mathf from "lib/Mathf";
+import { roundNumber } from "lib/text";
 
 const isMouseEvent = (
     e: MouseEvent | TouchEvent | React.MouseEvent | React.TouchEvent
@@ -26,6 +27,7 @@ const Slider = ({
     disabled,
     vertical,
     ticks = 4,
+    decimalPlaces = 0,
 }: {
     label?: string;
     valueUnit?: string;
@@ -40,6 +42,7 @@ const Slider = ({
     disabled?: boolean;
     vertical?: boolean;
     ticks?: number;
+    decimalPlaces?: number;
 }): JSX.Element => {
     const trackDiv = useRef<HTMLDivElement>(null);
     const [dragging, setDragging] = useState(false);
@@ -83,8 +86,6 @@ const Slider = ({
             setDragging(false);
             if (onStopEdit) onStopEdit();
         };
-
-        if (!trackDiv.current) return;
         if (dragging) {
             document.addEventListener("mousemove", handleMouse);
             document.addEventListener("touchmove", handleMouse);
@@ -96,9 +97,9 @@ const Slider = ({
             document.removeEventListener("mousemove", handleMouse);
             document.removeEventListener("touchmove", handleMouse);
             document.removeEventListener("mouseup", handleMouseUp);
-            document.addEventListener("touchend", handleMouseUp);
+            document.removeEventListener("touchend", handleMouseUp);
         };
-    }, [dragging, trackDiv, onStopEdit]);
+    }, [dragging, onStopEdit]);
 
     return (
         <div className={`flex flex-col select-none  ${vertical ? "h-full" : "w-full"}`}>
@@ -108,7 +109,7 @@ const Slider = ({
                     <p>
                         {zeroValue && value === min
                             ? zeroValue
-                            : `${Math.round(value)}${valueUnit || ""}`}
+                            : `${roundNumber(value, decimalPlaces)}${valueUnit || ""}`}
                     </p>
                 </div>
             )}
@@ -177,7 +178,7 @@ const Slider = ({
                                     key={"slider_" + i}
                                 >
                                     <span>{vertical ? "—" : "|"}</span>
-                                    <span>{Math.round(value)}</span>
+                                    <span>{roundNumber(value, decimalPlaces)}</span>
                                 </div>
                             );
                         })}

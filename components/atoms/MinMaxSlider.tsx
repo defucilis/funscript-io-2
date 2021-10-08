@@ -151,7 +151,6 @@ const MinMaxSlider = ({
             setDraggingMax(false);
         };
 
-        if (!trackDiv.current) return;
         if (draggingMin || draggingMax) {
             document.addEventListener("mousemove", handleMouse);
             document.addEventListener("touchmove", handleMouse);
@@ -163,9 +162,9 @@ const MinMaxSlider = ({
             document.removeEventListener("mousemove", handleMouse);
             document.removeEventListener("touchmove", handleMouse);
             document.removeEventListener("mouseup", handleMouseUp);
-            document.addEventListener("touchend", handleMouseUp);
+            document.removeEventListener("touchend", handleMouseUp);
         };
-    }, [draggingMin, draggingMax, trackDiv, onStopEditMin, onStopEditMax]);
+    }, [draggingMin, draggingMax, onStopEditMin, onStopEditMax]);
 
     return (
         <div className={`flex flex-col select-none  ${vertical ? "h-full" : "w-full"}`}>

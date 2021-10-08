@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { MdPause, MdPlayArrow, MdSkipNext } from "react-icons/md";
+import { toast } from "react-toastify";
 import { HampState, HandyMode } from "lib/thehandy/types";
 import RateLimitedSlider from "components/molecules/RateLimitedSlider";
 import RateLimitedMinMaxSlider from "components/molecules/RateLimitedMinMaxSlider";
@@ -112,6 +113,14 @@ const AppRandom = (): JSX.Element => {
         getHampVelocity,
     ]);
 
+    const [lastError, setLastError] = useState("");
+    useEffect(() => {
+        if (error && error != lastError) {
+            toast.error(error);
+            setLastError(error);
+        }
+    }, [error]);
+
     return (
         <div className="flex min-h-mobilemain md:min-h-main flex-col -mt-4 pb-5 pt-5 justify-between">
             <div className="flex flex-col gap-4">
@@ -156,11 +165,6 @@ const AppRandom = (): JSX.Element => {
                     onChange={setSlideMax}
                     onLimitedChange={sendSlideMax}
                 />
-                {error && (
-                    <p className="text-neutral-900 bg-red-500 rounded font-bold text-sm w-full grid place-items-center p-2 my-2 text-center">
-                        {error}
-                    </p>
-                )}
             </div>
             <div className="flex justify-around items-center">
                 <div className="flex flex-col items-center">

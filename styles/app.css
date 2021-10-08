@@ -58,14 +58,10 @@
 
 /* Style NProgress */
 #nprogress .bar {
-    background: var(--color-theme-500) !important;
+    background-color: rgba(251, 113, 133) !important;
 }
 
 #nprogress .peg {
-    box-shadow: 0 0 10px var(--color-theme-500), 0 0 5px var(--color-theme-500) !important;
-}
-
-#nprogress .spinner-icon {
-    border-top-color: var(--color-theme-500) !important;
-    border-left-color: var(--color-theme-500) !important;
+    background-color: rgba(251, 113, 133) !important;
+    box-shadow: 0 0 10px rgba(251, 113, 133), 0 0 5px rgba(251, 113, 133) !important;
 }
