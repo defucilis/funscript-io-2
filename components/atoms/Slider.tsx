@@ -17,6 +17,7 @@ const Slider = ({
     label,
     valueUnit,
     zeroValue,
+    showValue = true,
     min,
     max,
     value,
@@ -28,10 +29,15 @@ const Slider = ({
     vertical,
     ticks = 4,
     decimalPlaces = 0,
+    trackSize = "0.5rem",
+    knobSize = "1.5rem",
+    activeColor = "rgb(244,63,94)",
+    inactiveColor = "rgb(200,200,200)",
 }: {
     label?: string;
     valueUnit?: string;
     zeroValue?: string;
+    showValue?: boolean;
     min: number;
     max: number;
     value: number;
@@ -43,6 +49,10 @@ const Slider = ({
     vertical?: boolean;
     ticks?: number;
     decimalPlaces?: number;
+    trackSize?: string;
+    knobSize?: string;
+    activeColor?: string;
+    inactiveColor?: string;
 }): JSX.Element => {
     const trackDiv = useRef<HTMLDivElement>(null);
     const [dragging, setDragging] = useState(false);
@@ -103,14 +113,16 @@ const Slider = ({
 
     return (
         <div className={`flex flex-col select-none  ${vertical ? "h-full" : "w-full"}`}>
-            {!vertical && (
+            {!vertical && (showValue || label) && (
                 <div className="flex justify-between text-sm">
                     {label ? <p>{label}</p> : <div />}
-                    <p>
-                        {zeroValue && value === min
-                            ? zeroValue
-                            : `${roundNumber(value, decimalPlaces)}${valueUnit || ""}`}
-                    </p>
+                    {showValue && (
+                        <p>
+                            {zeroValue && value === min
+                                ? zeroValue
+                                : `${roundNumber(value, decimalPlaces)}${valueUnit || ""}`}
+                        </p>
+                    )}
                 </div>
             )}
             <div
@@ -121,15 +133,17 @@ const Slider = ({
                 <div
                     ref={trackDiv}
                     className={`relative z-10 bg-neutral-500 rounded cursor-pointer ${
-                        vertical ? "h-full w-2" : "h-2 w-full"
+                        vertical ? `h-full` : `w-full`
                     }`}
                     style={{
                         backgroundImage: `linear-gradient(${vertical ? "to top" : "to right"}, ${
-                            disabled ? "rgb(200,200,200)" : "rgb(244,63,94)"
+                            disabled ? inactiveColor : activeColor
                         } ${getPercentage(value, true)}%, rgba(0, 0, 0, 0) ${getPercentage(
                             value,
                             true
                         )}% 100%)`,
+                        height: vertical ? undefined : trackSize,
+                        width: vertical ? trackSize : undefined,
                     }}
                     onMouseDown={(e: React.MouseEvent) => {
                         setDragging(true && !disabled);
@@ -138,18 +152,17 @@ const Slider = ({
                     }}
                 />
                 <div
-                    className={`absolute z-10 rounded-full h-6 w-6 cursor-pointer shadow-md border-2 ${
-                        disabled
-                            ? "bg-neutral-500 border-neutral-900"
-                            : "bg-primary-500 border-primary-900"
-                    }`}
+                    className={`absolute z-10 rounded-full cursor-pointer shadow-md`}
                     style={{
                         left: vertical
                             ? undefined
-                            : `calc(${(value - min) / (max - min)} * (100% - 1.5rem))`,
+                            : `calc(${(value - min) / (max - min)} * (100% - ${knobSize}))`,
                         bottom: vertical
-                            ? `calc(${(value - min) / (max - min)} * (100% - 1.5rem))`
+                            ? `calc(${(value - min) / (max - min)} * (100% - ${knobSize}))`
                             : undefined,
+                        width: knobSize,
+                        height: knobSize,
+                        backgroundColor: disabled ? inactiveColor : activeColor,
                     }}
                     onMouseDown={() => {
                         setDragging(true && !disabled);
@@ -160,7 +173,7 @@ const Slider = ({
                         if (onStartEdit && !disabled) onStartEdit();
                     }}
                 />
-                {ticks && ticks > 0 && (
+                {!!ticks && (
                     <div
                         className={`absolute w-full h-full left-0 bottom-0.5 flex justify-between z-0 text-neutral-500 ${
                             vertical ? "flex-col pl-1" : "pl-2"

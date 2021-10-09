@@ -9,7 +9,6 @@ import {
     HandyStatus,
     SlideInfo,
     HandyMode,
-    CsvUploadResponse,
     HsspState,
     HampState,
 } from "./types";
@@ -457,20 +456,6 @@ class Handy {
         this.hstpRtd = json.rtd;
         this.connected = true;
         return json.rtd;
-    }
-
-    async uploadCsv(csv: File, filename?: string): Promise<CsvUploadResponse> {
-        const url = "https://www.handyfeeling.com/api/sync/upload";
-        if (!filename) filename = "script_" + new Date().valueOf() + ".csv";
-        const formData = new FormData();
-        formData.append("syncFile", csv, filename);
-        const response = await fetch(url, {
-            method: "post",
-            body: formData,
-        });
-        const newUrl = await response.json();
-        this.connected = true;
-        return newUrl;
     }
 
     //---------------------------------------------

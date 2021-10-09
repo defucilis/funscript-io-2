@@ -19,6 +19,13 @@ const FunscriptHeatmap = ({
 
     useEffect(() => {
         if (!parent.current) return;
+        const observer = new ResizeObserver(() => {
+            if (!parent.current) return;
+            setWidth(parent.current.clientWidth);
+            setHeight(parent.current.clientHeight);
+        });
+        observer.observe(parent.current);
+
         setWidth(parent.current.clientWidth);
         setHeight(parent.current.clientHeight);
     }, [parent]);

@@ -1,6 +1,5 @@
 import React, { useState, useContext, createContext, ReactNode, useCallback } from "react";
 import {
-    CsvUploadResponse,
     HampState,
     HandyInfo,
     HandyMode,
@@ -83,7 +82,6 @@ interface UseHandy {
     getHstpOffset: () => Promise<number>;
     sendHstpOffset: (offset: number) => Promise<void>;
     getHstpRtd: () => Promise<number>;
-    uploadCsv: (csv: File, filename?: string) => Promise<CsvUploadResponse>;
     getSlideSettings: () => Promise<{ min: number; max: number }>;
     getSlidePositionAbsolute: () => Promise<number>;
     sendSlideSettings: (min: number, max: number) => Promise<void>;
@@ -844,27 +842,6 @@ const useHandy = (): UseHandy => {
         return handyState.hstpRtd;
     }, [handy, handyState.hstpRtd]);
 
-    const uploadCsv = useCallback(
-        async (csv: File, filename?: string): Promise<CsvUploadResponse> => {
-            setError("");
-            if (!handy) {
-                setError("Handy not initialized");
-                throw new Error("Handy not initialized");
-            }
-            setLoading(true);
-            try {
-                const response = await handy.uploadCsv(csv, filename);
-                setLoading(false);
-                return response;
-            } catch (error: any) {
-                setError(error.message);
-                setLoading(false);
-                throw new Error(error);
-            }
-        },
-        [handy]
-    );
-
     const getSlideSettings = useCallback(async (): Promise<{ min: number; max: number }> => {
         setError("");
         if (!handy) {
@@ -1060,7 +1037,6 @@ const useHandy = (): UseHandy => {
         getHstpOffset,
         sendHstpOffset,
         getHstpRtd,
-        uploadCsv,
         getSlideSettings,
         getSlidePositionAbsolute,
         sendSlideSettings,
