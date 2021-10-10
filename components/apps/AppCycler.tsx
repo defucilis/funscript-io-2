@@ -9,6 +9,7 @@ import Slider from "components/atoms/Slider";
 import MinMaxSlider from "components/atoms/MinMaxSlider";
 import IconButton from "components/atoms/IconButton";
 import useHandy from "lib/thehandy-react";
+import useKeyboard from "lib/hooks/useKeyboard";
 
 type Range = {
     min: number;
@@ -212,6 +213,21 @@ const AppCycler = (): JSX.Element => {
         ctx.fillText(speedPercent + "", mapX(0), actualValue + 1.5);
     }, [canvasContainer, previewCanvas, getValue, currentTime, speedBounds]);
 
+    const togglePlay = () => {
+        sendHampState(
+            handyState.hampState === HampState.moving ? HampState.stopped : HampState.moving
+        );
+    };
+
+    useKeyboard(e => {
+        switch (e.key) {
+            case " ":
+            case "Enter":
+                togglePlay();
+                break;
+        }
+    }, []);
+
     return (
         <div className="flex min-h-mobilemain md:min-h-main flex-col -mt-4 pb-5 pt-5 justify-between">
             <div className="flex flex-col gap-4">
@@ -264,16 +280,7 @@ const AppCycler = (): JSX.Element => {
                 />
 
                 <div className="flex flex-col items-center">
-                    <IconButton
-                        disabled={false}
-                        onClick={() =>
-                            sendHampState(
-                                handyState.hampState === HampState.moving
-                                    ? HampState.stopped
-                                    : HampState.moving
-                            )
-                        }
-                    >
+                    <IconButton disabled={false} onClick={togglePlay}>
                         {handyState.hampState === HampState.moving ? <MdPause /> : <MdPlayArrow />}
                     </IconButton>
                     <span className="text-sm">

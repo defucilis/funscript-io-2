@@ -9,6 +9,7 @@ import useAnim from "lib/hooks/useAnim";
 import Mathf from "lib/Mathf";
 import IconButton from "components/atoms/IconButton";
 import useHandy from "lib/thehandy-react";
+import useKeyboard from "lib/hooks/useKeyboard";
 
 type Range = {
     min: number;
@@ -121,6 +122,44 @@ const AppRandom = (): JSX.Element => {
         }
     }, [error]);
 
+    const togglePlay = () => {
+        sendHampState(
+            handyState.hampState === HampState.moving ? HampState.stopped : HampState.moving
+        );
+    };
+
+    const doSkip = () => {
+        setSkip(true);
+    };
+
+    const incrementSlide = (direction: -1 | 1): void => {
+        if (direction > 0 && slideMax === 100) return;
+        if (direction < 0 && slideMax === 0) return;
+        setSlideMax(cur => cur + direction * 10);
+        sendSlideMax(slideMax + direction * 10);
+    };
+
+    useKeyboard(e => {
+        switch (e.key) {
+            case " ":
+            case "Enter":
+                togglePlay();
+                break;
+            case "ArrowRight":
+            case "d":
+                doSkip();
+                break;
+            case "ArrowUp":
+            case "w":
+                incrementSlide(1);
+                break;
+            case "ArrowDown":
+            case "s":
+                incrementSlide(-1);
+                break;
+        }
+    }, []);
+
     return (
         <div className="flex min-h-mobilemain md:min-h-main flex-col -mt-4 pb-5 pt-5 justify-between">
             <div className="flex flex-col gap-4">
@@ -168,15 +207,7 @@ const AppRandom = (): JSX.Element => {
             </div>
             <div className="flex justify-around items-center">
                 <div className="flex flex-col items-center">
-                    <IconButton
-                        onClick={() =>
-                            sendHampState(
-                                handyState.hampState === HampState.moving
-                                    ? HampState.stopped
-                                    : HampState.moving
-                            )
-                        }
-                    >
+                    <IconButton onClick={togglePlay}>
                         {handyState.hampState === HampState.moving ? <MdPause /> : <MdPlayArrow />}
                     </IconButton>
                     <span className="text-sm">
@@ -208,7 +239,7 @@ const AppRandom = (): JSX.Element => {
                     </p>
                 </div>
                 <div className="flex flex-col items-center">
-                    <IconButton onClick={() => setSkip(true)}>
+                    <IconButton onClick={doSkip}>
                         <MdSkipNext />
                     </IconButton>
                     <span className="text-sm">Skip</span>

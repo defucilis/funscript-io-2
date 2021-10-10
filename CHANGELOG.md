@@ -10,6 +10,7 @@
 -   Nicer, pop-up error messages
 -   Added dedicated randomization app with real-time feedback
 -   It is now possible to apply multiple script modifications in a chain in the Modify app
+-   A completely new video/audio/script player which is way better in every way
 -   Scripts can now be played with .mp3 audio files
 -   Scripts can now be played on their own (with no synced video or audio)
 
@@ -20,7 +21,6 @@
 
 #### Todo
 
--   Add keyboard support to manual, random and cyler modes (arrow keys for buttons + space bar to play/pause)
 -   Ads?
 -   Doubler modifier
 -   Randomization modifier

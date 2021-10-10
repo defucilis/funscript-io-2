@@ -1,6 +1,7 @@
 import React, { useRef } from "react";
 import RateLimitedMinMaxSlider from "components/molecules/RateLimitedMinMaxSlider";
 import RateLimitedSlider from "components/molecules/RateLimitedSlider";
+import useKeyboard from "lib/hooks/useKeyboard";
 import ManualButtons from "./ManualButtons";
 
 const ManualControls = ({
@@ -39,6 +40,34 @@ const ManualControls = ({
     onLimitedSlideHorizontal: (val: number) => void;
 }): JSX.Element => {
     const parentRef = useRef<HTMLDivElement>(null);
+
+    useKeyboard(
+        e => {
+            switch (e.key) {
+                case "a":
+                case "ArrowLeft":
+                    onButtonLeft();
+                    break;
+                case "w":
+                case "ArrowUp":
+                    onButtonUp();
+                    break;
+                case "d":
+                case "ArrowRight":
+                    onButtonRight();
+                    break;
+                case "s":
+                case "ArrowDown":
+                    onButtonDown();
+                    break;
+                case " ":
+                case "Enter":
+                    onButtonCenter();
+                    break;
+            }
+        },
+        [onButtonLeft, onButtonUp, onButtonRight, onButtonDown, onButtonCenter]
+    );
 
     return (
         <div className="flex gap-2 w-full justify-between">

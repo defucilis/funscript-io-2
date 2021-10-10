@@ -12,6 +12,7 @@ import {
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import Slider from "components/atoms/Slider";
 import { formatTime } from "lib/text";
+import useKeyboard from "lib/hooks/useKeyboard";
 
 const isMouseEvent = (
     e: MouseEvent | TouchEvent | React.MouseEvent | React.TouchEvent
@@ -87,8 +88,15 @@ const PlayerControls = ({
     };
 
     const toggleFullscreen = (): void => {
+        if (!showFullscreen) return;
+
         if (fullscreen && onLeaveFullscreen) onLeaveFullscreen();
         else if (!fullscreen && onEnterFullscreen) onEnterFullscreen();
+    };
+
+    const toggleMute = () => {
+        if (!showFullscreen) return;
+        if (onSetVolume) onSetVolume(volume === 0 ? cachedVolume : 0);
     };
 
     const handleMouse = useCallback(
@@ -150,6 +158,36 @@ const PlayerControls = ({
             document.removeEventListener("touchend", handleMouseUp);
         };
     }, [dragging, handleMouse]);
+
+    const stepSeek = useCallback(
+        (offset: number) => {
+            if (onSeek) onSeek(Math.max(0, Math.min(duration, time + offset)));
+        },
+        [onSeek, time, duration]
+    );
+
+    useKeyboard(
+        e => {
+            switch (e.key) {
+                case " ":
+                    togglePlay();
+                    break;
+                case "m":
+                    toggleMute();
+                    break;
+                case "f":
+                    toggleFullscreen();
+                    break;
+                case "ArrowRight":
+                    stepSeek(10);
+                    break;
+                case "ArrowLeft":
+                    stepSeek(-10);
+                    break;
+            }
+        },
+        [stepSeek]
+    );
 
     return (
         <div className="absolute left-0 top-0 flex flex-col justify-end w-full h-full">
@@ -254,10 +292,7 @@ const PlayerControls = ({
                                 >
                                     <button
                                         className="text-2xl p-2"
-                                        onClick={() => {
-                                            if (onSetVolume)
-                                                onSetVolume(volume === 0 ? cachedVolume : 0);
-                                        }}
+                                        onClick={toggleMute}
                                         style={{
                                             paddingLeft:
                                                 volume === 0 ? "4px" : volume < 0.5 ? "6px" : "8px",
