@@ -15,8 +15,8 @@ module.exports = {
                 mobileHeader: "4.5rem",
             },
             minHeight: theme => ({
-                main: `calc(100vh - ${theme("height.header")})`,
-                mobilemain: `calc(100vh - ${theme("height.mobileHeader")})`,
+                main: `calc(100vh - ${theme("height.header")} - 1rem)`,
+                mobilemain: `calc(100vh - ${theme("height.mobileHeader")} - 1rem)`,
                 48: "12rem",
             }),
             inset: theme => ({
