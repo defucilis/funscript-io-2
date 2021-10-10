@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { PlayableContent } from "components/molecules/ContentDropzone";
 import useInterval from "lib/hooks/useInterval";
 import useDoubleClick from "lib/hooks/useDoubleClick";
+import useDimensions from "lib/hooks/useDimensions";
 import PlayerControls from "./PlayerControls";
 
 const VideoPlayer = ({
@@ -35,11 +36,16 @@ const VideoPlayer = ({
     const [mouseActive, setMouseActive] = useState(false);
     const [lastMoveTime, setLastMoveTime] = useState(0);
 
+    const { width } = useDimensions();
+
     useEffect(() => {
         const handlePlay = () => onPlay && onPlay();
         const handlePause = () => onPause && onPause();
         const handleEnded = () => onEnded && onEnded();
-        const handleSeek = () => onSeek && onSeek(video.current?.currentTime || 0);
+        const handleSeek = () => {
+            onSeek && onSeek(video.current?.currentTime || 0);
+            setTime(video.current?.currentTime || 0);
+        };
         const handleProgress = () => {
             onProgress && onProgress((video.current?.currentTime || 0) / duration);
             setTime(video.current?.currentTime || 0);
@@ -78,6 +84,7 @@ const VideoPlayer = ({
     }, [volume, video]);
 
     const seek = (time: number) => {
+        setTime(time);
         if (!video.current) return;
         video.current.currentTime = time;
     };
@@ -140,19 +147,8 @@ const VideoPlayer = ({
                 }}
             >
                 <video ref={video} src={content?.url} className="rounded-tl rounded-tr" />
-                <div
-                    className="absolute left-0 bottom-0 w-full h-32 z-0"
-                    style={{
-                        backgroundImage:
-                            "linear-gradient(to top, rgba(0,0,0,0.5) 0%, rgba(0,0,0,0.3) 10%, rgba(0,0,0,0) 100% )",
-                        opacity: showingUi() ? 1 : 0,
-                        transition: "opacity 0.2s",
-                    }}
-                />
                 <PlayerControls
-                    className={`absolute bottom-0 left-0 w-full ${
-                        showingUi() ? "opacity-100" : "opacity-0"
-                    } transition-opacity`}
+                    showingUi={showingUi()}
                     onMouseEnter={() => setMouseInControls(true)}
                     onMouseLeave={() => setMouseInControls(false)}
                     playing={playing}
@@ -166,7 +162,9 @@ const VideoPlayer = ({
                     onSetVolume={setVolume}
                     onEnterFullscreen={enterFullscreen}
                     onLeaveFullscreen={leaveFullscreen}
+                    showPlayPause={width > 600}
                     showFullscreen={true}
+                    showVolume={width > 600}
                 />
             </div>
         </div>

@@ -1,5 +1,8 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { PlayableContent } from "components/molecules/ContentDropzone";
+import useInterval from "lib/hooks/useInterval";
+import useDoubleClick from "lib/hooks/useDoubleClick";
+import useDimensions from "lib/hooks/useDimensions";
 import PlayerControls from "./PlayerControls";
 
 const AudioPlayer = ({
@@ -21,78 +24,147 @@ const AudioPlayer = ({
     onProgress?: (time: number) => void;
     onDuration?: (duration: number) => void;
 }): JSX.Element => {
-    const audio = useRef<HTMLAudioElement>(null);
+    const video = useRef<HTMLAudioElement>(null);
+    const playerParent = useRef<HTMLDivElement>(null);
 
     const [time, setTime] = useState(0);
     const [duration, setDuration] = useState(0);
     const [volume, setVolume] = useState(1);
+    const [fullscreen, setFullscreen] = useState(false);
+
+    const [mouseInControls, setMouseInControls] = useState(false);
+    const [mouseActive, setMouseActive] = useState(false);
+    const [lastMoveTime, setLastMoveTime] = useState(0);
+
+    const { width } = useDimensions();
 
     useEffect(() => {
         const handlePlay = () => onPlay && onPlay();
         const handlePause = () => onPause && onPause();
         const handleEnded = () => onEnded && onEnded();
-        const handleSeek = () => onSeek && onSeek(audio.current?.currentTime || 0);
-        const handleProgress = () => {
-            onProgress && onProgress((audio.current?.currentTime || 0) / duration);
-            setTime(audio.current?.currentTime || 0);
+        const handleSeek = () => {
+            onSeek && onSeek(video.current?.currentTime || 0);
+            setTime(video.current?.currentTime || 0);
         };
-        const handleDuration = () => setDuration(audio.current?.duration || 0);
+        const handleProgress = () => {
+            onProgress && onProgress((video.current?.currentTime || 0) / duration);
+            setTime(video.current?.currentTime || 0);
+        };
+        const handleDuration = () => setDuration(video.current?.duration || 0);
 
-        if (!audio.current) return;
+        if (!video.current) return;
 
-        audio.current.addEventListener("play", handlePlay);
-        audio.current.addEventListener("pause", handlePause);
-        audio.current.addEventListener("ended", handleEnded);
-        audio.current.addEventListener("seeked", handleSeek);
-        audio.current.addEventListener("timeupdate", handleProgress);
-        audio.current.addEventListener("durationchange", handleDuration);
+        video.current.addEventListener("play", handlePlay);
+        video.current.addEventListener("pause", handlePause);
+        video.current.addEventListener("ended", handleEnded);
+        video.current.addEventListener("seeked", handleSeek);
+        video.current.addEventListener("timeupdate", handleProgress);
+        video.current.addEventListener("durationchange", handleDuration);
 
         return () => {
-            if (!audio.current) return;
+            if (!video.current) return;
 
-            audio.current.removeEventListener("ended", handlePlay);
-            audio.current.removeEventListener("pause", handlePause);
-            audio.current.removeEventListener("play", handlePlay);
-            audio.current.removeEventListener("seeked", handleSeek);
-            audio.current.removeEventListener("timeupdate", handleProgress);
-            audio.current.removeEventListener("durationchange", handleDuration);
+            video.current.removeEventListener("ended", handlePlay);
+            video.current.removeEventListener("pause", handlePause);
+            video.current.removeEventListener("play", handlePlay);
+            video.current.removeEventListener("seeked", handleSeek);
+            video.current.removeEventListener("timeupdate", handleProgress);
+            video.current.removeEventListener("durationchange", handleDuration);
         };
-    }, [audio, content, duration]);
+    }, [video, content, duration]);
 
     useEffect(() => {
         if (onDuration) onDuration(duration);
     }, [duration, onDuration]);
 
     useEffect(() => {
-        if (!audio.current) return;
+        if (!video.current) return;
 
-        audio.current.volume = volume;
-    }, [volume, audio]);
+        video.current.volume = volume;
+    }, [volume, video]);
 
     const seek = (time: number) => {
-        if (!audio.current) return;
-        audio.current.currentTime = time;
+        setTime(time);
+        if (!video.current) return;
+        video.current.currentTime = time;
     };
+
+    const bump = () => {
+        setMouseActive(true);
+        setLastMoveTime(Date.now());
+    };
+
+    const showingUi = () => !playing || mouseInControls || mouseActive;
+
+    useInterval(() => {
+        if (Date.now().valueOf() - lastMoveTime.valueOf() > 3000) {
+            setMouseActive(false);
+        }
+    }, 500);
+
+    const enterFullscreen = useCallback(() => {
+        playerParent.current?.requestFullscreen();
+    }, [playerParent]);
+
+    const leaveFullscreen = () => {
+        document.exitFullscreen();
+    };
+
+    useEffect(() => {
+        const handleFullscreenChange = () => {
+            console.log(document.fullscreenElement);
+            if (document.fullscreenElement) setFullscreen(true);
+            else setFullscreen(false);
+        };
+        document.addEventListener("fullscreenchange", handleFullscreenChange);
+        return () => {
+            document.removeEventListener("fullscreenchange", handleFullscreenChange);
+        };
+    }, []);
+
+    useDoubleClick({
+        onSingleClick: () => {
+            if (playing) video.current?.pause();
+            else video.current?.play();
+        },
+        onDoubleClick: () => {
+            if (fullscreen) document.exitFullscreen();
+            else playerParent.current?.requestFullscreen();
+        },
+        ref: video,
+        latency: 200,
+    });
 
     return (
         <div className="mt-4">
             <h1 className="text-2xl">{content.name}</h1>
-            <audio
-                ref={audio}
-                src={
-                    content?.url || "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3"
-                }
-            />
-            <div className="w-full flex flex-col justify-end">
+            <div
+                ref={playerParent}
+                className={`w-full flex flex-col justify-end relative h-36`}
+                onMouseMove={bump}
+                style={{
+                    cursor: showingUi() ? undefined : "none",
+                }}
+            >
+                <audio ref={video} src={content?.url} className="rounded-tl rounded-tr" />
                 <PlayerControls
+                    showingUi={showingUi()}
+                    onMouseEnter={() => setMouseInControls(true)}
+                    onMouseLeave={() => setMouseInControls(false)}
                     playing={playing}
                     time={time}
                     duration={duration}
                     volume={volume}
-                    onPlay={() => audio.current?.play()}
-                    onPause={() => audio.current?.pause()}
+                    fullscreen={fullscreen}
+                    onPlay={() => video.current?.play()}
+                    onPause={() => video.current?.pause()}
                     onSeek={seek}
                     onSetVolume={setVolume}
+                    onEnterFullscreen={enterFullscreen}
+                    onLeaveFullscreen={leaveFullscreen}
+                    showPlayPause={width > 600}
+                    showFullscreen={true}
+                    showVolume={width > 600}
                 />
             </div>
         </div>

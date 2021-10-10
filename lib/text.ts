@@ -10,7 +10,7 @@ export const formatTime = (seconds: number): string => {
     else if (minutes > 0 && hours > 0) output += "0" + minutes + ":";
     else if (minutes > 0 && hours === 0) output += minutes + ":";
     else if (minutes === 0) output += "00:";
-    if (seconds > 10) output += seconds;
+    if (seconds >= 10) output += seconds;
     else if (seconds > 0) output += "0" + seconds;
     else output += "00";
     return output;

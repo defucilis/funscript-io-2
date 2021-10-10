@@ -56,6 +56,27 @@
     }
 }
 
+@layer utilities {
+    .touchable {
+        position: relative;
+    }
+    .touchable-absolute {
+        position: absolute;
+    }
+
+    @media screen and (max-width: 768px) {
+        .touchable:after,
+        .touchable-absolute:after {
+            content: "";
+            position: absolute;
+            top: -10px;
+            bottom: -10px;
+            left: -10px;
+            right: -10px;
+        }
+    }
+}
+
 /* Style NProgress */
 #nprogress .bar {
     background-color: rgba(251, 113, 133) !important;

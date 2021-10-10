@@ -25,7 +25,7 @@ const isTouchEvent = (
 };
 
 const PlayerControls = ({
-    className,
+    showingUi = true,
     playing,
     time,
     duration,
@@ -38,13 +38,14 @@ const PlayerControls = ({
     onZoom,
     onEnterFullscreen,
     onLeaveFullscreen,
+    showPlayPause = true,
     showVolume = true,
     showZoom = false,
     showFullscreen = false,
     onMouseEnter,
     onMouseLeave,
 }: {
-    className?: string;
+    showingUi?: boolean;
     playing: boolean;
     time: number;
     duration: number;
@@ -57,6 +58,7 @@ const PlayerControls = ({
     onZoom?: (direction: -1 | 1) => void;
     onEnterFullscreen?: () => void;
     onLeaveFullscreen?: () => void;
+    showPlayPause?: boolean;
     showVolume?: boolean;
     showZoom?: boolean;
     showFullscreen?: boolean;
@@ -107,6 +109,7 @@ const PlayerControls = ({
             const pos = rawPos - (rect.left + 16 * 0.75);
             const percent = Math.min(1, Math.max(0, pos / (rect.width - 16 * 1.5)));
             const val = percent * duration;
+            console.log(val);
             if (onSeek) onSeek(val);
         },
         [onSeek, trackDiv, dragging]
@@ -147,141 +150,176 @@ const PlayerControls = ({
             document.removeEventListener("mouseup", handleMouseUp);
             document.removeEventListener("touchend", handleMouseUp);
         };
-    }, [dragging]);
+    }, [dragging, handleMouse]);
 
     return (
-        <div
-            className={className || ""}
-            onMouseEnter={() => {
-                if (onMouseEnter) onMouseEnter();
-            }}
-            onMouseLeave={() => {
-                if (onMouseLeave) onMouseLeave();
-            }}
-        >
-            <div className="flex flex-col px-3 select-none">
-                <div
-                    className="h-3 flex flex-col justify-end cursor-pointer"
-                    ref={trackDiv}
-                    onMouseDown={(e: React.MouseEvent) => {
-                        setDragging(true);
-                        handleMouse(e, false);
-                    }}
-                    onMouseMove={handleHoverMove}
-                    onMouseLeave={() => setHoverPosition(-1)}
-                >
+        <div className="absolute left-0 top-0 flex flex-col justify-end w-full h-full">
+            <div
+                className="absolute left-0 bottom-0 w-full h-32 z-0 pointer-events-none"
+                style={{
+                    backgroundImage:
+                        "linear-gradient(to top, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.5) 20%, rgba(0,0,0,0) 100% )",
+                    opacity: showingUi ? 1 : 0,
+                    transition: "opacity 0.2s",
+                }}
+            />
+            <div
+                className={`relative z-10 flex-grow grid place-items-center pt-4 ${
+                    showingUi ? "opacity-100" : "opacity-0"
+                } transition-opacity`}
+                style={{
+                    fontSize: "5rem",
+                }}
+            >
+                <button onClick={() => (showingUi ? togglePlay() : undefined)}>
+                    {playing ? <MdPause /> : <MdPlayArrow />}
+                </button>
+            </div>
+            <div
+                className={`relative z-10 w-full ${
+                    showingUi ? "opacity-100" : "opacity-0"
+                } transition-opacity`}
+                onMouseEnter={() => {
+                    if (onMouseEnter) onMouseEnter();
+                }}
+                onMouseLeave={() => {
+                    if (onMouseLeave) onMouseLeave();
+                }}
+            >
+                <div className="flex flex-col px-3 select-none">
                     <div
-                        className={`flex items-center relative w-full bg-white bg-opacity-20 ${
-                            hoverPosition >= 0 || dragging ? "h-1" : "h-0.5"
-                        }`}
-                        style={{
-                            transition: "all 0.3s",
+                        className="h-3 flex flex-col justify-end cursor-pointer"
+                        ref={trackDiv}
+                        onMouseDown={(e: React.MouseEvent) => {
+                            setDragging(true);
+                            handleMouse(e, false);
                         }}
+                        onMouseMove={handleHoverMove}
+                        onMouseLeave={() => setHoverPosition(-1)}
                     >
                         <div
-                            className="absolute z-0 top-0 left-0 h-full bg-white bg-opacity-40"
+                            className={`flex items-center relative w-full bg-white bg-opacity-20 ${
+                                hoverPosition >= 0 || dragging || (!showPlayPause && showingUi)
+                                    ? "h-1"
+                                    : "h-0.5"
+                            }`}
                             style={{
-                                width: hoverPosition >= 0 ? `${hoverPosition * 100}%` : "0%",
+                                transition: "all 0.3s",
                             }}
-                        />
-                        <div
-                            className="absolute z-10 top-0 left-0 h-full bg-primary-400"
-                            style={{
-                                width: `${(time / duration) * 100}%`,
-                            }}
-                        />
-                        <div
-                            className={`relative z-20 ${
-                                hoverPosition >= 0 || dragging ? "h-3 w-3" : "h-0 w-0"
-                            } bg-primary-400 rounded-full`}
-                            style={{
-                                left: `calc(${time / duration} * (100% - 0.75rem))`,
-                                transition: "width 0.3s, height 0.3s",
-                            }}
-                            onMouseDown={() => {
-                                setDragging(true);
-                            }}
-                            onTouchStart={() => {
-                                setDragging(true);
-                            }}
-                        />
-                    </div>
-                </div>
-                <div className="flex justify-between px-1">
-                    <div className="flex items-center">
-                        <button className="text-4xl p-2" onClick={togglePlay}>
-                            {playing ? <MdPause /> : <MdPlayArrow />}
-                        </button>
-                        {showVolume && (
+                        >
                             <div
-                                className="flex items-center"
-                                onMouseEnter={() => setHoveringVolume(true)}
-                                onMouseLeave={() => setHoveringVolume(false)}
-                            >
-                                <button
-                                    className="text-2xl p-2"
-                                    onClick={() => {
-                                        if (onSetVolume)
-                                            onSetVolume(volume === 0 ? cachedVolume : 0);
-                                    }}
-                                    style={{
-                                        paddingLeft:
-                                            volume === 0 ? "4px" : volume < 0.5 ? "6px" : "8px",
-                                        paddingRight:
-                                            volume === 0 ? "12px" : volume < 0.5 ? "10px" : "8px",
-                                    }}
-                                >
-                                    {volume === 0 ? (
-                                        <MdVolumeMute />
-                                    ) : volume < 0.5 ? (
-                                        <MdVolumeDown />
-                                    ) : (
-                                        <MdVolumeUp />
-                                    )}
-                                </button>
-                                <div
-                                    className="relative h-10 flex items-center overflow-hidden"
-                                    style={{
-                                        width: hoveringVolume ? "5rem" : "0",
-                                        transition: "all 0.3s",
-                                    }}
-                                >
-                                    <div className="absolute w-20">
-                                        <Slider
-                                            value={volume}
-                                            min={0}
-                                            max={1}
-                                            onChange={changeVolume}
-                                            ticks={0}
-                                            showValue={false}
-                                            trackSize={"0.2rem"}
-                                            knobSize={"1rem"}
-                                            activeColor="white"
-                                        />
-                                    </div>
-                                </div>
-                            </div>
-                        )}
-                        <div className="flex text-xs pl-2">
-                            {formatTime(time)} / {formatTime(duration)}
+                                className="absolute z-0 top-0 left-0 h-full bg-white bg-opacity-40"
+                                style={{
+                                    width: hoverPosition >= 0 ? `${hoverPosition * 100}%` : "0%",
+                                }}
+                            />
+                            <div
+                                className="absolute z-10 top-0 left-0 h-full bg-primary-400"
+                                style={{
+                                    width: `${(time / duration) * 100}%`,
+                                }}
+                            />
+                            <div
+                                className={`relative z-20 touchable ${
+                                    hoverPosition >= 0 || dragging || (!showPlayPause && showingUi)
+                                        ? "h-3 w-3"
+                                        : "h-0 w-0"
+                                } bg-primary-400 rounded-full`}
+                                style={{
+                                    left: `calc(${time / duration} * (100% - 0.75rem))`,
+                                    transition: "width 0.3s, height 0.3s",
+                                }}
+                                onMouseDown={() => {
+                                    setDragging(true);
+                                }}
+                                onTouchStart={() => {
+                                    setDragging(true);
+                                }}
+                            />
                         </div>
                     </div>
-                    <div className="flex">
-                        {showZoom && (
-                            <>
-                                <button className="text-2xl p-2" onClick={() => zoom(-1)}>
-                                    <MdZoomOut />
+                    <div className="flex justify-between px-1">
+                        <div className="flex items-center">
+                            {showPlayPause && (
+                                <button className="text-4xl p-2" onClick={togglePlay}>
+                                    {playing ? <MdPause /> : <MdPlayArrow />}
                                 </button>
-                                <button className="text-2xl p-2" onClick={() => zoom(1)}>
-                                    <MdZoomIn />
+                            )}
+                            {showVolume && (
+                                <div
+                                    className="flex items-center"
+                                    onMouseEnter={() => setHoveringVolume(true)}
+                                    onMouseLeave={() => setHoveringVolume(false)}
+                                >
+                                    <button
+                                        className="text-2xl p-2"
+                                        onClick={() => {
+                                            if (onSetVolume)
+                                                onSetVolume(volume === 0 ? cachedVolume : 0);
+                                        }}
+                                        style={{
+                                            paddingLeft:
+                                                volume === 0 ? "4px" : volume < 0.5 ? "6px" : "8px",
+                                            paddingRight:
+                                                volume === 0
+                                                    ? "12px"
+                                                    : volume < 0.5
+                                                    ? "10px"
+                                                    : "8px",
+                                        }}
+                                    >
+                                        {volume === 0 ? (
+                                            <MdVolumeMute />
+                                        ) : volume < 0.5 ? (
+                                            <MdVolumeDown />
+                                        ) : (
+                                            <MdVolumeUp />
+                                        )}
+                                    </button>
+                                    <div
+                                        className="relative h-10 flex items-center overflow-hidden"
+                                        style={{
+                                            width: hoveringVolume ? "5rem" : "0",
+                                            transition: "all 0.3s",
+                                        }}
+                                    >
+                                        <div className="absolute w-20">
+                                            <Slider
+                                                value={volume}
+                                                min={0}
+                                                max={1}
+                                                onChange={changeVolume}
+                                                ticks={0}
+                                                showValue={false}
+                                                trackSize={"0.2rem"}
+                                                knobSize={"1rem"}
+                                                activeColor="white"
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+                            <div className="flex text-xs pl-2">
+                                {formatTime(time)} / {formatTime(duration)}
+                            </div>
+                        </div>
+                        <div className="flex">
+                            {showZoom && (
+                                <>
+                                    <button className="text-2xl p-2" onClick={() => zoom(-1)}>
+                                        <MdZoomOut />
+                                    </button>
+                                    <button className="text-2xl p-2" onClick={() => zoom(1)}>
+                                        <MdZoomIn />
+                                    </button>
+                                </>
+                            )}
+                            {showFullscreen && (
+                                <button className="text-2xl p-2" onClick={toggleFullscreen}>
+                                    {fullscreen ? <MdFullscreenExit /> : <MdFullscreen />}
                                 </button>
-                            </>
-                        )}
-                        {showFullscreen && (
-                            <button className="text-2xl p-2" onClick={toggleFullscreen}>
-                                {fullscreen ? <MdFullscreenExit /> : <MdFullscreen />}
-                            </button>
-                        )}
+                            )}
+                        </div>
                     </div>
                 </div>
             </div>
