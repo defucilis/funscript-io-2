@@ -109,7 +109,6 @@ const PlayerControls = ({
             const pos = rawPos - (rect.left + 16 * 0.75);
             const percent = Math.min(1, Math.max(0, pos / (rect.width - 16 * 1.5)));
             const val = percent * duration;
-            console.log(val);
             if (onSeek) onSeek(val);
         },
         [onSeek, trackDiv, dragging]
@@ -163,18 +162,20 @@ const PlayerControls = ({
                     transition: "opacity 0.2s",
                 }}
             />
-            <div
-                className={`relative z-10 flex-grow grid place-items-center pt-4 ${
-                    showingUi ? "opacity-100" : "opacity-0"
-                } transition-opacity`}
-                style={{
-                    fontSize: "5rem",
-                }}
-            >
-                <button onClick={() => (showingUi ? togglePlay() : undefined)}>
-                    {playing ? <MdPause /> : <MdPlayArrow />}
-                </button>
-            </div>
+            {!showPlayPause && (
+                <div
+                    className={`relative z-10 flex-grow grid place-items-center pt-4 ${
+                        showingUi ? "opacity-100" : "opacity-0"
+                    } transition-opacity`}
+                    style={{
+                        fontSize: "5rem",
+                    }}
+                >
+                    <button onClick={() => (showingUi ? togglePlay() : undefined)}>
+                        {playing ? <MdPause /> : <MdPlayArrow />}
+                    </button>
+                </div>
+            )}
             <div
                 className={`relative z-10 w-full ${
                     showingUi ? "opacity-100" : "opacity-0"
@@ -226,7 +227,7 @@ const PlayerControls = ({
                                         : "h-0 w-0"
                                 } bg-primary-400 rounded-full`}
                                 style={{
-                                    left: `calc(${time / duration} * (100% - 0.75rem))`,
+                                    left: `calc(${time / duration} * 100% - 0.325rem)`,
                                     transition: "width 0.3s, height 0.3s",
                                 }}
                                 onMouseDown={() => {

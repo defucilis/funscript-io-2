@@ -50,7 +50,10 @@ const VideoPlayer = ({
             onProgress && onProgress((video.current?.currentTime || 0) / duration);
             setTime(video.current?.currentTime || 0);
         };
-        const handleDuration = () => setDuration(video.current?.duration || 0);
+        const handleDuration = () => {
+            setDuration(video.current?.duration || 0);
+            handlePause();
+        };
 
         if (!video.current) return;
 

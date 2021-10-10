@@ -3,6 +3,7 @@ import { PlayableContent } from "components/molecules/ContentDropzone";
 import useInterval from "lib/hooks/useInterval";
 import useDoubleClick from "lib/hooks/useDoubleClick";
 import useDimensions from "lib/hooks/useDimensions";
+import AudioWaveform from "components/atoms/AudioWaveform";
 import PlayerControls from "./PlayerControls";
 
 const AudioPlayer = ({
@@ -50,7 +51,10 @@ const AudioPlayer = ({
             onProgress && onProgress((video.current?.currentTime || 0) / duration);
             setTime(video.current?.currentTime || 0);
         };
-        const handleDuration = () => setDuration(video.current?.duration || 0);
+        const handleDuration = () => {
+            setDuration(video.current?.duration || 0);
+            handlePause();
+        };
 
         if (!video.current) return;
 
@@ -140,13 +144,14 @@ const AudioPlayer = ({
             <h1 className="text-2xl">{content.name}</h1>
             <div
                 ref={playerParent}
-                className={`w-full flex flex-col justify-end relative h-36`}
+                className={`w-full flex flex-col justify-end relative h-48`}
                 onMouseMove={bump}
                 style={{
                     cursor: showingUi() ? undefined : "none",
                 }}
             >
                 <audio ref={video} src={content?.url} className="rounded-tl rounded-tr" />
+                <AudioWaveform url={content?.url} progress={time / duration} />
                 <PlayerControls
                     showingUi={showingUi()}
                     onMouseEnter={() => setMouseInControls(true)}
