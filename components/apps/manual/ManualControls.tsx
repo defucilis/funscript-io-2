@@ -1,7 +1,7 @@
 import React, { useRef } from "react";
-import RateLimitedMinMaxSlider from "components/molecules/RateLimitedMinMaxSlider";
-import RateLimitedSlider from "components/molecules/RateLimitedSlider";
 import useKeyboard from "lib/hooks/useKeyboard";
+import SliderField from "components/molecules/SliderField";
+import SliderMinMaxField from "components/molecules/SliderMinMaxField";
 import ManualButtons from "./ManualButtons";
 
 const ManualControls = ({
@@ -14,13 +14,13 @@ const ManualControls = ({
     onButtonCenter,
     slideVerticalMin,
     onSlideVerticalMin,
-    onLimitedSlideVerticalMin,
+    onIntervalSlideVerticalMin,
     slideVerticalMax,
     onSlideVerticalMax,
-    onLimitedSlideVerticalMax,
+    onIntervalSlideVerticalMax,
     slideHorizontal,
     onSlideHorizontal,
-    onLimitedSlideHorizontal,
+    onIntervalSlideHorizontal,
 }: {
     loading: boolean;
     running: boolean;
@@ -31,13 +31,13 @@ const ManualControls = ({
     onButtonCenter: () => void;
     slideVerticalMin: number;
     onSlideVerticalMin: (val: number) => void;
-    onLimitedSlideVerticalMin: (val: number) => void;
+    onIntervalSlideVerticalMin: (val: number) => void;
     slideVerticalMax: number;
     onSlideVerticalMax: (val: number) => void;
-    onLimitedSlideVerticalMax: (val: number) => void;
+    onIntervalSlideVerticalMax: (val: number) => void;
     slideHorizontal: number;
     onSlideHorizontal: (val: number) => void;
-    onLimitedSlideHorizontal: (val: number) => void;
+    onIntervalSlideHorizontal: (val: number) => void;
 }): JSX.Element => {
     const parentRef = useRef<HTMLDivElement>(null);
 
@@ -85,28 +85,29 @@ const ManualControls = ({
                     />
                 </div>
                 <div className="w-full">
-                    <RateLimitedSlider
+                    <SliderField
                         label="Speed"
                         valueUnit="%"
                         min={0}
                         max={100}
                         value={slideHorizontal}
                         onChange={onSlideHorizontal}
-                        onLimitedChange={onLimitedSlideHorizontal}
+                        onIntervalChange={onIntervalSlideHorizontal}
                     />
                 </div>
             </div>
-            <div className="pb-10">
-                <RateLimitedMinMaxSlider
+            <div className="pb-10 w-12">
+                <SliderMinMaxField
                     min={0}
                     max={100}
                     valueMin={slideVerticalMin}
                     valueMax={slideVerticalMax}
                     onChangeMin={onSlideVerticalMin}
                     onChangeMax={onSlideVerticalMax}
-                    onLimitedChangeMin={onLimitedSlideVerticalMin}
-                    onLimitedChangeMax={onLimitedSlideVerticalMax}
+                    onIntervalChangeMin={onIntervalSlideVerticalMin}
+                    onIntervalChangeMax={onIntervalSlideVerticalMax}
                     vertical={true}
+                    valueUnit="%"
                 />
             </div>
         </div>

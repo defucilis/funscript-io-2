@@ -1,8 +1,8 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { HampState, HandyMode } from "lib/thehandy/types";
-import RateLimitedSlider from "components/molecules/RateLimitedSlider";
 import useHandy from "lib/thehandy-react";
+import SliderField from "components/molecules/SliderField";
 import ManualControls from "./manual/ManualControls";
 
 enum SlideIntervalMode {
@@ -132,16 +132,16 @@ const AppManual = (): JSX.Element => {
                 onButtonCenter={() => tryTogglePlay()}
                 slideVerticalMin={slideMin}
                 onSlideVerticalMin={setSlideMin}
-                onLimitedSlideVerticalMin={sendSlideMin}
+                onIntervalSlideVerticalMin={sendSlideMin}
                 slideVerticalMax={slideMax}
                 onSlideVerticalMax={setSlideMax}
-                onLimitedSlideVerticalMax={sendSlideMax}
+                onIntervalSlideVerticalMax={sendSlideMax}
                 slideHorizontal={hampVelocity}
                 onSlideHorizontal={setHampVelocity}
-                onLimitedSlideHorizontal={sendHampVelocity}
+                onIntervalSlideHorizontal={sendHampVelocity}
             />
             <div className="flex flex-col gap-2 w-full">
-                <RateLimitedSlider
+                <SliderField
                     label="Speed Interval"
                     valueUnit="%"
                     min={0}
@@ -149,7 +149,7 @@ const AppManual = (): JSX.Element => {
                     value={velocityInterval}
                     onChange={setVelocityInterval}
                 />
-                <RateLimitedSlider
+                <SliderField
                     label="Slide Interval"
                     valueUnit="%"
                     min={0}

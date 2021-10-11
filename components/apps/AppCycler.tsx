@@ -1,15 +1,14 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { MdPause, MdPlayArrow } from "react-icons/md";
 import { toast } from "react-toastify";
 import { HampState, HandyMode } from "lib/thehandy/types";
-import RateLimitedMinMaxSlider from "components/molecules/RateLimitedMinMaxSlider";
 import useAnim from "lib/hooks/useAnim";
 import Mathf from "lib/Mathf";
-import Slider from "components/atoms/Slider";
-import MinMaxSlider from "components/atoms/MinMaxSlider";
 import IconButton from "components/atoms/IconButton";
 import useHandy from "lib/thehandy-react";
 import useKeyboard from "lib/hooks/useKeyboard";
+import SliderField from "components/molecules/SliderField";
+import SliderMinMaxField from "components/molecules/SliderMinMaxField";
 
 type Range = {
     min: number;
@@ -231,7 +230,7 @@ const AppCycler = (): JSX.Element => {
     return (
         <div className="flex min-h-mobilemain md:min-h-main flex-col -mt-4 pb-5 pt-5 justify-between">
             <div className="flex flex-col gap-4">
-                <MinMaxSlider
+                <SliderMinMaxField
                     label="Speed Bounds"
                     valueUnit="%"
                     min={0}
@@ -241,7 +240,7 @@ const AppCycler = (): JSX.Element => {
                     onChangeMin={val => setSpeedBounds(cur => ({ ...cur, min: val }))}
                     onChangeMax={val => setSpeedBounds(cur => ({ ...cur, max: val }))}
                 />
-                <Slider
+                <SliderField
                     label="Cycle Duration"
                     valueUnit="s"
                     min={10}
@@ -250,17 +249,17 @@ const AppCycler = (): JSX.Element => {
                     onChange={setCycleDuration}
                     ticks={7}
                 />
-                <Slider
+                <SliderField
                     label="Session Duration"
                     valueUnit=" min"
-                    zeroValue="Unlimited"
+                    minValueDisplay="Unlimited"
                     min={0}
                     max={240}
                     value={sessionDuration}
                     onChange={setSessionDuration}
                     ticks={5}
                 />
-                <Slider
+                <SliderField
                     label="Handy Update Interval"
                     valueUnit="s"
                     min={0.5}
@@ -270,7 +269,7 @@ const AppCycler = (): JSX.Element => {
                     decimalPlaces={1}
                     ticks={8}
                 />
-                <Slider
+                <SliderField
                     label="Ease In/Out Balance"
                     valueUnit="%"
                     min={0}
@@ -287,7 +286,7 @@ const AppCycler = (): JSX.Element => {
                         {handyState.hampState === HampState.moving ? "Stop" : "Start"}
                     </span>
                 </div>
-                <RateLimitedMinMaxSlider
+                <SliderMinMaxField
                     label="Stroke Range"
                     valueUnit="%"
                     min={0}
@@ -296,8 +295,8 @@ const AppCycler = (): JSX.Element => {
                     valueMax={slideMax}
                     onChangeMin={setSlideMin}
                     onChangeMax={setSlideMax}
-                    onLimitedChangeMin={sendSlideMin}
-                    onLimitedChangeMax={sendSlideMax}
+                    onIntervalChangeMin={sendSlideMin}
+                    onIntervalChangeMax={sendSlideMax}
                     disabled={loading}
                 />
             </div>

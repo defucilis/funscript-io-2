@@ -2,14 +2,14 @@ import { useEffect, useState } from "react";
 import { MdPause, MdPlayArrow, MdSkipNext } from "react-icons/md";
 import { toast } from "react-toastify";
 import { HampState, HandyMode } from "lib/thehandy/types";
-import RateLimitedSlider from "components/molecules/RateLimitedSlider";
-import RateLimitedMinMaxSlider from "components/molecules/RateLimitedMinMaxSlider";
 import ProgressRing from "components/atoms/CircularProgress";
 import useAnim from "lib/hooks/useAnim";
 import Mathf from "lib/Mathf";
 import IconButton from "components/atoms/IconButton";
 import useHandy from "lib/thehandy-react";
 import useKeyboard from "lib/hooks/useKeyboard";
+import SliderMinMaxField from "components/molecules/SliderMinMaxField";
+import SliderField from "components/molecules/SliderField";
 
 type Range = {
     min: number;
@@ -163,7 +163,7 @@ const AppRandom = (): JSX.Element => {
     return (
         <div className="flex min-h-mobilemain md:min-h-main flex-col -mt-4 pb-5 pt-5 justify-between">
             <div className="flex flex-col gap-4">
-                <RateLimitedMinMaxSlider
+                <SliderMinMaxField
                     label="Random Interval"
                     valueUnit="s"
                     min={2}
@@ -174,7 +174,7 @@ const AppRandom = (): JSX.Element => {
                     onChangeMax={val => setRandomInterval(cur => ({ ...cur, max: val }))}
                     ticks={9}
                 />
-                <RateLimitedMinMaxSlider
+                <SliderMinMaxField
                     label="Speed Range"
                     valueUnit="%"
                     min={0}
@@ -184,7 +184,7 @@ const AppRandom = (): JSX.Element => {
                     onChangeMin={val => setRandomSpeed(cur => ({ ...cur, min: val }))}
                     onChangeMax={val => setRandomSpeed(cur => ({ ...cur, max: val }))}
                 />
-                <RateLimitedMinMaxSlider
+                <SliderMinMaxField
                     label="Stroke Min Range"
                     valueUnit="%"
                     min={0}
@@ -194,7 +194,7 @@ const AppRandom = (): JSX.Element => {
                     onChangeMin={val => setRandomSlide(cur => ({ ...cur, min: val }))}
                     onChangeMax={val => setRandomSlide(cur => ({ ...cur, max: val }))}
                 />
-                <RateLimitedSlider
+                <SliderField
                     label="Stroke Max"
                     valueUnit="%"
                     min={0}
@@ -202,7 +202,7 @@ const AppRandom = (): JSX.Element => {
                     value={slideMax}
                     disabled={loading}
                     onChange={setSlideMax}
-                    onLimitedChange={sendSlideMax}
+                    onIntervalChange={sendSlideMax}
                 />
             </div>
             <div className="flex justify-around items-center">

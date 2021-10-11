@@ -1,6 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import Mathf from "lib/Mathf";
-import { roundNumber } from "lib/text";
+import useInterval from "lib/hooks/useInterval";
 
 const isMouseEvent = (
     e: MouseEvent | TouchEvent | React.MouseEvent | React.TouchEvent
@@ -13,49 +12,49 @@ const isTouchEvent = (
     return (e as TouchEvent).touches !== undefined;
 };
 
+export type SliderBaseProps = {
+    interval?: number;
+    min?: number;
+    max?: number;
+    disabled?: boolean;
+    className?: string;
+    vertical?: boolean;
+    trackSize?: string | number;
+    knobSize?: string | number;
+    activeColor?: string;
+    inactiveColor?: string;
+};
+
+export type SliderProps = SliderBaseProps & {
+    value: number;
+    onChange?: (val: number) => void;
+    onIntervalChange?: (val: number) => void;
+    onStartEdit?: () => void;
+    onStopEdit?: () => void;
+};
+
 const Slider = ({
-    label,
-    valueUnit,
-    zeroValue,
-    showValue = true,
-    min,
-    max,
     value,
     onChange,
+    onIntervalChange,
     onStartEdit,
     onStopEdit,
-    className,
-    disabled,
-    vertical,
-    ticks = 4,
-    decimalPlaces = 0,
+    interval = 500,
+    min = 0,
+    max = 1,
+    disabled = false,
+    className = "",
+    vertical = false,
     trackSize = "0.5rem",
     knobSize = "1.5rem",
     activeColor = "rgb(244,63,94)",
     inactiveColor = "rgb(200,200,200)",
-}: {
-    label?: string;
-    valueUnit?: string;
-    zeroValue?: string;
-    showValue?: boolean;
-    min: number;
-    max: number;
-    value: number;
-    onChange: (val: number) => void;
-    onStartEdit?: () => void;
-    onStopEdit?: () => void;
-    className?: string;
-    disabled?: boolean;
-    vertical?: boolean;
-    ticks?: number;
-    decimalPlaces?: number;
-    trackSize?: string;
-    knobSize?: string;
-    activeColor?: string;
-    inactiveColor?: string;
-}): JSX.Element => {
+}: SliderProps): JSX.Element => {
     const trackDiv = useRef<HTMLDivElement>(null);
     const [dragging, setDragging] = useState(false);
+
+    const [lastSentValue, setLastSentValue] = useState<number>(-100000);
+    const [active, setActive] = useState(false);
 
     const getPercentage = useCallback(
         (val: number, round = false): number => {
@@ -86,15 +85,32 @@ const Slider = ({
                 Math.max(0, pos / ((vertical ? rect.height : rect.width) - 16 * 1.5))
             );
             const val = (vertical ? 1.0 - percent : percent) * (max - min) + min;
-            onChange(val);
+            if (onChange) onChange(val);
         },
         [onChange, trackDiv, dragging]
     );
 
+    const trySendValue = useCallback(() => {
+        if (lastSentValue !== value) {
+            if (onIntervalChange) onIntervalChange(value);
+            setLastSentValue(value);
+        }
+    }, [value, lastSentValue, onChange, onIntervalChange]);
+
+    const startEditing = () => {
+        setActive(true);
+        if (onStartEdit) onStartEdit();
+    };
+    const stopEditing = useCallback(() => {
+        setActive(false);
+        trySendValue();
+        if (onStopEdit) onStopEdit();
+    }, [trySendValue, onStopEdit]);
+
     useEffect(() => {
         const handleMouseUp = () => {
             setDragging(false);
-            if (onStopEdit) onStopEdit();
+            stopEditing();
         };
         if (dragging) {
             document.addEventListener("mousemove", handleMouse);
@@ -109,26 +125,27 @@ const Slider = ({
             document.removeEventListener("mouseup", handleMouseUp);
             document.removeEventListener("touchend", handleMouseUp);
         };
-    }, [dragging, onStopEdit]);
+    }, [dragging, stopEditing]);
+
+    useInterval(
+        () => {
+            if (active && onIntervalChange) {
+                trySendValue();
+            }
+        },
+        onIntervalChange && interval ? interval : 10000000
+    );
 
     return (
-        <div className={`flex flex-col select-none  ${vertical ? "h-full" : "w-full"}`}>
-            {!vertical && (showValue || label) && (
-                <div className="flex justify-between text-sm">
-                    {label ? <p>{label}</p> : <div />}
-                    {showValue && (
-                        <p>
-                            {zeroValue && value === min
-                                ? zeroValue
-                                : `${roundNumber(value, decimalPlaces)}${valueUnit || ""}`}
-                        </p>
-                    )}
-                </div>
-            )}
+        <div
+            className={`flex flex-col select-none  ${vertical ? "h-full" : "w-full"} ${
+                className || ""
+            }`}
+        >
             <div
                 className={`relative grid place-items-center ${
                     vertical ? "w-6 h-full" : "w-full h-6"
-                } ${ticks && ticks > 0 ? (vertical ? "mr-4" : "mb-4") : ""} ${className || ""}`}
+                }`}
             >
                 <div
                     ref={trackDiv}
@@ -147,7 +164,7 @@ const Slider = ({
                     }}
                     onMouseDown={(e: React.MouseEvent) => {
                         setDragging(true && !disabled);
-                        if (onStartEdit && !disabled) onStartEdit();
+                        if (!disabled) startEditing();
                         handleMouse(e, false);
                     }}
                 />
@@ -166,37 +183,13 @@ const Slider = ({
                     }}
                     onMouseDown={() => {
                         setDragging(true && !disabled);
-                        if (onStartEdit && !disabled) onStartEdit();
+                        if (!disabled) startEditing();
                     }}
                     onTouchStart={() => {
                         setDragging(true && !disabled);
-                        if (onStartEdit && !disabled) onStartEdit();
+                        if (!disabled) startEditing();
                     }}
                 />
-                {!!ticks && (
-                    <div
-                        className={`absolute w-full h-full left-0 bottom-0.5 flex justify-between z-0 text-neutral-500 ${
-                            vertical ? "flex-col pl-1" : "pl-2"
-                        }`}
-                    >
-                        {Array.from(Array(ticks + 2)).map((_, i) => {
-                            const value = Mathf.lerp(
-                                min,
-                                max,
-                                vertical ? 1.0 - i / (ticks + 1) : i / (ticks + 1)
-                            );
-                            return (
-                                <div
-                                    className={`flex items-center ${vertical ? "" : "flex-col"}`}
-                                    key={"slider_" + i}
-                                >
-                                    <span>{vertical ? "—" : "|"}</span>
-                                    <span>{roundNumber(value, decimalPlaces)}</span>
-                                </div>
-                            );
-                        })}
-                    </div>
-                )}
             </div>
         </div>
     );
