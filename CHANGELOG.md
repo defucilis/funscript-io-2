@@ -23,8 +23,6 @@
 #### Todo
 
 -   Ads?
--   Doubler modifier
--   Randomization modifier
 
 #### Coming Soon
 

@@ -11,6 +11,7 @@ import {
     getRemappedScript,
     getMetadataScript,
     getCustomFunctionScript,
+    getRandomizedScript,
 } from "lib/funscript-utils/funTweaker";
 import { getDoubleSpeedScript } from "lib/funscript-utils/funDoubler";
 import ModifierControls from "./ModifierControls";
@@ -108,8 +109,11 @@ const ModifyAdd = ({
                 setNewModifier({
                     type,
                     id: nextId,
-                    operation: getOffsetScript,
-                    ...ModifierOperations.getOptions({}),
+                    operation: getRandomizedScript,
+                    ...ModifierOperations.getOptions({
+                        positionJitter: 5,
+                        timeJitter: 50,
+                    }),
                 });
                 break;
             case ModifierType.Remapper:
@@ -184,7 +188,7 @@ const ModifyAdd = ({
                     }}
                 />
             )}
-            {newModifier && newModifier.type !== ModifierType.Randomizer && (
+            {newModifier && (
                 <Button onClick={confirm} className="bg-green-700">
                     Confirm
                 </Button>
