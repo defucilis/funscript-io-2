@@ -7,8 +7,8 @@ import ButtonIcon from "components/atoms/ButtonIcon";
 import FunscriptDropzone from "components/molecules/FunscriptDropzone";
 import FunscriptHeatmap from "components/molecules/FunscriptHeatmap";
 import { Funscript } from "lib/funscript-utils/types";
-import ModifierBlock from "./ModifierBlock";
 import FunscriptExplorer from "../organisms/FunscriptExplorer";
+import ModifierBlock from "./ModifierBlock";
 
 const ModifyHome = ({
     modifiers,
@@ -72,7 +72,7 @@ const ModifyHome = ({
                     />
                 ))}
             </div>
-            <div className="w-full flex justify-center mt-4">
+            <div className="w-full flex justify-center mt-4 mb-4">
                 {modifiers.length === 0 ? (
                     <Button onClick={onAddModifier}>Add your first modifier</Button>
                 ) : (
@@ -87,11 +87,11 @@ const ModifyHome = ({
                 </p>
             )}
             {modifiedFunscript && downloadFile && modifiers.length > 0 && (
-                <>
+                <div className="mb-4">
                     <a
                         href={downloadFile.url}
                         download={downloadFile.filename}
-                        className="h-16 mt-4 relative block"
+                        className="h-16 relative block"
                     >
                         <div className="relative w-full h-full">
                             <div className="relative z-10 bg-black bg-opacity-20 grid place-items-center w-full h-full">
@@ -104,9 +104,10 @@ const ModifyHome = ({
                         </div>
                     </a>
                     <FunscriptInfo funscript={modifiedFunscript} />
-                    <FunscriptExplorer funscript={modifiedFunscript} />
-                </>
+                </div>
             )}
+            {rawFunscript && !modifiedFunscript && <FunscriptExplorer funscript={rawFunscript} />}
+            {modifiedFunscript && <FunscriptExplorer funscript={modifiedFunscript} />}
         </div>
     );
 };

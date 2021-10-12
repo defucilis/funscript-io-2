@@ -20,7 +20,10 @@ export interface FunDoublerOptions {
  * @param  {Action[]} actionGroup - The group to double the speed of
  * @param  {FunDoublerOptions} options - Options to change the behaviour of the speed-doubling
  */
-export const getDoubleSpeedGroup = (actionGroup: Action[], options: FunDoublerOptions): Action[] => {
+export const getDoubleSpeedGroup = (
+    actionGroup: Action[],
+    options: FunDoublerOptions
+): Action[] => {
     //Select 'apex' actions where the direction changes, and action pairs that represent a pause
     const keyActions: Action[] = [];
     let apexCount = 0;

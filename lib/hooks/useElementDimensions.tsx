@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 
 const useElementDimensions = (
     ref: React.RefObject<HTMLElement>
-): { x: number, y: number, width: number; height: number } => {
+): { x: number; y: number; width: number; height: number } => {
     const [dimensions, setDimensions] = useState({ x: 0, y: 0, width: 0, height: 0 });
 
     useEffect(() => {
