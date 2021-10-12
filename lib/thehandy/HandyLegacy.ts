@@ -15,6 +15,7 @@ import {
 
 const baseUrl = "https://www.handyfeeling.com/api/v1/";
 
+/** Class to connect to and control a Handy using the HandyFeeling API V1 for devices with firmware v2.x. Will probably stop working eventually. And is no longer being suppoorted */
 class Handy {
     _connectionKey: string;
     serverTimeOffset: number;

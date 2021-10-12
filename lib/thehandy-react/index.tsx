@@ -16,6 +16,7 @@ const useProvideHandy = (verbose = false) => {
     return { handy };
 };
 
+/** Context provider for the Handy - wrap your app in it! */
 const HandyProvider = ({
     verbose,
     children,
@@ -28,65 +29,105 @@ const HandyProvider = ({
 };
 
 interface UseHandy {
+    /** Updates the connection status, mode and state of the Handy */
     refresh: () => Promise<void>;
+    /** The most recently-set connection key */
     connectionKey: string;
+    /** Sets the connection key of the Handy, and makes sure that it can be used to connect */
     connect: (connectionKey: string) => Promise<boolean>;
+    /** Clears the connection key of the Handy */
     disconnect: () => Promise<void>;
+    /** Internal state of the Handy - note that this can become out-of-sync if other apps are simultaneously controlling the Handy */
     handyState: HandyState;
+    /** Most recently-occurred error arising from commands sent to the Handy */
     error: string;
+    /** Whether a command is currently waiting to execute on the Handy */
     loading: boolean;
+    /** Gets the mode the Handy is currently in */
     getMode: () => Promise<HandyMode>;
+    /** Sets the Handy to a new mode. */
     sendMode: (mode: HandyMode) => Promise<void>;
+    /** Determines whether the Handy is currently connected or not */
     getConnected: () => Promise<boolean>;
+    /** Returns information about the device; hardware version, firmware version, firmware status, firmware branch and device model. */
     getInfo: () => Promise<HandyInfo | undefined>;
+    /** Returns min and mix slider position */
     getSettings: () => Promise<HandySettings>;
+    /** A convenient endpoint for fetching the current mode of the device and the state within the current mode. For modes with a single state, the returned state value will always be 0. For modes with multiple states, see the schema definition for possible values. */
     getStatus: () => Promise<{ mode: HandyMode; state: number }>;
+    /** Starts HAMP movement - puts the Handy in HAMP mode first, if it isn't already in HAMP mode. */
     sendHampStart: () => Promise<void>;
+    /** Stops HAMP movement - puts the Handy in HAMP mode first, if it isn't already in HAMP mode. */
     sendHampStop: () => Promise<void>;
+    /** Sets the current HAMP state - an alternative to sendHampStart and sendHampStop. Puts the Handy in HAMP mode first, if it isn't already in HAMP mode */
     sendHampState: (state: HampState) => Promise<void>;
+    /** Gets the current HAMP state - puts the Handy in HAMP mode first, if it isn't already in HAMP mode */
     getHampState: () => Promise<HampState>;
+    /** Gets the current HAMP velocity, from 0 - 100 - putes the handy in HAMP mode first, if it isn't already in HAMP mode */
     getHampVelocity: () => Promise<number>;
+    /** Sets the current HAMP velocity, from 0 - 100 - putes the handy in HAMP mode first, if it isn't already in HAMP mode */
     sendHampVelocity: (velocity: number) => Promise<void>;
+    /** Sets the next absolute position (xa) of the device, and the absolute velocity (va) the device should use to reach the position. Puts the Handy in HDSP mode, if it isn't already in HDSP mode */
     sendHdspXaVa: (
         positionAbsolute: number,
         velocityAbsolute: number,
         stopOnTarget?: boolean
     ) => Promise<void>;
+    /** Sets the next percent position (xp) of the device, and the absolute velocity (va) the device should use to reach the position. Puts the Handy in HDSP mode, if it isn't already in HDSP mode */
     sendHdspXpVa: (
         positionPercentage: number,
         velocityAbsolute: number,
         stopOnTarget?: boolean
     ) => Promise<void>;
+    /** Sets the next percent position (xp) of the device, and the percent velocity (vp) the device should use to reach the position. Puts the Handy in HDSP mode, if it isn't already in HDSP mode */
     sendHdspXpVp: (
         positionPercentage: number,
         velocityPercentage: number,
         stopOnTarget?: boolean
     ) => Promise<void>;
+    /** Sets the next absolute position (xa) of the device, and the time (t) the device should use to reach the position. Puts the Handy in HDSP mode, if it isn't already in HDSP mode */
     sendHdspXaT: (
         positionAbsolute: number,
         durationMilliseconds: number,
         stopOnTarget?: boolean
     ) => Promise<void>;
+    /** Sets the next percent position (xp) of the device, and the time (t) the device should use to reach the position. Puts the Handy in HDSP mode, if it isn't already in HDSP mode */
     sendHdspXpT: (
         positionPercentage: number,
         durationMilliseconds: number,
         stopOnTarget?: boolean
     ) => Promise<void>;
+    /** Starts HSSP playback, if a script has already been prepared. Can be used to skip to a timecode in ms from the start of the script. Pass in an estimated server time to ensure proper sync. Puts the handy in HSSP mode, if it isn't already in HSSP mode. */
     sendHsspPlay: (playbackPosition?: number, serverTime?: number) => Promise<void>;
+    /** Stops HSSP playback, if a script has already been prepared. Puts the handy in HSSP mode, if it isn't already in HSSP mode. */
     sendHsspStop: () => Promise<void>;
+    /** Setup script synchronization by providing the device with an URL from where the script can be downloaded. The device need to be able to access the URL for setup to work. If the sha-256 value of the script is provided, the device will only download the script if it can not be found in the device cache. Puts the Handy in HSSP mode, if it isn't already in HSSP mode */
     sendHsspSetup: (url: string, sha256?: string) => Promise<void>;
+    /** Determines whether the Handy has HSSP loop turned on. Puts the Handy in HSSP mode, if it isn't already in HSSP mode. */
     getHsspLoop: (loop: boolean) => Promise<boolean>;
+    /** Enables or disables loop mode in HSSP. Puts the Handy in HSSP mode, if it isn't already in HSSP mode */
     sendHsspLoop: (loop: boolean) => Promise<void>;
+    /** Returns the current HSSP state. Puts the Handy in HSSP mode, if it isn't already in HSSP mode. */
     getHsspState: () => Promise<HsspState>;
+    /** Get the current time of the device. When the device and the server time is synchronized, this will be the server time estimated by the device. */
     getHstpTime: () => Promise<number>;
+    /** Gets the current manual offset of the Handy in milliseconds. Negative values mean that the script will be delayed, positive values mean that the script will be advanced. */
     getHstpOffset: () => Promise<number>;
+    /** Sets the current manual offset of the Handy in milliseconds. Negative values mean that the script will be delayed, positive values mean that the script will be advanced. */
     sendHstpOffset: (offset: number) => Promise<void>;
+    /** Gets the current round-trip delay from the Handy to the server and back, in milliseconds. Used for synchronization. */
     getHstpRtd: () => Promise<number>;
+    /** Gets the min and max slide positions from 0 - 100 */
     getSlideSettings: () => Promise<{ min: number; max: number }>;
+    /** Gets the current position of the slider in mm from the bottom position */
     getSlidePositionAbsolute: () => Promise<number>;
+    /** Sets the min and max slide positions from 0 - 100 */
     sendSlideSettings: (min: number, max: number) => Promise<void>;
+    /** Sets the min slide position, from 0 - 100. If fixed is true, then the device will attempt to maintain the same distance between min and max */
     sendSlideMin: (min: number, fixed?: boolean) => Promise<void>;
+    /** Sets the max slide position, from 0 - 100. If fixed is true, then the device will attempt to maintain the same distance between min and max */
     sendSlideMax: (max: number, fixed?: boolean) => Promise<void>;
+    /** Gets the offset, in milliseconds, between the Handy and the HandyFeeling servers. Updates estimatedServerTimeOffset */
     getServerTimeOffset: () => Promise<number>;
 }
 
@@ -125,6 +166,7 @@ interface HandyState {
     slidePositionAbsolute: number;
 }
 
+/** Context consumer for the Handy provider. Provides access to the Handy and its internal state. */
 const useHandy = (): UseHandy => {
     const { handy } = useContext(handyContext);
     const [error, setError] = useState("");

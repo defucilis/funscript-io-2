@@ -15,6 +15,7 @@ import {
 
 const baseUrl = "https://www.handyfeeling.com/api/handy/v2/";
 
+/** Class to connect to, control and track the internal state of a Handy using the HandyFeeling API V2 */
 class Handy {
     private _connectionKey: string;
 
@@ -128,9 +129,7 @@ class Handy {
         return json;
     }
 
-    /** A convenient endpoint for fetching the current mode of the device and the state within the current mode.
-    For modes with a single state, the returned state value will always be 0.
-    For modes with multiple states, see the schema definition for possible values. */
+    /** A convenient endpoint for fetching the current mode of the device and the state within the current mode. For modes with a single state, the returned state value will always be 0. For modes with multiple states, see the schema definition for possible values. */
     async getStatus(): Promise<HandyStatus> {
         const json: HandyStatus = await this.getJson("status");
 
@@ -213,9 +212,7 @@ class Handy {
     //                  HDSP
     //---------------------------------------------
 
-    /** Sets the next absolute position (xa) of the device, and the absolute velocity (va) the device should use to reach the position.
-     * Puts the Handy in HDSP mode, if it isn't already in HDSP mode
-     */
+    /** Sets the next absolute position (xa) of the device, and the absolute velocity (va) the device should use to reach the position. Puts the Handy in HDSP mode, if it isn't already in HDSP mode */
     async setHdspXaVa(
         positionAbsolute: number,
         velocityAbsolute: number,
@@ -236,9 +233,7 @@ class Handy {
         return json.result;
     }
 
-    /** Sets the next percent position (xp) of the device, and the absolute velocity (va) the device should use to reach the position.
-     * Puts the Handy in HDSP mode, if it isn't already in HDSP mode
-     */
+    /** Sets the next percent position (xp) of the device, and the absolute velocity (va) the device should use to reach the position. Puts the Handy in HDSP mode, if it isn't already in HDSP mode */
     async setHdspXpVa(
         positionPercentage: number,
         velocityAbsolute: number,
@@ -259,9 +254,7 @@ class Handy {
         return json.result;
     }
 
-    /** Sets the next percent position (xp) of the device, and the percent velocity (vp) the device should use to reach the position.
-     * Puts the Handy in HDSP mode, if it isn't already in HDSP mode
-     */
+    /** Sets the next percent position (xp) of the device, and the percent velocity (vp) the device should use to reach the position. Puts the Handy in HDSP mode, if it isn't already in HDSP mode */
     async setHdspXpVp(
         positionPercentage: number,
         velocityPercentage: number,
@@ -282,9 +275,7 @@ class Handy {
         return json.result;
     }
 
-    /** Sets the next absolute position (xa) of the device, and the time (t) the device should use to reach the position.
-     * Puts the Handy in HDSP mode, if it isn't already in HDSP mode
-     */
+    /** Sets the next absolute position (xa) of the device, and the time (t) the device should use to reach the position. Puts the Handy in HDSP mode, if it isn't already in HDSP mode */
     async setHdspXaT(
         positionAbsolute: number,
         durationMilliseconds: number,
@@ -305,9 +296,7 @@ class Handy {
         return json.result;
     }
 
-    /** Sets the next percent position (xp) of the device, and the time (t) the device should use to reach the position.
-     * Puts the Handy in HDSP mode, if it isn't already in HDSP mode
-     */
+    /** Sets the next percent position (xp) of the device, and the time (t) the device should use to reach the position. Puts the Handy in HDSP mode, if it isn't already in HDSP mode */
     async setHdspXpT(
         positionPercentage: number,
         durationMilliseconds: number,
@@ -332,9 +321,7 @@ class Handy {
     //                  HSSP
     //---------------------------------------------
 
-    /** Starts HSSP playback, if a script has already been prepared. Can be used to skip to a timecode in ms from the start of the script. Pass in an estimated server time to ensure proper sync.
-     * Puts the handy in HSSP mode, if it isn't already in HSSP mode.
-     */
+    /** Starts HSSP playback, if a script has already been prepared. Can be used to skip to a timecode in ms from the start of the script. Pass in an estimated server time to ensure proper sync. Puts the handy in HSSP mode, if it isn't already in HSSP mode. */
     async setHsspPlay(playbackPosition?: number, serverTime?: number): Promise<GenericResult> {
         if (this.currentMode !== HandyMode.hssp) await this.setMode(HandyMode.hssp);
         if (this.hsspState == HsspState.needSetup)
@@ -350,9 +337,7 @@ class Handy {
         return json.result;
     }
 
-    /** Stops HSSP playback, if a script has already been prepared.
-     * Puts the handy in HSSP mode, if it isn't already in HSSP mode.
-     */
+    /** Stops HSSP playback, if a script has already been prepared. Puts the handy in HSSP mode, if it isn't already in HSSP mode. */
     async setHsspStop(): Promise<GenericResult> {
         if (this.currentMode !== HandyMode.hssp) await this.setMode(HandyMode.hssp);
         if (this.hsspState == HsspState.needSetup)
@@ -365,11 +350,7 @@ class Handy {
         return json.result;
     }
 
-    /**
-     * Setup script synchronization by providing the device with an URL from where the script can be downloaded. The device need to be able to access the URL for setup to work.
-     * If the sha-256 value of the script is provided, the device will only download the script if it can not be found in the device cache.
-     * Puts the Handy in HSSP mode, if it isn't already in HSSP mode
-     */
+    /** Setup script synchronization by providing the device with an URL from where the script can be downloaded. The device need to be able to access the URL for setup to work. If the sha-256 value of the script is provided, the device will only download the script if it can not be found in the device cache. Puts the Handy in HSSP mode, if it isn't already in HSSP mode */
     async setHsspSetup(url: string, sha256?: string): Promise<HsspSetupResult> {
         if (this.currentMode !== HandyMode.hssp) await this.setMode(HandyMode.hssp);
 
@@ -428,9 +409,7 @@ class Handy {
         return json.time;
     }
 
-    /** Gets the current manual offset of the Handy in milliseconds.
-     * Negative values mean that the script will be delayed, positive values mean that the script will be advanced.
-     */
+    /** Gets the current manual offset of the Handy in milliseconds. Negative values mean that the script will be delayed, positive values mean that the script will be advanced. */
     async getHstpOffset(): Promise<number> {
         const json: { result: GenericResult; offset: number } = await this.getJson("hstp/time");
         this.hstpOffset = json.offset;
@@ -438,9 +417,7 @@ class Handy {
         return json.offset;
     }
 
-    /** Sets the current manual offset of the Handy in milliseconds.
-     * Negative values mean that the script will be delayed, positive values mean that the script will be advanced.
-     */
+    /** Sets the current manual offset of the Handy in milliseconds. Negative values mean that the script will be delayed, positive values mean that the script will be advanced. */
     async setHstpoffset(offset: number): Promise<GenericResult> {
         const json: { result: GenericResult } = await this.putJson("hstp/time", {
             offset: offset,
@@ -536,11 +513,13 @@ class Handy {
     //---------------------------------------------
     //                  TIMESYNC
     //---------------------------------------------
+    /** Gets the current time on the HandyFeeling server */
     async getServerTime(): Promise<number> {
         const json = await this.getJson("servertime");
         return json.serverTime;
     }
 
+    /** Gets the offset, in milliseconds, between the Handy and the HandyFeeling servers. Updates estimatedServerTimeOffset */
     async getServerTimeOffset(
         trips = 30,
         onProgress?: (progress: number) => void
