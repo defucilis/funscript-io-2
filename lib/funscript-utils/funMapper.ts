@@ -325,4 +325,17 @@ export const renderActions = (
         ctx.fillStyle = "#FFF";
         ctx.fill();
     }
+
+    ctx.fillStyle = "white";
+    ctx.strokeStyle = "rgba(255,255,255,0.1)";
+    ctx.textAlign = "left";
+    ctx.lineWidth = 1;
+    for (let i = 0; i < script.actions.slice(-1)[0].at; i += 1000) {
+        const x = timeToX(i);
+        if (i % 5000 === 0) ctx.fillText(String(Math.round(i / 1000)), x, height - 5);
+        ctx.beginPath();
+        ctx.moveTo(x, 0);
+        ctx.lineTo(x, height);
+        ctx.stroke();
+    }
 };

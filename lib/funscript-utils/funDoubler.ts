@@ -7,12 +7,8 @@ const sign = (val: number) => {
 };
 
 export interface FunDoublerOptions {
-    removeShortPauses?: boolean;
+    matchGroupEnd?: boolean;
     shortPauseDuration?: number;
-    matchFirstDownstroke?: boolean;
-    matchGroupEndPosition?: boolean;
-    resetAfterPause?: boolean;
-    debugMode?: boolean;
 }
 
 /**
@@ -24,164 +20,76 @@ export const getDoubleSpeedGroup = (
     actionGroup: Action[],
     options: FunDoublerOptions
 ): Action[] => {
-    //Select 'apex' actions where the direction changes, and action pairs that represent a pause
-    const keyActions: Action[] = [];
-    let apexCount = 0;
-    let filteredGroup = actionGroup.filter((action, i) => {
+    //to begin with, we remove short pauses
+    const noShortPauses = actionGroup.filter((action, i) => {
         if (i === 0) return true;
-        if (i === actionGroup.length - 1) return true;
+        if (action.pos !== actionGroup[i - 1].pos) return true;
 
-        //ignore actions that occur within a pause (there shouldn't be any, but just in case)
-        const lastAction = actionGroup[i - 1];
-        const nextAction = actionGroup[i + 1];
-        return !(action.pos === lastAction.pos && action.pos === nextAction.pos);
-    });
-    if (options.removeShortPauses) {
-        const newFilteredGroup: Action[] = [];
-        const pauseTime =
-            options.shortPauseDuration && options.shortPauseDuration > 0
-                ? options.shortPauseDuration
-                : 2000;
-        filteredGroup.forEach((action, i) => {
-            if (i === 0 || i === filteredGroup.length - 1) {
-                newFilteredGroup.push(action);
-                return;
-            }
-            const lastAction = actionGroup[i - 1];
-            const nextAction = actionGroup[i + 1];
-
-            //if the gap between to equal positions is less than 0.5 seconds (configurable?)
-            if (action.pos === lastAction.pos && Math.abs(action.at - lastAction.at) < pauseTime) {
-                newFilteredGroup.push({ at: (action.at + lastAction.at) * 0.5, pos: action.pos });
-            } else if (
-                action.pos === nextAction.pos &&
-                Math.abs(action.at - nextAction.at) < pauseTime
-            ) {
-                //do nothing - we're going to combine them at the next action so we don't add it!
-            } else {
-                newFilteredGroup.push(action);
-            }
-        });
-        filteredGroup = newFilteredGroup;
-    }
-    filteredGroup.forEach((action, i) => {
-        //The first and last points in a group are always added
-        if (i === 0) {
-            keyActions.push({ ...action, subActions: [], type: "first" });
-            return;
-        }
-        if (i === filteredGroup.length - 1) {
-            //note - should this be a key action? Hard to know right now, need to test
-            keyActions.push({ ...action, subActions: [], type: "last" });
-            return;
-        }
-
-        const lastAction = filteredGroup[i - 1];
-        const nextAction = filteredGroup[i + 1];
-
-        //Add the actions on either side of a pause
-        if (action.pos - lastAction.pos === 0) {
-            keyActions.push({ ...action, subActions: [], type: "pause" });
-            apexCount = 0;
-            return;
-        }
-        if (action.pos - nextAction.pos === 0) {
-            keyActions.push({ ...action, subActions: [], type: "prepause" });
-            apexCount = 0;
-            return;
-        }
-
-        if (options.matchFirstDownstroke && i === 1 && action.pos < lastAction.pos) {
-            apexCount = 1;
-        }
-
-        //apex actions - add every second one (reset when at a pause)
-        if (sign(action.pos - lastAction.pos) !== sign(nextAction.pos - action.pos)) {
-            if (apexCount === 0) {
-                const lastKeyAction = keyActions.slice(-1)[0];
-                if (lastKeyAction.subActions) {
-                    lastKeyAction.subActions = [...lastKeyAction.subActions, action];
-                }
-                apexCount++;
-                return;
-            } else {
-                keyActions.push({ ...action, subActions: [], type: "apex" });
-                apexCount = 0;
-                return;
-            }
-        }
-
-        const lastKeyAction = keyActions.slice(-1)[0];
-        if (lastKeyAction.subActions) {
-            lastKeyAction.subActions = [...lastKeyAction.subActions, action];
-        }
+        const diff = Math.abs(action.at - actionGroup[i - 1].at);
+        return diff > (options.shortPauseDuration || 100);
     });
 
-    let pos = options.resetAfterPause ? 100 : keyActions[0].pos;
-    const finalActions: Action[] = [];
-    keyActions.forEach((action, i) => {
-        if (i === 0) {
-            const outputAction: Action = { at: action.at, pos };
-            if (options.debugMode) {
-                outputAction.type = action.type;
-                if (action.subActions && action.subActions.length > 0)
-                    outputAction.subActions = action.subActions;
-            }
-            finalActions.push(outputAction);
-            return;
+    //first, we need to simplify the group into straight up and down lines - no curves
+    const simplifiedGroup: Action[] = [];
+    for (let i = 0; i < noShortPauses.length; i++) {
+        if (i === 0 || i === noShortPauses.length - 1) {
+            simplifiedGroup.push(noShortPauses[i]);
+            continue;
         }
-
-        const lastAction = keyActions[i - 1];
-
-        const outputAction: Action = { at: 0, pos: 0 };
-        if (action.type === "pause") {
-            outputAction.at = action.at;
-            outputAction.pos = action.pos;
-        } else {
-            if (lastAction.subActions) {
-                const max = Math.max(...[...lastAction.subActions.map(a => a.pos), action.pos]);
-                const min = Math.min(...[...lastAction.subActions.map(a => a.pos), action.pos]);
-                const newPos = Math.abs(pos - min) > Math.abs(pos - max) ? min : max;
-
-                outputAction.pos = newPos;
-                pos = newPos;
-            } else {
-                outputAction.pos = action.pos;
-            }
-
-            outputAction.at = action.at;
-        }
-
-        if (options.debugMode) {
-            outputAction.type = action.type;
-            if (action.subActions && action.subActions.length > 0)
-                outputAction.subActions = action.subActions;
-        }
-        finalActions.push(outputAction);
-    });
-
-    if (options.matchGroupEndPosition) {
-        if (finalActions.slice(-1)[0].pos !== actionGroup.slice(-1)[0].pos) {
-            const finalActionDuration = finalActions.slice(-1)[0].at - finalActions.slice(-2)[0].at;
-            const outputAction: Action = { at: 0, pos: 0 };
-            outputAction.pos = actionGroup.slice(-1)[0].pos;
-            outputAction.at = finalActions.slice(-1)[0].at + finalActionDuration;
-
-            if (options.debugMode) {
-                finalActions.slice(-1)[0].type = "apex";
-
-                outputAction.subActions = [];
-                outputAction.type = "last";
-            }
-            finalActions.push(outputAction);
-        }
+        const dirPrev = sign(noShortPauses[i].pos - noShortPauses[i - 1].pos);
+        const dirNext = sign(noShortPauses[i + 1].pos - noShortPauses[i].pos);
+        if (dirPrev !== dirNext) simplifiedGroup.push(noShortPauses[i]);
     }
 
-    return finalActions.map(action => ({
-        ...action,
-        pos: Math.round(action.pos),
-        at: Math.round(action.at),
-    }));
+    //now we can just go through and double each action
+    let currentPos = simplifiedGroup[0].pos;
+    const finalGroup: Action[] = [];
+    for (let i = 0; i < simplifiedGroup.length; i++) {
+        const curAction = simplifiedGroup[i];
+
+        if (i === simplifiedGroup.length - 1) {
+            if (!options.matchGroupEnd) simplifiedGroup.push(curAction);
+            continue;
+        }
+        const nextAction = simplifiedGroup[i + 1];
+
+        const min = Math.min(curAction.pos, nextAction.pos);
+        const max = Math.max(curAction.pos, nextAction.pos);
+        const halfTime = curAction.at + (nextAction.at - curAction.at) / 2;
+        const endTime = nextAction.at;
+        const minFurther = Math.abs(currentPos - min) > Math.abs(currentPos - max);
+
+        if (i === 0) {
+            //always add the first action
+            finalGroup.push(curAction);
+            finalGroup.push({ at: halfTime, pos: minFurther ? min : max });
+            finalGroup.push({ at: endTime, pos: minFurther ? max : min });
+            currentPos = minFurther ? max : min;
+            continue;
+        }
+
+        const dir = nextAction.pos - curAction.pos;
+        if (dir === 0) {
+            //hold current position during pauses
+            finalGroup.push({ ...nextAction, pos: currentPos });
+            continue;
+        }
+
+        //if this is the second-last group
+        if (i === simplifiedGroup.length - 2 && options.matchGroupEnd) {
+            finalGroup.push(simplifiedGroup[simplifiedGroup.length - 1]);
+            continue;
+        }
+
+        finalGroup.push({ at: halfTime, pos: minFurther ? min : max });
+        finalGroup.push({ at: endTime, pos: minFurther ? max : min });
+        currentPos = minFurther ? max : min;
+        finalGroup.push({ at: endTime + 10, pos: currentPos });
+    }
+
+    console.log({ actionGroup, noShortPauses, simplifiedGroup, finalGroup });
+
+    return finalGroup;
 };
 /**
  * Creates a double-speed version of a script without sacrificing cadence by turning every up or downstroke into a full up+down stroke
@@ -202,10 +110,10 @@ export const getDoubleSpeedScript = (script: Funscript, options: FunDoublerOptio
     const actionGroups = longFirstWait
         ? getActionGroups(orderedActions.slice(1))
         : getActionGroups(orderedActions);
-    const slowerGroups = actionGroups.map(group => getDoubleSpeedGroup(group, options));
+    const fasterGroups = actionGroups.map(group => getDoubleSpeedGroup(group, options));
 
     //finally, we combine these slower groups into the final actions array
-    slowerGroups.forEach(group => {
+    fasterGroups.forEach(group => {
         group.forEach(action => {
             output.actions.push(action);
         });

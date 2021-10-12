@@ -4,7 +4,13 @@ import FunscriptPreview from "components/molecules/FunscriptPreview";
 import { Funscript } from "lib/funscript-utils/types";
 import useElementDimensions from "lib/hooks/useElementDimensions";
 
-const FunscriptExplorer = ({ funscript }: { funscript?: Funscript }): JSX.Element | null => {
+const FunscriptExplorer = ({
+    funscript,
+    compareFunscript,
+}: {
+    funscript?: Funscript;
+    compareFunscript?: Funscript;
+}): JSX.Element | null => {
     const parent = useRef<HTMLDivElement>(null);
     const { x, width } = useElementDimensions(parent);
 
@@ -36,7 +42,6 @@ const FunscriptExplorer = ({ funscript }: { funscript?: Funscript }): JSX.Elemen
             5000,
             Math.min(duration, viewDuration * (delta > 0 ? 1.5 : 1 / 1.5))
         );
-        console.log({ newDuration, delta });
         setViewDuration(newDuration);
         if (viewCenter - newDuration * 0.5 < 0) setViewCenter(newDuration * 0.5);
         else if (viewCenter + newDuration * 0.5 > duration)
@@ -46,9 +51,9 @@ const FunscriptExplorer = ({ funscript }: { funscript?: Funscript }): JSX.Elemen
     if (!funscript) return null;
 
     return (
-        <div className="w-full flex flex-col">
+        <div className="w-full flex flex-col relative">
             <FunscriptPreview
-                className="h-40 py-2"
+                className="h-40 py-2 relative z-10"
                 funscript={funscript}
                 options={{
                     duration: viewDuration,
@@ -63,9 +68,34 @@ const FunscriptExplorer = ({ funscript }: { funscript?: Funscript }): JSX.Elemen
                             : viewDuration > 30000
                             ? 3
                             : 4,
-                    lineColor: "rgb(521, 113, 133)",
+                    lineColor: `rgba(255,255,255,${compareFunscript ? "0.5" : "1"})`,
                 }}
             />
+            {compareFunscript && (
+                <FunscriptPreview
+                    className="w-full h-40 py-2 absolute left-0 top-0 z-0"
+                    funscript={compareFunscript}
+                    options={{
+                        duration: viewDuration,
+                        startTime: viewCenter - viewDuration * 0.5,
+                        background: "rgba(0,0,0,0)",
+                        clear: true,
+                        lineWeight:
+                            viewDuration > 300000
+                                ? 1
+                                : viewDuration > 100000
+                                ? 2
+                                : viewDuration > 30000
+                                ? 3
+                                : 4,
+                        lineColor: "rgb(521, 113, 133)",
+                        offset: {
+                            x: 2,
+                            y: 0,
+                        },
+                    }}
+                />
+            )}
             <div
                 className="h-12 relative"
                 onMouseMove={handleMouseMove}

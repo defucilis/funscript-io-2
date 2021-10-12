@@ -12,6 +12,7 @@ import {
     getMetadataScript,
     getCustomFunctionScript,
 } from "lib/funscript-utils/funTweaker";
+import { getDoubleSpeedScript } from "lib/funscript-utils/funDoubler";
 import ModifierControls from "./ModifierControls";
 
 const defaultFunction = `actions => {
@@ -85,8 +86,11 @@ const ModifyAdd = ({
                 setNewModifier({
                     type,
                     id: nextId,
-                    operation: getOffsetScript,
-                    ...ModifierOperations.getOptions({}),
+                    operation: getDoubleSpeedScript,
+                    ...ModifierOperations.getOptions({
+                        matchGroupEnd: true,
+                        shortPauseDuration: 100,
+                    }),
                 });
                 break;
             case ModifierType.Limiter:
@@ -180,13 +184,11 @@ const ModifyAdd = ({
                     }}
                 />
             )}
-            {newModifier &&
-                newModifier.type !== ModifierType.Randomizer &&
-                newModifier.type !== ModifierType.Doubler && (
-                    <Button onClick={confirm} className="bg-green-700">
-                        Confirm
-                    </Button>
-                )}
+            {newModifier && newModifier.type !== ModifierType.Randomizer && (
+                <Button onClick={confirm} className="bg-green-700">
+                    Confirm
+                </Button>
+            )}
         </div>
     );
 };

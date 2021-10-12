@@ -7,7 +7,7 @@ import ButtonIcon from "components/atoms/ButtonIcon";
 import FunscriptDropzone from "components/molecules/FunscriptDropzone";
 import FunscriptHeatmap from "components/molecules/FunscriptHeatmap";
 import { Funscript } from "lib/funscript-utils/types";
-import FunscriptExplorer from "../organisms/FunscriptExplorer";
+import FunscriptExplorer from "../../organisms/FunscriptExplorer";
 import ModifierBlock from "./ModifierBlock";
 
 const ModifyHome = ({
@@ -107,7 +107,9 @@ const ModifyHome = ({
                 </div>
             )}
             {rawFunscript && !modifiedFunscript && <FunscriptExplorer funscript={rawFunscript} />}
-            {modifiedFunscript && <FunscriptExplorer funscript={modifiedFunscript} />}
+            {rawFunscript && modifiedFunscript && (
+                <FunscriptExplorer funscript={rawFunscript} compareFunscript={modifiedFunscript} />
+            )}
         </div>
     );
 };

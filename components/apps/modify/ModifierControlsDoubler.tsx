@@ -1,9 +1,9 @@
-import Modifier from "lib/modify/Modifier";
+import NumberField from "components/molecules/NumberField";
+import ToggleField from "components/molecules/ToggleField";
+import Modifier, { ModifierOperations } from "lib/modify/Modifier";
 
 const ModifierControlsDoubler = ({
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     modifier,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     onSetValue,
 }: {
     modifier: Modifier;
@@ -15,7 +15,16 @@ const ModifierControlsDoubler = ({
                 Doubles the speed of a script without sacrificing sync by changing each up or down
                 stroke into an up+down stroke.
             </p>
-            <p>The doubler is coming soon, I promise!</p>
+            <ToggleField
+                label="Match Group End"
+                value={ModifierOperations.getBoolean(modifier, "matchGroupEnd")}
+                onChange={value => onSetValue("matchGroupEnd", value)}
+            />
+            <NumberField
+                label="Short Pause Duration"
+                value={ModifierOperations.getNumber(modifier, "shortPauseDuration")}
+                onChange={value => onSetValue("shortPauseDuration", value)}
+            />
         </div>
     );
 };
