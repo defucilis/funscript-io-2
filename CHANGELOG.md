@@ -18,6 +18,7 @@
 
 -   Manual mode now supports min and max stroke ranges
 -   Cycler app now displays real-time preview of pattern
+-   Made funscript heatmaps much nicer
 
 #### Todo
 

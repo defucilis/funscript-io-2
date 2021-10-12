@@ -5,7 +5,7 @@ import useElementDimensions from "lib/hooks/useElementDimensions";
 
 const FunscriptHeatmap = ({
     funscript,
-    className,
+    className = "",
     options,
 }: {
     funscript: Funscript;

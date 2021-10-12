@@ -1,4 +1,4 @@
-import { Funscript } from "./types";
+import { Action, Funscript } from "./types";
 import { getSpeed } from "./utils";
 
 //colors from Lucife
@@ -19,7 +19,7 @@ export const heatmapColors: ColorGroup[] = [
  * @returns {string} CSS color string
  */
 export const formatColor = (c: ColorGroup, alpha = 1): string => {
-    return "rgb(" + c[0] + ", " + c[1] + ", " + c[2] + ", " + alpha + ")";
+    return "rgba(" + c[0] + ", " + c[1] + ", " + c[2] + ", " + alpha + ")";
 };
 
 const getLerpedColor = (colorA: ColorGroup, colorB: ColorGroup, t: number) =>
@@ -60,13 +60,18 @@ export const getColor = (intensity: number): ColorGroup => {
 };
 
 export interface HeatmapOptions {
+    /** Whether to draw a background, and what color it should be (default is undefined, which creates a transparent-background heatmap) */
     background?: string;
-    showStrokeLength?: boolean;
-    gapThreshold?: number;
+    /** The width of the lines that are drawn to the canvas - default is 2px. Has no effect in solid mode */
+    lineWidth?: number;
+    /** Over how many pixels the color should be smoothed - default is 5px */
+    colorSmoothing?: number;
+    /** If true, the heatmap will be a solid gradient. Otherwise, actions will be drawn, demonstrating the stroke lengths over time */
+    solid?: boolean;
 }
 const defaultHeatmapOptions: HeatmapOptions = {
-    showStrokeLength: true,
-    gapThreshold: 5000,
+    lineWidth: 2,
+    colorSmoothing: 5,
 };
 /**
  * Renders a heatmap into a provided HTML5 Canvas
@@ -76,8 +81,8 @@ const defaultHeatmapOptions: HeatmapOptions = {
  */
 export const renderHeatmap = (
     canvas: HTMLCanvasElement,
-    script: Funscript,
-    options: HeatmapOptions | undefined = undefined
+    script?: Funscript,
+    options?: HeatmapOptions
 ): void => {
     if (options) options = { ...defaultHeatmapOptions, ...options };
     else options = { ...defaultHeatmapOptions };
@@ -87,6 +92,11 @@ export const renderHeatmap = (
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
+    if (!script || width === 0 || height === 0) {
+        ctx.clearRect(0, 0, width, height);
+        return;
+    }
+
     if (options.background) {
         ctx.fillStyle = options.background;
         ctx.fillRect(0, 0, width, height);
@@ -94,71 +104,90 @@ export const renderHeatmap = (
         ctx.clearRect(0, 0, width, height);
     }
 
-    const msToX = width / script.actions.slice(-1)[0].at;
+    const duration = script.metadata?.duration || script.actions.slice(-1)[0].at;
 
-    let colorAverageList: ColorGroup[] = [];
-    let intensityList: number[] = [];
-    let posList: number[] = [];
-    let yMaxList = [script.actions[0].pos];
-    let yMinList = [script.actions[0].pos];
-    const yWindowSize = 15;
-    const xWindowSize = 50;
-    let lastX = 0;
-    for (let i = 1; i < script.actions.length; i++) {
-        const x = Math.floor(msToX * script.actions[i].at);
+    let currentIndex = 0;
+    const pixelColors: ColorGroup[] = [];
+    const pixelBounds: { min: number; max: number }[] = [];
+    const pixelCounts: number[] = [];
 
-        if (
-            options.gapThreshold &&
-            script.actions[i].at - script.actions[i - 1].at > options.gapThreshold
+    //first, we get the target color of each pixel
+    for (let i = 0; i < width; i++) {
+        const pixelTimeBounds = {
+            min: (i / width) * duration,
+            max: ((i + 1) / width) * duration,
+        };
+        const currentPixel: {
+            last: Action;
+            cur: Action;
+        }[] = [];
+        while (
+            currentIndex < script.actions.length &&
+            script.actions[currentIndex].at < pixelTimeBounds.max
         ) {
-            colorAverageList = [];
-            intensityList = [];
-            posList = [];
-            yMaxList = [script.actions[i].pos];
-            yMinList = [script.actions[i].pos];
-            lastX = x;
-            continue;
+            if (currentIndex > 0) {
+                currentPixel.push({
+                    last: script.actions[currentIndex - 1],
+                    cur: script.actions[currentIndex],
+                });
+            }
+            currentIndex++;
         }
+        const speedSum =
+            currentPixel.reduce((acc, p) => {
+                return acc + getSpeed(p.last, p.cur);
+            }, 0) / (currentPixel.length || 1);
+        pixelColors.push(getColor(speedSum));
 
-        const intensity = getSpeed(script.actions[i - 1], script.actions[i]);
-        intensityList.push(intensity);
-        colorAverageList.push(getColor(intensity));
-        posList.push(script.actions[i].pos);
+        const min = currentPixel.reduce((acc, p) => Math.min(acc, p.cur.pos), 100);
+        const max = currentPixel.reduce((acc, p) => Math.max(acc, p.cur.pos), 0);
+        pixelBounds.push({ min, max });
 
-        if (intensityList.length > xWindowSize) intensityList = intensityList.slice(1);
-        if (colorAverageList.length > xWindowSize) colorAverageList = colorAverageList.slice(1);
-        if (posList.length > yWindowSize) posList = posList.slice(1);
+        pixelCounts.push(currentPixel.length);
+    }
 
-        const averageIntensity =
-            intensityList.reduce((acc, cur) => acc + cur, 0) / intensityList.length;
-        //const averageColor = getAverageColor(colorAverageList);
-        const averageColor = getColor(averageIntensity);
-        const sortedPos = [...posList].sort((a, b) => a - b);
-        const bottomHalf = sortedPos.slice(0, sortedPos.length / 2);
-        const topHalf = sortedPos.slice(sortedPos.length / 2);
-        const averageBottom = bottomHalf.reduce((acc, cur) => acc + cur, 0) / bottomHalf.length;
-        const averageTop = topHalf.reduce((acc, cur) => acc + cur, 0) / topHalf.length;
-
-        yMaxList.push(script.actions[i].pos);
-        yMinList.push(script.actions[i].pos);
-
-        if (yMinList.length > yWindowSize) yMinList = yMinList.slice(1);
-        if (yMaxList.length > yWindowSize) yMaxList = yMaxList.slice(1);
-
-        const y2 = height * (averageBottom / 100.0);
-        const y1 = height * (averageTop / 100.0);
-
-        ctx.fillStyle = formatColor(averageColor, 1);
-        if (options.showStrokeLength) {
-            ctx.fillRect(lastX, height - y2, x - lastX, y2 - y1);
-        } else {
-            ctx.fillRect(lastX, 0, x - lastX, height);
+    const colorSmoothing = options.colorSmoothing || 5;
+    const colorAverage: ColorGroup[] = [];
+    pixelColors.forEach((color, x) => {
+        if (pixelCounts[x] > 0 || options?.solid) {
+            if (colorAverage.length === colorSmoothing) colorAverage.shift();
+            colorAverage.push(color);
         }
+        const col = getAverageColor(colorAverage);
+        ctx.fillStyle = formatColor(col);
+        ctx.fillRect(x - Math.floor(colorSmoothing * 0.5), 0, 1, options?.solid ? height : 1);
+    });
 
-        lastX = x;
+    if (options?.solid) return;
+
+    const colors = ctx.getImageData(0, 0, width, 1).data;
+
+    //we just did this to get the smooth colors, now we can clear and draw the actual lines
+    if (options.background) {
+        ctx.fillStyle = options.background;
+        ctx.fillRect(0, 0, width, height);
+    } else {
+        ctx.clearRect(0, 0, width, height);
+    }
+
+    ctx.lineWidth = options.lineWidth || 2;
+
+    const timeToX = (time: number) => (time / duration) * width;
+    const posToY = (pos: number) => (1 - pos / 100) * height;
+    for (let i = 1; i < script.actions.length; i++) {
+        const action = script.actions[i];
+        const prevAction = script.actions[i - 1];
+
+        const x = Math.floor(timeToX((action.at + prevAction.at) / 2));
+        ctx.strokeStyle = `rgba(${colors[x * 4]}, ${colors[x * 4 + 1]}, ${colors[x * 4 + 2]}, ${
+            colors[x * 4 + 3]
+        })`;
+        ctx.beginPath();
+        ctx.moveTo(timeToX(prevAction.at), posToY(prevAction.pos));
+        ctx.lineTo(timeToX(action.at), posToY(action.pos));
+        ctx.stroke();
     }
 };
-
 export interface ActionsOptions {
     /** Whether to clear the canvas before drawing. Defaults to true */
     clear?: boolean;

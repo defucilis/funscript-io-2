@@ -7,6 +7,8 @@ import Slider from "components/atoms/Slider";
 import SliderField from "components/molecules/SliderField";
 import SliderMinMax from "components/atoms/SliderMinMax";
 import SliderMinMaxField from "components/molecules/SliderMinMaxField";
+import FunscriptHeatmap from "components/molecules/FunscriptHeatmap";
+import debugFunscript from "lib/debugFunscript";
 
 const AppDebug = (): JSX.Element => {
     const {
@@ -115,6 +117,12 @@ const AppDebug = (): JSX.Element => {
                     maxValueDisplay="max!"
                 />
             </div>
+            <FunscriptHeatmap
+                className="h-20"
+                funscript={debugFunscript}
+                options={{ lineWidth: 2, colorSmoothing: 5, solid: true }}
+            />
+            <FunscriptHeatmap className="h-20" funscript={debugFunscript} />
             {error && <p className="text-red-300 text-sm">{error}</p>}
         </div>
     );
