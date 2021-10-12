@@ -160,15 +160,26 @@ export const renderHeatmap = (
 };
 
 export interface ActionsOptions {
+    /** Whether to clear the canvas before drawing. Defaults to true */
     clear?: boolean;
+    /** Background style for the canvas - defaults to black */
     background?: string;
+    /** Line color for the actions - defaults to white */
     lineColor?: string;
+    /** Line weight - defaults to 3 */
     lineWeight?: number;
+    /** Start time in ms - defaults to zero */
     startTime?: number;
+    /** Duration to display in ms - defaults to the full duration of the script */
     duration?: number;
+    /** Whether to only show the times as vertical lines, without position information */
     onlyTimes?: boolean;
+    /** The color to draw the 'only times' lines */
     onlyTimeColor?: string;
+    /** A global offset to apply to all actions - useful for displaying multiple scripts on the same canvas */
     offset?: { x: number; y: number };
+    /** The current time in ms, for use in displaying realtime playback information. If undefined, realtime playback info won't be displayed */
+    currentTime?: number;
 }
 
 const defaultActionsOptions: ActionsOptions = {
@@ -180,6 +191,7 @@ const defaultActionsOptions: ActionsOptions = {
     onlyTimes: false,
     onlyTimeColor: "rgba(255,255,255,0.1)",
     offset: { x: 0, y: 0 },
+    currentTime: undefined,
 };
 /**
  * Renders a funscript preview onto a provided HTML5 Canvas
@@ -189,17 +201,51 @@ const defaultActionsOptions: ActionsOptions = {
  */
 export const renderActions = (
     canvas: HTMLCanvasElement,
-    script: Funscript,
+    script?: Funscript,
     options?: ActionsOptions
 ): void => {
+    const width = canvas.width;
+    const height = canvas.height;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    if (!script) {
+        ctx.clearRect(0, 0, width, height);
+        return;
+    }
+
+    options = { ...defaultActionsOptions, ...options };
+
+    const position = options.startTime || 0;
+    const duration =
+        options.duration || script.metadata?.duration || script.actions.slice(-1)[0].at;
+    const min = position;
+    const max = min + duration;
+
+    const timeToX = (time: number, offset = 0) => {
+        return width * ((time - min) / duration) + offset;
+    };
+    const posToY = (pos: number, offset = 0) => {
+        return height - (pos / 100) * height + offset;
+    };
+
+    const posAtTime = (time: number) => {
+        if (time <= script.actions[0].at) return script.actions[0].pos;
+        if (time >= script.actions.slice(-1)[0].at) return script.actions.slice(-1)[0].pos;
+        for (let i = 1; i < script.actions.length; i++) {
+            if (time > script.actions[i].at) continue;
+            const inverseLerp =
+                (time - script.actions[i - 1].at) /
+                (script.actions[i].at - script.actions[i - 1].at);
+            return (
+                script.actions[i - 1].pos +
+                (script.actions[i].pos - script.actions[i - 1].pos) * inverseLerp
+            );
+        }
+        return script.actions.slice(-1)[0].pos;
+    };
+
     const drawPath = (ctx: CanvasRenderingContext2D, funscript: Funscript, opt: ActionsOptions) => {
-        const position = opt.startTime || 0;
-        const duration = opt.duration || (script.metadata ? script.metadata.duration || 10 : 10);
-
-        const scriptDuration = funscript.actions.slice(-1)[0].at;
-        const min = Math.max(0, scriptDuration * position - duration * 0.5);
-        const max = min + duration;
-
         ctx.beginPath();
         let first = true;
         funscript.actions
@@ -209,10 +255,8 @@ export const renderActions = (
                 return next.at > min && prev.at < max;
             })
             .forEach(action => {
-                const x =
-                    (width * (action.at - min)) / duration + (opt && opt.offset ? opt.offset.x : 0);
-                const y =
-                    height - (action.pos / 100) * height + (opt && opt.offset ? opt.offset.y : 0);
+                const x = timeToX(action.at, opt?.offset?.x || 0);
+                const y = posToY(action.pos, opt?.offset?.y || 0);
 
                 if (first) ctx.moveTo(x, y);
                 else ctx.lineTo(x, y);
@@ -223,13 +267,6 @@ export const renderActions = (
             });
         if (!opt.onlyTimes) ctx.stroke();
     };
-
-    const width = canvas.width;
-    const height = canvas.height;
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return;
-
-    options = { ...defaultActionsOptions, ...options };
 
     if (options.clear) ctx.clearRect(0, 0, width, height);
 
@@ -243,4 +280,20 @@ export const renderActions = (
     ctx.strokeStyle = options.lineColor || "#FFF";
     ctx.fillStyle = options.onlyTimeColor || "rgba(255,255,255,0.1)";
     drawPath(ctx, script, options);
+
+    if (options.currentTime != null) {
+        ctx.strokeStyle = "#FFF";
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        const x = timeToX(options.currentTime);
+        ctx.moveTo(x, 0);
+        ctx.lineTo(x, height);
+        ctx.stroke();
+
+        ctx.beginPath();
+        const y = posToY(posAtTime(options.currentTime));
+        ctx.arc(x, y, (options.lineWeight || 3) * 3, 0, 2 * Math.PI);
+        ctx.fillStyle = "#FFF";
+        ctx.fill();
+    }
 };

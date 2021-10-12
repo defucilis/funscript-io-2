@@ -1,6 +1,6 @@
 import { ReactNode } from "react";
 
-const IconButton = ({
+const ButtonIcon = ({
     className,
     style,
     children,
@@ -27,4 +27,4 @@ const IconButton = ({
     );
 };
 
-export default IconButton;
+export default ButtonIcon;

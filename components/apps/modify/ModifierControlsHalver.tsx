@@ -1,5 +1,5 @@
-import CheckboxField from "components/atoms/CheckboxField";
-import NumberField from "components/atoms/NumberField";
+import NumberField from "components/molecules/NumberField";
+import ToggleField from "components/molecules/ToggleField";
 import Modifier, { ModifierOperations } from "lib/modify/Modifier";
 
 const ModifierControlsHalver = ({
@@ -15,12 +15,12 @@ const ModifierControlsHalver = ({
                 Halves the speed of a script without sacrificing sync by changing each up+down
                 stroke into a single up or down stroke.
             </p>
-            <CheckboxField
+            <ToggleField
                 label="Reset After Pause"
                 value={ModifierOperations.getBoolean(modifier, "resetAfterPause")}
                 onChange={value => onSetValue("resetAfterPause", value)}
             />
-            <CheckboxField
+            <ToggleField
                 label="Remove Short Pauses"
                 value={ModifierOperations.getBoolean(modifier, "removeShortPauses")}
                 onChange={value => onSetValue("removeShortPauses", value)}
@@ -30,12 +30,12 @@ const ModifierControlsHalver = ({
                 value={ModifierOperations.getNumber(modifier, "shortPauseDuration")}
                 onChange={value => onSetValue("shortPauseDuration", value)}
             />
-            <CheckboxField
+            <ToggleField
                 label="Match First Downstroke"
                 value={ModifierOperations.getBoolean(modifier, "matchFirstDownstroke")}
                 onChange={value => onSetValue("matchFirstDownstroke", value)}
             />
-            <CheckboxField
+            <ToggleField
                 label="Match Group End Position"
                 value={ModifierOperations.getBoolean(modifier, "matchGroupEndPosition")}
                 onChange={value => onSetValue("matchGroupEndPosition", value)}

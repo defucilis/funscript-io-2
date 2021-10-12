@@ -1,5 +1,5 @@
-import TextAreaField from "components/atoms/TextAreaField";
-import TextField from "components/atoms/TextField";
+import TextAreaField from "components/molecules/TextAreaField";
+import TextField from "components/molecules/TextField";
 import Modifier, { ModifierOperations } from "lib/modify/Modifier";
 
 const ModifierControlsMetadata = ({

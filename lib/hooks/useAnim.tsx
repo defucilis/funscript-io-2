@@ -2,38 +2,45 @@ import { useRef, useEffect } from "react";
 
 const useAnim = (
     callback?: (runTime: number, deltaTime: number) => void,
-    dependencies?: any[]
+    dependencies?: React.DependencyList
 ): void => {
     const animationRef = useRef<number>();
     const prevTimeRef = useRef<number>();
     const startTimeRef = useRef<number>();
+    const savedCallback = useRef(callback);
+    useEffect(() => {
+        savedCallback.current = callback;
+    });
 
-    const runAnim = (time: number) => {
-        if (!startTimeRef.current) startTimeRef.current = time;
+    useEffect(() => {
+        const tick = () => {
+            const time = performance.now();
+            const handle = animationRef.current;
 
-        const deltaTime = (time - (prevTimeRef.current || 0)) / 1000.0;
-        const runTime = (time - startTimeRef.current) / 1000.0;
-        if (callback) callback(runTime, deltaTime);
-
-        prevTimeRef.current = time;
-        animationRef.current = requestAnimationFrame(runAnim);
-    };
-
-    useEffect(
-        () => {
-            if (animationRef.current) {
-                cancelAnimationFrame(animationRef.current);
+            if (!startTimeRef.current) {
+                startTimeRef.current = time;
+            }
+            if (!prevTimeRef.current) {
+                prevTimeRef.current = time;
+                animationRef.current = requestAnimationFrame(tick);
+                return;
             }
 
-            animationRef.current = requestAnimationFrame(runAnim);
+            const deltaTime = (time - (prevTimeRef.current || 0)) / 1000.0;
+            const runTime = (time - startTimeRef.current) / 1000.0;
 
-            return () => {
-                if (animationRef.current) cancelAnimationFrame(animationRef.current);
-            };
-            // eslint-disable-next-line
-        },
-        dependencies ? [...dependencies, runAnim] : [runAnim]
-    );
+            if (savedCallback.current) savedCallback.current(runTime, deltaTime);
+
+            prevTimeRef.current = time;
+            if (animationRef.current === handle) animationRef.current = requestAnimationFrame(tick);
+        };
+
+        animationRef.current = requestAnimationFrame(tick);
+
+        return () => {
+            cancelAnimationFrame(animationRef.current || -1);
+        };
+    }, dependencies);
 };
 
 export default useAnim;

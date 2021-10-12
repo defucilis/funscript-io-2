@@ -1,6 +1,6 @@
 import { MdKeyboardArrowLeft } from "react-icons/md";
 import { useEffect, useState } from "react";
-import IconButton from "components/atoms/IconButton";
+import ButtonIcon from "components/atoms/ButtonIcon";
 import Modifier, { ModifierType, ModifierOperations } from "lib/modify/Modifier";
 import Button from "components/atoms/Button";
 import ModifierControls from "./ModifierControls";
@@ -54,9 +54,9 @@ const ModifyEdit = ({
             {internalModifier && (
                 <>
                     <div className="flex gap-4 items-center mb-4">
-                        <IconButton onClick={cancel}>
+                        <ButtonIcon onClick={cancel}>
                             <MdKeyboardArrowLeft />
-                        </IconButton>
+                        </ButtonIcon>
                         <h1 className="text-2xl">
                             {ModifierType[internalModifier.type]} #{internalModifier.id}
                         </h1>

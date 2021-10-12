@@ -16,6 +16,7 @@ const Player = ({
     const [playing, setPlaying] = useState(false);
     const [progress, setProgress] = useState(0);
     const [duration, setDuration] = useState(0);
+    const [ended, setEnded] = useState(false);
 
     const getFunscriptPadding = () => {
         if (!funscript) return "0px";
@@ -48,7 +49,29 @@ const Player = ({
                     onDuration={setDuration}
                 />
             )}
-            {!content && funscript && <ScriptPlayer script={funscript} />}
+            {!content && funscript && (
+                <ScriptPlayer
+                    script={funscript}
+                    playing={playing}
+                    time={progress * duration}
+                    ended={ended}
+                    onPlay={() => {
+                        if (ended) {
+                            setProgress(0);
+                            setEnded(false);
+                        }
+                        setPlaying(true);
+                    }}
+                    onPause={() => setPlaying(false)}
+                    onProgress={setProgress}
+                    onDuration={setDuration}
+                    onSeek={time => setProgress(time / duration)}
+                    onEnded={() => {
+                        setPlaying(false);
+                        setEnded(true);
+                    }}
+                />
+            )}
             {funscript && (
                 <div className="relative px-2 bg-black bg-opacity-40 rounded-bl rounded-br">
                     <div

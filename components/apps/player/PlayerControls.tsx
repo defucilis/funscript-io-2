@@ -10,9 +10,9 @@ import {
     MdZoomOut,
 } from "react-icons/md";
 import React, { useCallback, useEffect, useRef, useState } from "react";
+import useKeyboard from "lib/hooks/useKeyboard";
 import Slider from "components/atoms/Slider";
 import { formatTime } from "lib/text";
-import useKeyboard from "lib/hooks/useKeyboard";
 
 const isMouseEvent = (
     e: MouseEvent | TouchEvent | React.MouseEvent | React.TouchEvent

@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import { MdKeyboardArrowLeft } from "react-icons/md";
 import Button from "components/atoms/Button";
-import IconButton from "components/atoms/IconButton";
-import SelectField from "components/atoms/SelectField";
+import ButtonIcon from "components/atoms/ButtonIcon";
+import SelectField from "components/molecules/SelectField";
 import Modifier, { ModifierType, ModifierOperations } from "lib/modify/Modifier";
 import { getHalfSpeedScript } from "lib/funscript-utils/funHalver";
 import {
@@ -152,9 +152,9 @@ const ModifyAdd = ({
             }}
         >
             <div className="flex gap-4 items-center mb-4">
-                <IconButton onClick={cancel}>
+                <ButtonIcon onClick={cancel}>
                     <MdKeyboardArrowLeft />
-                </IconButton>
+                </ButtonIcon>
                 <h1 className="text-2xl">Add modifier</h1>
             </div>
             <SelectField

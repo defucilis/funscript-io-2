@@ -1,5 +1,5 @@
-import NumberField from "components/atoms/NumberField";
-import SelectField from "components/atoms/SelectField";
+import SelectField from "components/molecules/SelectField";
+import NumberField from "components/molecules/NumberField";
 import Modifier, { ModifierOperations } from "lib/modify/Modifier";
 
 const devicePresets = ["handy", "launch", "custom"];

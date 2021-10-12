@@ -1,7 +1,17 @@
 import { useEffect, useRef, useState } from "react";
 import { MdSync } from "react-icons/md";
 
-const AudioWaveform = ({ url, progress }: { url: string; progress?: number }): JSX.Element => {
+const AudioWaveform = ({
+    url,
+    progress,
+    width = 1000,
+    height = 192,
+}: {
+    url: string;
+    progress?: number;
+    width?: number;
+    height?: number;
+}): JSX.Element => {
     const canvas = useRef<HTMLCanvasElement>(null);
     const [loading, setLoading] = useState(true);
 
@@ -58,8 +68,8 @@ const AudioWaveform = ({ url, progress }: { url: string; progress?: number }): J
     }, [url, canvas]);
 
     return (
-        <div className="h-48 relative px-3">
-            <canvas className="w-full h-full" ref={canvas} width={1000} height={192} />
+        <div className="relative px-3" style={{ height }}>
+            <canvas className="w-full h-full" ref={canvas} width={width} height={height} />
             {loading ? (
                 <div className="absolute left-0 top-0 w-full h-full grid place-items-center">
                     <div className="flex flex-col items-center">

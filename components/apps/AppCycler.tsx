@@ -4,7 +4,7 @@ import { toast } from "react-toastify";
 import { HampState, HandyMode } from "lib/thehandy/types";
 import useAnim from "lib/hooks/useAnim";
 import Mathf from "lib/Mathf";
-import IconButton from "components/atoms/IconButton";
+import ButtonIcon from "components/atoms/ButtonIcon";
 import useHandy from "lib/thehandy-react";
 import useKeyboard from "lib/hooks/useKeyboard";
 import SliderField from "components/molecules/SliderField";
@@ -279,9 +279,9 @@ const AppCycler = (): JSX.Element => {
                 />
 
                 <div className="flex flex-col items-center">
-                    <IconButton disabled={false} onClick={togglePlay}>
+                    <ButtonIcon disabled={false} onClick={togglePlay}>
                         {handyState.hampState === HampState.moving ? <MdPause /> : <MdPlayArrow />}
-                    </IconButton>
+                    </ButtonIcon>
                     <span className="text-sm">
                         {handyState.hampState === HampState.moving ? "Stop" : "Start"}
                     </span>

@@ -1,5 +1,5 @@
 import { ReactNode } from "react";
-import IconButton from "components/atoms/IconButton";
+import ButtonIcon from "components/atoms/ButtonIcon";
 
 const ManualButton = ({
     label,
@@ -18,7 +18,7 @@ const ManualButton = ({
 
     return (
         <div className="w-full h-full grid place-items-center">
-            <IconButton
+            <ButtonIcon
                 disabled={disabled}
                 onClick={onClick}
                 style={{
@@ -28,7 +28,7 @@ const ManualButton = ({
                 }}
             >
                 {children}
-            </IconButton>
+            </ButtonIcon>
             <span className="text-white text-sm">{label}</span>
         </div>
     );

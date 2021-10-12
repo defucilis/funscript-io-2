@@ -5,7 +5,7 @@ import FunscriptDropzone from "components/molecules/FunscriptDropzone";
 import { convertFunscriptToCsv } from "lib/funscript-utils/funConverter";
 import HandyUtils from "lib/thehandy/HandyUtils";
 import useHandy from "lib/thehandy-react";
-import Player from "./organisms/Player";
+import Player from "./play/Player";
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const AppPlay = (): JSX.Element => {

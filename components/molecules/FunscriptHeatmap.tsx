@@ -1,6 +1,7 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import { Funscript } from "lib/funscript-utils/types";
 import { HeatmapOptions, renderHeatmap } from "lib/funscript-utils/funMapper";
+import useElementDimensions from "lib/hooks/useElementDimensions";
 
 const FunscriptHeatmap = ({
     funscript,
@@ -14,21 +15,7 @@ const FunscriptHeatmap = ({
     const canvas = useRef<HTMLCanvasElement>(null);
     const parent = useRef<HTMLDivElement>(null);
 
-    const [width, setWidth] = useState(1);
-    const [height, setHeight] = useState(1);
-
-    useEffect(() => {
-        if (!parent.current) return;
-        const observer = new ResizeObserver(() => {
-            if (!parent.current) return;
-            setWidth(parent.current.clientWidth);
-            setHeight(parent.current.clientHeight);
-        });
-        observer.observe(parent.current);
-
-        setWidth(parent.current.clientWidth);
-        setHeight(parent.current.clientHeight);
-    }, [parent]);
+    const { width, height } = useElementDimensions(parent);
 
     useEffect(() => {
         if (!canvas.current) return;

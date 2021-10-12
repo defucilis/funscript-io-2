@@ -1,4 +1,4 @@
-import NumberField from "components/atoms/NumberField";
+import NumberField from "components/molecules/NumberField";
 import Modifier, { ModifierOperations } from "lib/modify/Modifier";
 
 const ModifierControlsRemapper = ({

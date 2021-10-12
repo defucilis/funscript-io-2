@@ -2,10 +2,10 @@ import { useEffect, useState } from "react";
 import { MdPause, MdPlayArrow, MdSkipNext } from "react-icons/md";
 import { toast } from "react-toastify";
 import { HampState, HandyMode } from "lib/thehandy/types";
-import ProgressRing from "components/atoms/CircularProgress";
+import ProgressRing from "components/atoms/ProgressRing";
 import useAnim from "lib/hooks/useAnim";
 import Mathf from "lib/Mathf";
-import IconButton from "components/atoms/IconButton";
+import ButtonIcon from "components/atoms/ButtonIcon";
 import useHandy from "lib/thehandy-react";
 import useKeyboard from "lib/hooks/useKeyboard";
 import SliderMinMaxField from "components/molecules/SliderMinMaxField";
@@ -207,9 +207,9 @@ const AppRandom = (): JSX.Element => {
             </div>
             <div className="flex justify-around items-center">
                 <div className="flex flex-col items-center">
-                    <IconButton onClick={togglePlay}>
+                    <ButtonIcon onClick={togglePlay}>
                         {handyState.hampState === HampState.moving ? <MdPause /> : <MdPlayArrow />}
-                    </IconButton>
+                    </ButtonIcon>
                     <span className="text-sm">
                         {handyState.hampState === HampState.moving ? "Stop" : "Start"}
                     </span>
@@ -239,9 +239,9 @@ const AppRandom = (): JSX.Element => {
                     </p>
                 </div>
                 <div className="flex flex-col items-center">
-                    <IconButton onClick={doSkip}>
+                    <ButtonIcon onClick={doSkip}>
                         <MdSkipNext />
-                    </IconButton>
+                    </ButtonIcon>
                     <span className="text-sm">Skip</span>
                 </div>
             </div>

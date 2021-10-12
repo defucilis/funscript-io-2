@@ -3,7 +3,7 @@ import { MdAdd } from "react-icons/md";
 import Modifier from "lib/modify/Modifier";
 import Button from "components/atoms/Button";
 import FunscriptInfo from "components/atoms/FunscriptInfo";
-import IconButton from "components/atoms/IconButton";
+import ButtonIcon from "components/atoms/ButtonIcon";
 import FunscriptDropzone from "components/molecules/FunscriptDropzone";
 import FunscriptHeatmap from "components/molecules/FunscriptHeatmap";
 import { Funscript } from "lib/funscript-utils/types";
@@ -75,9 +75,9 @@ const ModifyHome = ({
                 {modifiers.length === 0 ? (
                     <Button onClick={onAddModifier}>Add your first modifier</Button>
                 ) : (
-                    <IconButton onClick={onAddModifier}>
+                    <ButtonIcon onClick={onAddModifier}>
                         <MdAdd />
-                    </IconButton>
+                    </ButtonIcon>
                 )}
             </div>
             {error && (
