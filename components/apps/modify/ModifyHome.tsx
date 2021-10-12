@@ -8,6 +8,7 @@ import FunscriptDropzone from "components/molecules/FunscriptDropzone";
 import FunscriptHeatmap from "components/molecules/FunscriptHeatmap";
 import { Funscript } from "lib/funscript-utils/types";
 import ModifierBlock from "./ModifierBlock";
+import FunscriptExplorer from "../organisms/FunscriptExplorer";
 
 const ModifyHome = ({
     modifiers,
@@ -103,6 +104,7 @@ const ModifyHome = ({
                         </div>
                     </a>
                     <FunscriptInfo funscript={modifiedFunscript} />
+                    <FunscriptExplorer funscript={modifiedFunscript} />
                 </>
             )}
         </div>
