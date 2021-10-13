@@ -2,9 +2,10 @@ import { useEffect, useState } from "react";
 import { MdReport, MdWifiTethering } from "react-icons/md";
 import { AiOutlineSync } from "react-icons/ai";
 import useHandy from "lib/thehandy-react";
+import { HampState, HandyMode, HsspState } from "lib/thehandy/types";
 
 const HeaderHandyConnection = (): JSX.Element => {
-    const { refresh, connectionKey, loading, connect, disconnect, handyState, error } = useHandy();
+    const { refresh, connectionKey, loading, connect, disconnect, handyState } = useHandy();
     const [initialized, setInitialized] = useState(false);
     const [expanded, setExpanded] = useState(false);
     const [newConnectionKey, setNewConnectionKey] = useState(connectionKey);
@@ -73,10 +74,35 @@ const HeaderHandyConnection = (): JSX.Element => {
                         Connect
                     </button>
                 )}
-                {error && (
-                    <p className="text-red-300 text-sm leading-none mt-2">
-                        {JSON.stringify(error, null, 2)}
-                    </p>
+                {handyState.connected && (
+                    <div className="text-white mt-4 grid grid-cols-2 w-2/3">
+                        <p className="mb-2 font-bold">Slide</p>
+                        <p>
+                            {handyState.slideMin}% - {handyState.slideMax}%
+                        </p>
+                        <p className="font-bold">Mode</p>
+                        <p>{HandyMode[handyState.currentMode]}</p>
+                        {handyState.currentMode === HandyMode.hamp && (
+                            <>
+                                <p className="font-bold">Status</p>
+                                <p>{HampState[handyState.hampState]}</p>
+                                <p className="font-bold">Velocity</p>
+                                <p>{handyState.hampVelocity}%</p>
+                            </>
+                        )}
+                        {handyState.currentMode === HandyMode.hssp && (
+                            <>
+                                <p className="font-bold">Status</p>
+                                <p>{HsspState[handyState.hsspState]}</p>
+                                <p className="font-bold">Loop</p>
+                                <p>{handyState.hsspLoop ? "On" : "Off"}</p>
+                                <p className="font-bold">Offset</p>
+                                <p>{handyState.hstpOffset} ms</p>
+                                <p className="font-bold">RTD</p>
+                                <p>{handyState.hstpRtd} ms</p>
+                            </>
+                        )}
+                    </div>
                 )}
             </div>
         </>

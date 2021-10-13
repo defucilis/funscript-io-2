@@ -222,6 +222,8 @@ const useHandyReact = (verbose?: boolean): UseHandy => {
         } else if (mode === HandyMode.hssp) {
             //get hssp specific stuff
             await getHsspLoop();
+            await getHstpOffset();
+            await getHstpRtd();
         }
 
         //get round trip delay

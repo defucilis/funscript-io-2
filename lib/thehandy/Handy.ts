@@ -409,7 +409,7 @@ class Handy {
 
     /** Gets the current manual offset of the Handy in milliseconds. Negative values mean that the script will be delayed, positive values mean that the script will be advanced. */
     async getHstpOffset(): Promise<number> {
-        const json: { result: GenericResult; offset: number } = await this.getJson("hstp/time");
+        const json: { result: GenericResult; offset: number } = await this.getJson("hstp/offset");
         this.hstpOffset = json.offset;
         this.connected = true;
         return json.offset;

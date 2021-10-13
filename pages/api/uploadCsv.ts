@@ -24,7 +24,8 @@ const writeFile = (bucket: any, path: string, data: string): Promise<string> => 
 };
 
 const processFunscript = async (filename: string, funscript: Funscript): Promise<string> => {
-    if (!firebase.database || !firebase.storage) throw new Error("Firebase failed to initialize: " + JSON.stringify(firebase.error));
+    if (!firebase.database || !firebase.storage)
+        throw new Error("Firebase failed to initialize: " + JSON.stringify(firebase.error));
 
     const d = new Date();
     const dayName = `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;

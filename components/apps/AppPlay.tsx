@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { AiOutlineSync } from "react-icons/ai";
 import ContentDropzone, { PlayableContent } from "components/molecules/ContentDropzone";
@@ -6,19 +6,24 @@ import { Funscript } from "lib/funscript-utils/types";
 import FunscriptDropzone from "components/molecules/FunscriptDropzone";
 import useHandy from "lib/thehandy-react";
 import { testProcessFunscript } from "lib/customCsvUpload";
+import { HandyMode } from "lib/thehandy/types";
 import Player from "./play/Player";
 import PlayerAdjustments from "./player/PlayerAdjustments";
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const AppPlay = (): JSX.Element => {
     //const { sendHsspSetup, handyState } = useHandy();
-    const { handyState, sendHsspSetup, getServerTimeOffset } = useHandy();
+    const { sendMode, handyState, sendHsspSetup, getServerTimeOffset } = useHandy();
 
     const [content, setContent] = useState<PlayableContent | null>(null);
     const [funscript, setFunscript] = useState<Funscript | null>(null);
     const [preparing, setPreparing] = useState(false);
     const [preparingMessage, setPreparingMessage] = useState("");
     const [prepared, setPrepared] = useState(false);
+
+    useEffect(() => {
+        sendMode(HandyMode.hssp);
+    }, [sendMode]);
 
     const prepare = (filename: string, script: Funscript) => {
         const prepareSequence = async (filename: string, script: Funscript) => {
