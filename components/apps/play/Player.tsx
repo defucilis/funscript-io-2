@@ -42,24 +42,15 @@ const Player = ({
 
     useEffect(() => {
         if (!prepared) {
-            console.log("App isn't prepared, so we're ignoring this effect");
             return;
         }
         if (handyState.hsspState === HsspState.needSetup) {
-            console.log("Handy needs setup, so we're ignoring this effect");
             return;
         }
 
         if (playing && handyState.hsspState === HsspState.stopped) {
-            console.log(
-                "Playing locally, but not on Handy, so sending HAMP play to position ",
-                cachedPlaybackPosition
-            );
             sendHsspPlay(Math.round(cachedPlaybackPosition * 1000));
         } else if (!playing && handyState.hsspState === HsspState.playing) {
-            console.log(
-                "Stopped locally, but playing on Handy, so sending stop and storing playback position"
-            );
             setCachedPlaybackPosition(Math.min(scriptDuration, progress * duration));
             sendHsspStop();
         }
@@ -68,23 +59,15 @@ const Player = ({
     const handleSeek = useCallback(
         (time: number) => {
             if (!prepared) {
-                console.log(`Seeking to ${time}, but not prepared`);
                 return;
             }
             if (handyState.hsspState === HsspState.needSetup) {
-                console.log(`Seeking to ${time}, but Handy reports needing setup`);
                 return;
             }
 
             if (playing && handyState.hsspState === HsspState.playing) {
-                console.log(
-                    `Seeking to ${time} - currently playing, so sending play command to handy`
-                );
                 sendHsspPlay(Math.round(time * 1000));
             } else {
-                console.log(
-                    `Seeking to ${time} - not currently playing, so storing cached playback position for Handy`
-                );
                 setCachedPlaybackPosition(Math.min(scriptDuration, time));
             }
         },
