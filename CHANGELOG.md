@@ -1,6 +1,14 @@
+## v2.0.1 - Polished Beta
+
+##### In progress - updating this list as I go
+
+#### Added
+
+-    The local player now supports more filetypes - .webm for videos, .m4a and .ogg for audio.
+
 ## v2.0.0 - Complete Rebuild!
 
-##### Coming Soon!
+##### 13th October 2021
 
 #### Added
 

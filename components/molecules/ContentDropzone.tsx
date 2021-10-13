@@ -31,20 +31,26 @@ const ContentDropzone = ({
         const split = files[0].name.split(".");
         const extension = split.pop();
 
-        if (extension === "mp4") {
-            onChange({
-                url: URL.createObjectURL(files[0]),
-                name: files[0].name,
-                type: "video",
-            });
-        } else if (extension === "mp3") {
-            onChange({
-                url: URL.createObjectURL(files[0]),
-                name: files[0].name,
-                type: "audio",
-            });
-        } else {
-            setLocalError("Unsupported filetype");
+        switch (extension) {
+            case "mp4":
+            case "webm":
+                onChange({
+                    url: URL.createObjectURL(files[0]),
+                    name: files[0].name,
+                    type: "video",
+                });
+                break;
+            case "mp3":
+            case "m4a":
+            case "ogg":
+                onChange({
+                    url: URL.createObjectURL(files[0]),
+                    name: files[0].name,
+                    type: "audio",
+                });
+                break;
+            default:
+                setLocalError("Unsupported filetype");
         }
     };
 
@@ -57,7 +63,7 @@ const ContentDropzone = ({
         <Dropzone
             className={className}
             options={{
-                accept: [".mp4", ".mp3"],
+                accept: [".mp4", ".webm", ".mp3", ".m4a", ".ogg"],
                 maxSize,
                 onDropAccepted: acceptFiles,
                 onDropRejected: rejectFiles,
@@ -70,7 +76,7 @@ const ContentDropzone = ({
                 }`}
             >
                 {value && <p>{value.name}</p>}
-                {!value && <p>Drop a .mp4 or .mp3 here</p>}
+                {!value && <p>Drop an audio or video file here</p>}
                 {(error || localError) && (
                     <p className="text-red-300 text-sm">{error || localError}</p>
                 )}
