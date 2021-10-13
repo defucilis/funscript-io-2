@@ -42,7 +42,7 @@ export const addFunscriptMetadata = (funscript: Funscript): Funscript => {
  * @param  {string} funscript - Funscript to be converted
  * @returns Plaintext blob ready to be uploaded to a Handy
  */
-export const convertFunscriptToCsv = (funscript: string): Blob => {
+export const convertFunscriptToCsvBlob = (funscript: string): Blob => {
     const script = JSON.parse(funscript);
     const csv = script.actions
         .map((action: Action) => {
@@ -55,6 +55,18 @@ export const convertFunscriptToCsv = (funscript: string): Blob => {
     });
 
     return csvBlob;
+};
+
+/**
+ * Converts a funscript into a list of time/action pairs, ready to be turned into a CSV
+ * @param  {Funscript} funscript - Funscript to be converted
+ * @returns Plaintext blob ready to be uploaded to a Handy
+ */
+export const convertFunscriptToCsv = (funscript: Funscript): [number, number][] => {
+    return funscript.actions.map((action: Action) => [
+        Math.round(action.at),
+        Math.round(action.pos),
+    ]);
 };
 
 /** Converts a .csv file of the format time(ms),pos(0-100) into a funscript.  */

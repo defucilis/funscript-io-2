@@ -35,6 +35,7 @@ const PlayerControls = ({
     onPlay,
     onPause,
     onSeek,
+    onSeekEnd,
     onSetVolume,
     onZoom,
     onEnterFullscreen,
@@ -55,6 +56,7 @@ const PlayerControls = ({
     onPlay?: () => void;
     onPause?: () => void;
     onSeek?: (time: number) => void;
+    onSeekEnd?: () => void;
     onSetVolume?: (volume: number) => void;
     onZoom?: (direction: -1 | 1) => void;
     onEnterFullscreen?: () => void;
@@ -142,6 +144,7 @@ const PlayerControls = ({
 
     useEffect(() => {
         const handleMouseUp = () => {
+            if (dragging && onSeekEnd) onSeekEnd();
             setDragging(false);
         };
         if (dragging) {

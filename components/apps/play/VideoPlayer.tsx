@@ -12,6 +12,7 @@ const VideoPlayer = ({
     onPause,
     onEnded,
     onSeek,
+    onSeekEnd,
     onProgress,
     onDuration,
 }: {
@@ -21,6 +22,7 @@ const VideoPlayer = ({
     onPause?: () => void;
     onEnded?: () => void;
     onSeek?: (time: number) => void;
+    onSeekEnd?: () => void;
     onProgress?: (time: number) => void;
     onDuration?: (duration: number) => void;
 }): JSX.Element => {
@@ -115,7 +117,6 @@ const VideoPlayer = ({
 
     useEffect(() => {
         const handleFullscreenChange = () => {
-            console.log(document.fullscreenElement);
             if (document.fullscreenElement) setFullscreen(true);
             else setFullscreen(false);
         };
@@ -162,6 +163,7 @@ const VideoPlayer = ({
                     onPlay={() => video.current?.play()}
                     onPause={() => video.current?.pause()}
                     onSeek={seek}
+                    onSeekEnd={onSeekEnd}
                     onSetVolume={setVolume}
                     onEnterFullscreen={enterFullscreen}
                     onLeaveFullscreen={leaveFullscreen}

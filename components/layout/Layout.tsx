@@ -22,7 +22,7 @@ const Layout = ({ children }: { children: ReactNode }): JSX.Element => {
             <div className="flex w-full">
                 <Sidebar open={menuOpen} />
                 <main className="pt-4 px-4 min-h-mobilemain md:min-h-main bg-neutral-900 text-white flex-grow">
-                    <div className="container mx-auto">{children}</div>
+                    <div className="container mx-auto h-full">{children}</div>
                 </main>
             </div>
         </>

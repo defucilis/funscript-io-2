@@ -4,6 +4,37 @@ module.exports = {
     purge: ["./pages/**/*.{js,ts,jsx,tsx}", "./components/**/*.{js,ts,jsx,tsx}"],
     darkMode: false, // or 'media' or 'class'
     theme: {
+        fontFamily: {
+            sans: [
+                "'Exo 2'",
+                "ui-sans-serif",
+                "system-ui",
+                "-apple-system",
+                "BlinkMacSystemFont",
+                "Segoe UI",
+                "Roboto",
+                "Helvetica Neue",
+                "Arial",
+                "Noto Sans",
+                "sans-serif",
+                "Apple Color Emoji",
+                "Segoe UI Emoji",
+                "Segoe UI Symbol",
+                "Noto Color Emoji",
+            ],
+            serif: ["ui-serif", "Georgia", "Cambria", "Times New Roman", "Times", "serif"],
+            mono: [
+                "JetBrains Mono",
+                "ui-monospace",
+                "SFMono-Regular",
+                "Menlo",
+                "Monaco",
+                "Consolas",
+                "Liberation Mono",
+                "Courier New",
+                "monospace",
+            ],
+        },
         extend: {
             colors: {
                 primary: colors.rose,
@@ -15,8 +46,8 @@ module.exports = {
                 mobileHeader: "4.5rem",
             },
             minHeight: theme => ({
-                main: `calc(100vh - ${theme("height.header")} - 1rem)`,
-                mobilemain: `calc(100vh - ${theme("height.mobileHeader")} - 1rem)`,
+                main: `calc(100vh - ${theme("height.header")})`,
+                mobilemain: `calc(100vh - ${theme("height.mobileHeader")})`,
                 48: "12rem",
             }),
             inset: theme => ({

@@ -20,15 +20,6 @@
 -   Cycler app now displays real-time preview of pattern
 -   Made funscript heatmaps much nicer
 
-#### Todo
-
--   Ads?
-
-#### Coming Soon
-
--   I'm going to be merging ScriptAxis and Funscript.io - as you can probably guess from the non-functional search bar in the header!
--   I'm toying with the idea of adding a simple script creation app - probably mainly for tweaking existing scripts. I'm still undecided about it though since it'll be a lot of work...
-
 ---
 
 ## v0.9.1

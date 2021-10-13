@@ -51,7 +51,7 @@ const ModifyHome = ({
                 <FunscriptDropzone
                     className="h-16"
                     value={rawFunscript}
-                    onChange={onAddRawFunscript}
+                    onChange={(filename, script) => onAddRawFunscript(script)}
                 />
                 {rawFunscript && <FunscriptInfo funscript={rawFunscript} />}
             </div>

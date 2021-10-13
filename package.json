@@ -14,6 +14,7 @@
         "test:watch": "jest --watchAll"
     },
     "dependencies": {
+        "firebase-admin": "^9.12.0",
         "next": "latest",
         "next-auth": "latest",
         "nprogress": "^0.2.0",

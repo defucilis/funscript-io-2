@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { MdSync } from "react-icons/md";
+import { AiOutlineSync } from "react-icons/ai";
 
 const AudioWaveform = ({
     url,
@@ -50,7 +50,7 @@ const AudioWaveform = ({
 
                     //canvasCtx.beginPath();
                     //canvasCtx.moveTo(0, height/2);
-                    canvasCtx.fillStyle = "rgb(244,63,94)";
+                    canvasCtx.fillStyle = "rgb(251,113,133)";
                     const barWidth = width / subAverages.length;
                     for (let i = 0; i < subAverages.length; i++) {
                         const barHeight = height * subAverages[i];
@@ -73,7 +73,7 @@ const AudioWaveform = ({
             {loading ? (
                 <div className="absolute left-0 top-0 w-full h-full grid place-items-center">
                     <div className="flex flex-col items-center">
-                        <MdSync className="text-white text-4xl animate-spin" />
+                        <AiOutlineSync className="text-white text-4xl animate-spin" />
                         <p>Calculating Waveform...</p>
                     </div>
                 </div>

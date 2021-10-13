@@ -24,9 +24,9 @@ const Header = ({
                 <div className="flex md:flex-grow items-center justify-between gap-5 px-5">
                     <HeaderSearch className="flex-grow hidden md:flex" />
                     <div className="flex">
-                        <a href="/signin" className="text-white w-16 mr-4">
+                        {/* <a href="/signin" className="text-white w-16 mr-4">
                             Sign In
-                        </a>
+                        </a> */}
                         <HeaderHandyConnection />
                     </div>
                 </div>

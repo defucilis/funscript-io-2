@@ -22,7 +22,7 @@ const SliderMinMaxField = ({
     vertical = false,
     trackSize = "0.5rem",
     knobSize = "1.5rem",
-    activeColor = "rgb(244,63,94)",
+    activeColor = "rgb(251,113,133)",
     inactiveColor = "rgb(200,200,200)",
     label = "",
     showValue = true,
@@ -34,8 +34,8 @@ const SliderMinMaxField = ({
 }: SliderMinMaxProps & SliderFieldOptions): JSX.Element => {
     return (
         <div
-            className={`flex flex-col items-center select-none  ${
-                vertical ? "h-full" : "w-full"
+            className={`flex flex-col select-none  ${
+                vertical ? "h-full items-center" : "w-full"
             } ${className}`}
         >
             <SliderHeader

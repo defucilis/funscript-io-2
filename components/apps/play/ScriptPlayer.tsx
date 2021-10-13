@@ -16,6 +16,7 @@ const ScriptPlayer = ({
     onPause,
     onEnded,
     onSeek,
+    onSeekEnd,
     onProgress,
     onDuration,
 }: {
@@ -27,6 +28,7 @@ const ScriptPlayer = ({
     onPause?: () => void;
     onEnded?: () => void;
     onSeek?: (time: number) => void;
+    onSeekEnd?: () => void;
     onProgress?: (time: number) => void;
     onDuration?: (duration: number) => void;
 }): JSX.Element => {
@@ -82,9 +84,7 @@ const ScriptPlayer = ({
 
     const zoom = useCallback(
         (direction: -1 | 1) => {
-            console.log({ duration, displayDuration });
             const newDuration = displayDuration * (direction < 0 ? 1.5 : 1 / 1.5);
-            console.log(newDuration);
             setDisplayDuration(Math.max(5000, Math.min(duration * 1000, newDuration)));
         },
         [duration, displayDuration]
@@ -92,7 +92,6 @@ const ScriptPlayer = ({
 
     useEffect(() => {
         const handleFullscreenChange = () => {
-            console.log(document.fullscreenElement);
             if (document.fullscreenElement) setFullscreen(true);
             else setFullscreen(false);
         };
@@ -161,7 +160,7 @@ const ScriptPlayer = ({
                         className="h-full"
                         options={{
                             duration: displayDuration,
-                            lineColor: "rgb(244,63,94)",
+                            lineColor: "rgb(251,113,133)",
                             lineWeight:
                                 displayDuration > 60000 ? 1 : displayDuration > 30000 ? 2 : 3,
                             clear: true,
@@ -183,6 +182,7 @@ const ScriptPlayer = ({
                     onPlay={play}
                     onPause={pause}
                     onSeek={seek}
+                    onSeekEnd={onSeekEnd}
                     onSetVolume={setVolume}
                     onZoom={zoom}
                     onEnterFullscreen={enterFullscreen}

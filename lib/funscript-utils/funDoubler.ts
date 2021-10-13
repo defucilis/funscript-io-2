@@ -87,8 +87,6 @@ export const getDoubleSpeedGroup = (
         finalGroup.push({ at: endTime + 10, pos: currentPos });
     }
 
-    console.log({ actionGroup, noShortPauses, simplifiedGroup, finalGroup });
-
     return finalGroup;
 };
 /**

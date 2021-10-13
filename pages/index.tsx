@@ -7,7 +7,7 @@ export const Home = (): JSX.Element => {
 
     return (
         <Layout>
-            <div className="min-h-mobilemain md:min-h-main grid place-items-center">
+            <div className="h-3/4 grid place-items-center">
                 <div>
                     <div className="w-full text-center">
                         <Image
@@ -25,7 +25,6 @@ export const Home = (): JSX.Element => {
                         {"Enjoy Funscripts"}
                     </h3>
                 </div>
-                <div />
             </div>
         </Layout>
     );

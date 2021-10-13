@@ -15,7 +15,7 @@ const FunscriptDropzone = ({
 }: {
     className?: string;
     value: Funscript | null;
-    onChange: (newScript: Funscript) => void;
+    onChange: (filename: string, newScript: Funscript) => void;
     error?: string;
     onError?: (error: string) => void;
     accept?: string[];
@@ -39,10 +39,10 @@ const FunscriptDropzone = ({
                     if (!newFunscript.metadata) newFunscript.metadata = { title: name };
                     else newFunscript.metadata.title = name;
                 }
-                onChange(newFunscript);
+                onChange(files[0].name, newFunscript);
             } else if (extension === "csv") {
                 const newFunscript = convertCsvToFunscript(resultString, name);
-                onChange(newFunscript);
+                onChange(files[0].name, newFunscript);
             } else {
                 throw new Error("invalid type for script file");
             }

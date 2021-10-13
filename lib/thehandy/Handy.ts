@@ -152,7 +152,6 @@ class Handy {
 
     /** Starts HAMP movement - puts the Handy in HAMP mode first, if it isn't already in HAMP mode. */
     async setHampStart(): Promise<SetHampStateResult> {
-        console.log(HandyMode[this.currentMode]);
         if (this.currentMode !== HandyMode.hamp) await this.setMode(HandyMode.hamp);
         const json: { result: SetHampStateResult } = await this.putJson("hamp/start", {});
 
@@ -163,7 +162,6 @@ class Handy {
 
     /** Stops HAMP movement - puts the Handy in HAMP mode first, if it isn't already in HAMP mode. */
     async setHampStop(): Promise<SetHampStateResult> {
-        console.log(HandyMode[this.currentMode]);
         if (this.currentMode !== HandyMode.hamp) await this.setMode(HandyMode.hamp);
         const json: { result: SetHampStateResult } = await this.putJson("hamp/stop", {});
         this.hampState = HampState.stopped;
@@ -287,7 +285,7 @@ class Handy {
         if (this.currentMode !== HandyMode.hdsp) await this.setMode(HandyMode.hdsp);
         const json: { result: SetHdspResult } = await this.putJson("hdsp/xat", {
             position: positionAbsolute,
-            duration: durationMilliseconds,
+            duration: Math.round(durationMilliseconds),
             stopOnTarget: !!stopOnTarget,
         });
 
@@ -308,7 +306,7 @@ class Handy {
         if (this.currentMode !== HandyMode.hdsp) await this.setMode(HandyMode.hdsp);
         const json: { result: SetHdspResult } = await this.putJson("hdsp/xpt", {
             position: positionPercentage,
-            duration: durationMilliseconds,
+            duration: Math.round(durationMilliseconds),
             stopOnTarget: !!stopOnTarget,
         });
 
@@ -328,8 +326,8 @@ class Handy {
             throw new Error("Need to setup the Handy with a script before calling HSSP Play!");
 
         const json: { result: GenericResult } = await this.putJson("hssp/play", {
-            estimatedServerTime: serverTime || new Date().valueOf() + this.hstpOffset,
-            startTime: playbackPosition || 0,
+            estimatedServerTime: Math.round(serverTime || new Date().valueOf() + this.hstpOffset),
+            startTime: Math.round(playbackPosition || 0),
         });
 
         this.hsspState = HsspState.playing;
@@ -419,8 +417,8 @@ class Handy {
 
     /** Sets the current manual offset of the Handy in milliseconds. Negative values mean that the script will be delayed, positive values mean that the script will be advanced. */
     async setHstpoffset(offset: number): Promise<GenericResult> {
-        const json: { result: GenericResult } = await this.putJson("hstp/time", {
-            offset: offset,
+        const json: { result: GenericResult } = await this.putJson("hstp/offset", {
+            offset: Math.round(offset),
         });
         this.hstpOffset = offset;
         this.connected = true;
@@ -433,6 +431,23 @@ class Handy {
         this.hstpRtd = json.rtd;
         this.connected = true;
         return json.rtd;
+    }
+
+    /** Syncronizes the device with the server clock and calculates the round-trip-delay between the device and the server. As far as I can tell, this just doesn't work. I suggest using getServerTimeOffset instead. */
+    async getHstpSync(
+        syncCount = 30,
+        outliers = 6
+    ): Promise<GenericResult & { time: number; rtd: number }> {
+        const json: GenericResult & { time: number; rtd: number } = await this.getJson(
+            "hstp/sync",
+            {
+                syncCount: Math.round(syncCount).toString(),
+                outliers: Math.round(outliers).toString(),
+            }
+        );
+        this.hstpRtd = json.rtd;
+        this.connected = true;
+        return json;
     }
 
     //---------------------------------------------

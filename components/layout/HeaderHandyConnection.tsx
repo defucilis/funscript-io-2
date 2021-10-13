@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import { MdReport, MdSync, MdWifiTethering } from "react-icons/md";
+import { MdReport, MdWifiTethering } from "react-icons/md";
+import { AiOutlineSync } from "react-icons/ai";
 import useHandy from "lib/thehandy-react";
 
 const HeaderHandyConnection = (): JSX.Element => {
@@ -9,6 +10,8 @@ const HeaderHandyConnection = (): JSX.Element => {
     const [newConnectionKey, setNewConnectionKey] = useState(connectionKey);
 
     useEffect(() => {
+        if (!refresh) return;
+
         if (!initialized) {
             refresh();
             setInitialized(true);
@@ -28,7 +31,7 @@ const HeaderHandyConnection = (): JSX.Element => {
                 {handyState.connected ? (
                     <MdWifiTethering className="text-2xl text-green-400" />
                 ) : loading ? (
-                    <MdSync className="text-2xl text-yellow-400 animate-spin" />
+                    <AiOutlineSync className="text-2xl text-yellow-400 animate-spin" />
                 ) : (
                     <MdReport className="text-2xl text-red-400" />
                 )}

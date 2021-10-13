@@ -1,7 +1,9 @@
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { PlayableContent } from "components/molecules/ContentDropzone";
 import { Funscript } from "lib/funscript-utils/types";
 import FunscriptHeatmap from "components/molecules/FunscriptHeatmap";
+import useHandy from "lib/thehandy-react";
+import { HsspState } from "lib/thehandy/types";
 import AudioPlayer from "./AudioPlayer";
 import ScriptPlayer from "./ScriptPlayer";
 import VideoPlayer from "./VideoPlayer";
@@ -9,14 +11,20 @@ import VideoPlayer from "./VideoPlayer";
 const Player = ({
     content,
     funscript,
+    prepared = false,
 }: {
     content: PlayableContent | null;
     funscript: Funscript | null;
+    prepared?: boolean;
 }): JSX.Element => {
+    const { sendHsspPlay, sendHsspStop, handyState } = useHandy();
+
     const [playing, setPlaying] = useState(false);
     const [progress, setProgress] = useState(0);
     const [duration, setDuration] = useState(0);
+    const [scriptDuration, setScriptDuration] = useState(0);
     const [ended, setEnded] = useState(false);
+    const [cachedPlaybackPosition, setCachedPlaybackPosition] = useState(0);
 
     const getFunscriptPadding = () => {
         if (!funscript) return "0px";
@@ -26,6 +34,45 @@ const Player = ({
         const videoPercentage = 100 - Math.min(100, 100 * videoFraction);
         return `${videoPercentage}%`;
     };
+
+    useEffect(() => {
+        if (!funscript) setScriptDuration(0);
+        else setScriptDuration(funscript.actions.slice(-1)[0].at / 1000);
+    }, [funscript]);
+
+    useEffect(() => {
+        if (!prepared) return;
+        if (handyState.hsspState === HsspState.needSetup) return;
+
+        if (playing && handyState.hsspState === HsspState.stopped) {
+            sendHsspPlay(Math.round(cachedPlaybackPosition * 1000));
+        } else if (!playing && handyState.hsspState === HsspState.playing) {
+            setCachedPlaybackPosition(Math.min(scriptDuration, progress * duration));
+            sendHsspStop();
+        }
+    }, [playing, prepared, handyState.hsspState, cachedPlaybackPosition]);
+
+    const handleSeek = useCallback(
+        (time: number) => {
+            if (!prepared) {
+                return;
+            }
+            if (handyState.hsspState === HsspState.needSetup) {
+                return;
+            }
+
+            if (playing && handyState.hsspState === HsspState.playing) {
+                sendHsspPlay(Math.round(time * 1000));
+            } else {
+                setCachedPlaybackPosition(Math.min(scriptDuration, time));
+            }
+        },
+        [prepared, playing, handyState.hsspState]
+    );
+
+    useEffect(() => {
+        if (!playing) setCachedPlaybackPosition(Math.min(scriptDuration, progress * duration));
+    }, [playing, progress]);
 
     return (
         <div>
@@ -37,6 +84,9 @@ const Player = ({
                     onPause={() => setPlaying(false)}
                     onProgress={setProgress}
                     onDuration={setDuration}
+                    onSeekEnd={() => {
+                        handleSeek(progress * duration);
+                    }}
                 />
             )}
             {content && content.type === "audio" && (
@@ -47,6 +97,9 @@ const Player = ({
                     onPause={() => setPlaying(false)}
                     onProgress={setProgress}
                     onDuration={setDuration}
+                    onSeekEnd={() => {
+                        handleSeek(progress * duration);
+                    }}
                 />
             )}
             {!content && funscript && (
@@ -65,7 +118,13 @@ const Player = ({
                     onPause={() => setPlaying(false)}
                     onProgress={setProgress}
                     onDuration={setDuration}
-                    onSeek={time => setProgress(time / duration)}
+                    onSeek={time => {
+                        setProgress(time / duration);
+                        handleSeek(time);
+                    }}
+                    onSeekEnd={() => {
+                        handleSeek(progress * duration);
+                    }}
                     onEnded={() => {
                         setPlaying(false);
                         setEnded(true);

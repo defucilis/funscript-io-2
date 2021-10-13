@@ -70,7 +70,6 @@ const AppRandom = (): JSX.Element => {
                     Math.round(
                         Mathf.randomRange(randomSlide.min, randomSlide.max) * 0.01 * slideMax
                     );
-                console.log({ newVelocity, newSlideMin });
                 sendHampVelocity(newVelocity);
                 sendSlideMin(newSlideMin);
                 setSkip(false);
@@ -224,7 +223,7 @@ const AppRandom = (): JSX.Element => {
                             progress={
                                 handyState.hampState === HampState.moving ? progress * 100 : 100
                             }
-                            color="rgb(244,63,94)"
+                            color="rgb(251,113,133)"
                         />
                         <p className="text-4xl">
                             {handyState.hampState === HampState.moving

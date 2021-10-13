@@ -6,7 +6,6 @@ import { GetStaticPropsResult } from "next";
 import Layout from "components/layout/Layout";
 
 const Changelog = ({ changelog }: { changelog: string }): JSX.Element => {
-    console.log(changelog);
     return (
         <Layout>
             <div className="markdown" dangerouslySetInnerHTML={{ __html: changelog }} />

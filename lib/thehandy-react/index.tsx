@@ -9,12 +9,7 @@ import {
 } from "lib/thehandy/types";
 import Handy from "../thehandy";
 
-const handyContext = createContext<{ handy: Handy | null }>({ handy: null });
-
-const useProvideHandy = (verbose = false) => {
-    const [handy] = useState<Handy>(new Handy(verbose));
-    return { handy };
-};
+const reactHandyContext = createContext<UseHandy | null>(null);
 
 /** Context provider for the Handy - wrap your app in it! */
 const HandyProvider = ({
@@ -24,8 +19,17 @@ const HandyProvider = ({
     verbose?: boolean;
     children: ReactNode;
 }): JSX.Element => {
-    const context = useProvideHandy(verbose || false);
-    return <handyContext.Provider value={context}>{children}</handyContext.Provider>;
+    const reactContext = useHandyReact(verbose);
+    return <reactHandyContext.Provider value={reactContext}>{children}</reactHandyContext.Provider>;
+};
+
+const useHandy = (): UseHandy => {
+    const context = useContext(reactHandyContext);
+    if (!context)
+        throw new Error(
+            "For some reason, Handy context isn't initialized! This shouldn't happen..."
+        );
+    return context;
 };
 
 interface UseHandy {
@@ -117,6 +121,8 @@ interface UseHandy {
     sendHstpOffset: (offset: number) => Promise<void>;
     /** Gets the current round-trip delay from the Handy to the server and back, in milliseconds. Used for synchronization. */
     getHstpRtd: () => Promise<number>;
+    /** Syncronizes the device with the server clock and calculates the round-trip-delay between the device and the server. As far as I can tell, this just doesn't work. I suggest using getServerTimeOffset instead. */
+    getHstpSync: (syncCount?: number, outliers?: number) => Promise<{ time: number; rtd: number }>;
     /** Gets the min and max slide positions from 0 - 100 */
     getSlideSettings: () => Promise<{ min: number; max: number }>;
     /** Gets the current position of the slider in mm from the bottom position */
@@ -128,7 +134,10 @@ interface UseHandy {
     /** Sets the max slide position, from 0 - 100. If fixed is true, then the device will attempt to maintain the same distance between min and max */
     sendSlideMax: (max: number, fixed?: boolean) => Promise<void>;
     /** Gets the offset, in milliseconds, between the Handy and the HandyFeeling servers. Updates estimatedServerTimeOffset */
-    getServerTimeOffset: () => Promise<number>;
+    getServerTimeOffset: (
+        trips?: number,
+        onProgress?: (progress: number) => void
+    ) => Promise<number>;
 }
 
 interface HandyState {
@@ -167,8 +176,8 @@ interface HandyState {
 }
 
 /** Context consumer for the Handy provider. Provides access to the Handy and its internal state. */
-const useHandy = (): UseHandy => {
-    const { handy } = useContext(handyContext);
+const useHandyReact = (verbose?: boolean): UseHandy => {
+    const [handy] = useState<Handy>(new Handy(!!verbose));
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
     const [connectionKey, setConnectionKey] = useState("");
@@ -207,7 +216,6 @@ const useHandy = (): UseHandy => {
 
         //get mode and status
         const { mode } = await getStatus();
-        console.log("got mode " + mode);
         if (mode === HandyMode.hamp) {
             //get hamp-specific stuff
             await getHampVelocity();
@@ -271,7 +279,7 @@ const useHandy = (): UseHandy => {
         }
         try {
             const result = await handy.getConnected();
-            setHandyState(cur => ({ ...cur, connceted: result }));
+            setHandyState(cur => ({ ...cur, connected: result }));
             return true;
         } catch (error: any) {
             setError(error.message);
@@ -884,6 +892,35 @@ const useHandy = (): UseHandy => {
         return handyState.hstpRtd;
     }, [handy, handyState.hstpRtd]);
 
+    const getHstpSync = useCallback(
+        async (syncCount = 30, outliers = 6): Promise<{ time: number; rtd: number }> => {
+            setError("");
+            if (!handy) {
+                setError("Handy not initialized");
+                return {
+                    rtd: handyState.hstpRtd,
+                    time: 0,
+                };
+            }
+            setLoading(true);
+            try {
+                const result = await handy.getHstpSync(syncCount, outliers);
+                setHandyState(cur => ({ ...cur, hstpRtd: result.rtd, connected: true }));
+                setLoading(false);
+                return result;
+            } catch (error: any) {
+                setError(error.message);
+                setHandyState(cur => ({ ...cur, connected: handy.connected }));
+            }
+            setLoading(false);
+            return {
+                rtd: handyState.hstpRtd,
+                time: 0,
+            };
+        },
+        [handy, handyState.hstpRtd]
+    );
+
     const getSlideSettings = useCallback(async (): Promise<{ min: number; max: number }> => {
         setError("");
         if (!handy) {
@@ -1079,6 +1116,7 @@ const useHandy = (): UseHandy => {
         getHstpOffset,
         sendHstpOffset,
         getHstpRtd,
+        getHstpSync,
         getSlideSettings,
         getSlidePositionAbsolute,
         sendSlideSettings,

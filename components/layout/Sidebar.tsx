@@ -44,9 +44,9 @@ const Sidebar = ({ open }: { open: boolean }): JSX.Element => {
                     <li>
                         <SidebarLink path="app/modify" label="Modify script" />
                     </li>
-                    <li>
+                    {/* <li>
                         <SidebarLink path="app/create" label="Create script" />
-                    </li>
+                    </li> */}
                     {/* <li>
                         <SidebarLink path="app/debug" label="Debug Mode" />
                     </li> */}
