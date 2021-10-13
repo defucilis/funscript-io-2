@@ -17,7 +17,7 @@ NProgress.configure({ showSpinner: false });
 
 function MyApp({ Component, pageProps }: AppProps): ReactNode {
     return (
-        <HandyProvider verbose={true}>
+        <HandyProvider verbose={false}>
             <Head>
                 <title>Funscript.io</title>
             </Head>
