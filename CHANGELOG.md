@@ -5,6 +5,7 @@
 #### Added
 
 -   The local player now supports more filetypes - .webm for videos, .m4a and .ogg for audio.
+-   Video player now shows a preview thumbnail when hovering/dragging the seek bar
 
 #### Fixed
 

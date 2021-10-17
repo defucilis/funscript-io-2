@@ -3,7 +3,7 @@ import { PlayableContent } from "components/molecules/ContentDropzone";
 import useInterval from "lib/hooks/useInterval";
 import useDoubleClick from "lib/hooks/useDoubleClick";
 import useDimensions from "lib/hooks/useDimensions";
-import PlayerControls from "./PlayerControls";
+import VideoPlayerControls from "./VideoPlayerControls";
 
 const VideoPlayer = ({
     content,
@@ -151,7 +151,8 @@ const VideoPlayer = ({
                 }}
             >
                 <video ref={video} src={content?.url} className="rounded-tl rounded-tr" />
-                <PlayerControls
+                <VideoPlayerControls
+                    videoUrl={content?.url}
                     showingUi={showingUi()}
                     onMouseEnter={() => setMouseInControls(true)}
                     onMouseLeave={() => setMouseInControls(false)}

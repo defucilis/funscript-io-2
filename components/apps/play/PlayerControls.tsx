@@ -25,6 +25,32 @@ const isTouchEvent = (
     return (e as TouchEvent).touches !== undefined;
 };
 
+export interface PlayerControlsProps {
+    showingUi?: boolean;
+    playing: boolean;
+    time: number;
+    duration: number;
+    volume: number;
+    fullscreen?: boolean;
+    onPlay?: () => void;
+    onPause?: () => void;
+    onSeek?: (time: number) => void;
+    onSeekEnd?: () => void;
+    onSetVolume?: (volume: number) => void;
+    onZoom?: (direction: -1 | 1) => void;
+    onEnterFullscreen?: () => void;
+    onLeaveFullscreen?: () => void;
+    showPlayPause?: boolean;
+    showVolume?: boolean;
+    showZoom?: boolean;
+    showFullscreen?: boolean;
+    onMouseEnter?: () => void;
+    onMouseLeave?: () => void;
+    onHoverStart?: () => void;
+    onHoverEnd?: () => void;
+    onHoverMove?: (newPosition: number) => void;
+}
+
 const PlayerControls = ({
     showingUi = true,
     playing,
@@ -46,28 +72,10 @@ const PlayerControls = ({
     showFullscreen = false,
     onMouseEnter,
     onMouseLeave,
-}: {
-    showingUi?: boolean;
-    playing: boolean;
-    time: number;
-    duration: number;
-    volume: number;
-    fullscreen?: boolean;
-    onPlay?: () => void;
-    onPause?: () => void;
-    onSeek?: (time: number) => void;
-    onSeekEnd?: () => void;
-    onSetVolume?: (volume: number) => void;
-    onZoom?: (direction: -1 | 1) => void;
-    onEnterFullscreen?: () => void;
-    onLeaveFullscreen?: () => void;
-    showPlayPause?: boolean;
-    showVolume?: boolean;
-    showZoom?: boolean;
-    showFullscreen?: boolean;
-    onMouseEnter?: () => void;
-    onMouseLeave?: () => void;
-}): JSX.Element => {
+    onHoverStart,
+    onHoverEnd,
+    onHoverMove,
+}: PlayerControlsProps): JSX.Element => {
     const trackDiv = useRef<HTMLDivElement>(null);
     const [cachedVolume, setCachedVolume] = useState(volume);
     const [hoverPosition, setHoverPosition] = useState(-1);
@@ -120,8 +128,9 @@ const PlayerControls = ({
             const percent = Math.min(1, Math.max(0, pos / (rect.width - 16 * 1.5)));
             const val = percent * duration;
             if (onSeek) onSeek(val);
+            if (onHoverMove && window.innerWidth < 768) onHoverMove(percent);
         },
-        [onSeek, trackDiv, dragging]
+        [onSeek, trackDiv, dragging, onHoverMove]
     );
 
     const handleHoverMove = useCallback(
@@ -138,14 +147,17 @@ const PlayerControls = ({
             const pos = rawPos - rect.left;
             const percent = Math.min(1, Math.max(0, pos / rect.width));
             setHoverPosition(percent);
+            if (hoverPosition < 0 && onHoverStart) onHoverStart();
+            if (onHoverMove) onHoverMove(percent);
         },
-        [trackDiv]
+        [trackDiv, onHoverEnd, hoverPosition]
     );
 
     useEffect(() => {
         const handleMouseUp = () => {
             if (dragging && onSeekEnd) onSeekEnd();
             setDragging(false);
+            if (window.innerWidth < 768 && onHoverEnd) onHoverEnd();
         };
         if (dragging) {
             document.addEventListener("mousemove", handleMouse);
@@ -160,7 +172,7 @@ const PlayerControls = ({
             document.removeEventListener("mouseup", handleMouseUp);
             document.removeEventListener("touchend", handleMouseUp);
         };
-    }, [dragging, handleMouse]);
+    }, [dragging, handleMouse, onHoverEnd]);
 
     const stepSeek = useCallback(
         (offset: number) => {
@@ -235,10 +247,14 @@ const PlayerControls = ({
                         ref={trackDiv}
                         onMouseDown={(e: React.MouseEvent) => {
                             setDragging(true);
+                            if (onHoverStart) onHoverStart();
                             handleMouse(e, false);
                         }}
                         onMouseMove={handleHoverMove}
-                        onMouseLeave={() => setHoverPosition(-1)}
+                        onMouseLeave={() => {
+                            setHoverPosition(-1);
+                            if (onHoverEnd) onHoverEnd();
+                        }}
                     >
                         <div
                             className={`flex items-center relative w-full bg-white bg-opacity-20 ${
@@ -274,9 +290,11 @@ const PlayerControls = ({
                                 }}
                                 onMouseDown={() => {
                                     setDragging(true);
+                                    if (onHoverStart) onHoverStart();
                                 }}
                                 onTouchStart={() => {
                                     setDragging(true);
+                                    if (onHoverStart) onHoverStart();
                                 }}
                             />
                         </div>
