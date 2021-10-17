@@ -1,10 +1,14 @@
-## v2.0.1 - Polished Beta
+## v2.0.2 - Polished Beta
 
 ##### In progress - updating this list as I go
 
 #### Added
 
--    The local player now supports more filetypes - .webm for videos, .m4a and .ogg for audio.
+-   The local player now supports more filetypes - .webm for videos, .m4a and .ogg for audio.
+
+#### Fixed
+
+-   Fixed a potential bug preventing script sync in local player (to do with URL encoding)
 
 ## v2.0.0 - Complete Rebuild!
 

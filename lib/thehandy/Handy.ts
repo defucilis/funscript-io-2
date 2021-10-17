@@ -352,7 +352,9 @@ class Handy {
     async setHsspSetup(url: string, sha256?: string): Promise<HsspSetupResult> {
         if (this.currentMode !== HandyMode.hssp) await this.setMode(HandyMode.hssp);
 
-        const data: { url: string; sha256?: string } = { url };
+        const data: { url: string; sha256?: string } = {
+            url: encodeURI(url),
+        };
         if (sha256) data.sha256 = sha256;
         const json: { result: HsspSetupResult } = await this.putJson("hssp/setup", data);
 
