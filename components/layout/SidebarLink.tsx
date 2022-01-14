@@ -48,6 +48,8 @@ const GetIcon = (path: string): JSX.Element => {
             return <MdTimeline className={iconClassName} />;
         case "app/debug":
             return <MdCode className={iconClassName} />;
+        case "app/list":
+            return <MdList className={iconClassName} />;
         case "changelog":
             return <MdChangeHistory className={iconClassName} />;
     }

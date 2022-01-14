@@ -14,10 +14,12 @@
         "test:watch": "jest --watchAll"
     },
     "dependencies": {
+        "@types/numeral": "^2.0.2",
         "firebase-admin": "^9.12.0",
         "next": "latest",
         "next-auth": "latest",
         "nprogress": "^0.2.0",
+        "numeral": "^2.0.6",
         "react": "latest",
         "react-dom": "latest",
         "react-dropzone": "^11.4.2",

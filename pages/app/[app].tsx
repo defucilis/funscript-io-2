@@ -1,6 +1,6 @@
 import { useRouter } from "next/dist/client/router";
 import Layout from "components/layout/Layout";
-import AppDebug from "components/apps/AppDebug";
+import AppList from "components/apps/AppList";
 import AppManual from "components/apps/AppManual";
 import AppRandom from "components/apps/AppRandom";
 import AppCycler from "components/apps/AppCycler";
@@ -22,8 +22,10 @@ const GetApp = (app: string) => {
             return <AppModify />;
         case "create":
             return <AppCreate />;
+        case "list":
+            return <AppList />;
         case "debug":
-            return <AppDebug />;
+            return <AppList />;
     }
 
     return null;
