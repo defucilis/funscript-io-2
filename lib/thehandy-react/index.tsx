@@ -59,17 +59,17 @@ interface UseHandy {
     getSettings: () => Promise<HandySettings>;
     /** A convenient endpoint for fetching the current mode of the device and the state within the current mode. For modes with a single state, the returned state value will always be 0. For modes with multiple states, see the schema definition for possible values. */
     getStatus: () => Promise<{ mode: HandyMode; state: number }>;
-    /** Starts HAMP movement - puts the Handy in HAMP mode first, if it isn't already in HAMP mode. */
+    /** Starts HAMP movement. Puts the Handy in HAMP mode first, if it isn't already in HAMP mode. */
     sendHampStart: () => Promise<void>;
-    /** Stops HAMP movement - puts the Handy in HAMP mode first, if it isn't already in HAMP mode. */
+    /** Stops HAMP movement. Puts the Handy in HAMP mode first, if it isn't already in HAMP mode. */
     sendHampStop: () => Promise<void>;
     /** Sets the current HAMP state - an alternative to sendHampStart and sendHampStop. Puts the Handy in HAMP mode first, if it isn't already in HAMP mode */
     sendHampState: (state: HampState) => Promise<void>;
-    /** Gets the current HAMP state - puts the Handy in HAMP mode first, if it isn't already in HAMP mode */
+    /** Gets the current HAMP state. Puts the Handy in HAMP mode first, if it isn't already in HAMP mode */
     getHampState: () => Promise<HampState>;
-    /** Gets the current HAMP velocity, from 0 - 100 - putes the handy in HAMP mode first, if it isn't already in HAMP mode */
+    /** Gets the current HAMP velocity, from 0 - 100. Puts the Handy in HAMP mode first, if it isn't already in HAMP mode */
     getHampVelocity: () => Promise<number>;
-    /** Sets the current HAMP velocity, from 0 - 100 - putes the handy in HAMP mode first, if it isn't already in HAMP mode */
+    /** Sets the current HAMP velocity, from 0 - 100. Puts the Handy in HAMP mode first, if it isn't already in HAMP mode */
     sendHampVelocity: (velocity: number) => Promise<void>;
     /** Sets the next absolute position (xa) of the device, and the absolute velocity (va) the device should use to reach the position. Puts the Handy in HDSP mode, if it isn't already in HDSP mode */
     sendHdspXaVa: (

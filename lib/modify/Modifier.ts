@@ -67,7 +67,7 @@ export const ModifierOperations = {
     setValue: (modifier: Modifier, key: string, value: number | string | boolean): Modifier => {
         return { ...modifier, options: { ...modifier.options, [key]: value } };
     },
-    reorder: <T extends any>(array: T[], from: number, increment: number): T[] => {
+    reorder: <T>(array: T[], from: number, increment: number): T[] => {
         if (increment === 0) return array;
 
         const output: T[] = [];
