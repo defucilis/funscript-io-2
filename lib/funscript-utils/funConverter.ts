@@ -11,7 +11,7 @@ export const getFunscriptFromString = (funscriptJson: string): Funscript => {
     return addFunscriptMetadata(script);
 };
 /**
- * Adds metadata (average speed and duration) to a funscript, as well as make sure that its actions are in the right order
+ * Adds metadata (average speed and duration) to a funscript, as well as make sure that its actions are in the right order (and deletes the accursed rawActions)
  * @param  {Funscript} funscript - Funscript to be processed
  * @returns Processed funscript with metadata
  */
@@ -34,6 +34,7 @@ export const addFunscriptMetadata = (funscript: Funscript): Funscript => {
         duration,
         average_speed: averageSpeed,
     };
+    if ((output as any).rawActions) delete (output as any).rawActions;
     return output;
 };
 
