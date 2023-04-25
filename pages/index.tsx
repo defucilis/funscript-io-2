@@ -14,6 +14,7 @@ export const Home = (): JSX.Element => {
                             src="/logo512.png"
                             width={Math.min(width * 0.5, height * 0.25)}
                             height={Math.min(width * 0.5, height * 0.25)}
+                            alt="Funscript.io logo"
                         />
                     </div>
                     <h1 className="w-full text-center text-5xl font-bold">Funscript.io</h1>
