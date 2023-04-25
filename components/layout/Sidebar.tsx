@@ -61,7 +61,7 @@ const Sidebar = ({ open }: { open: boolean }): JSX.Element => {
                 <ul>
                     <li>
                         <SidebarLink
-                            path="https://github.com/defucilis/funscript-io"
+                            path="https://github.com/defucilis/funscript-io-2"
                             label="GitHub repository"
                         />
                         <SidebarLink
@@ -79,7 +79,7 @@ const Sidebar = ({ open }: { open: boolean }): JSX.Element => {
                                 Funscript.io Version {packageJson.version}
                             </span>
                             <span className="text-neutral-500 text-sm">
-                                &copy; Funscript.io 2021
+                                &copy; Funscript.io 2023
                             </span>
                         </div>
                     </li>

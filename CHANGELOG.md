@@ -1,15 +1,30 @@
-## v2.0.2 - Polished Beta
+## v2.1.0 - I'm back baybeeee
 
-##### In progress - updating this list as I go
+##### 25th April 2023
 
 #### Added
 
 -   The local player now supports more filetypes - .webm for videos, .m4a and .ogg for audio.
 -   Video player now shows a preview thumbnail when hovering/dragging the seek bar
+-   The modifier now removes the hated `rawActions` from funscripts (inspired by @linuxguy's topic on EroScripts)
+-   Allows files to be saved even with no modifiers (for when you just want to remove `rawActions`)
+-   Added status information text to the header
+
+#### Changed
+
+-   Minor style improvements and updates (notably added a dropshadow to text over heatmaps)
+-   Updated everything - 18 months is long enough for everything to break lol
+
+#### Removed
+
+-   Took out the search bar from the header (RIP ScriptAxis)
 
 #### Fixed
 
 -   Fixed a potential bug preventing script sync in local player (to do with URL encoding)
+-   The GitHub link now correctly goes to the new repo, rather than the legacy site
+
+---
 
 ## v2.0.0 - Complete Rebuild!
 
