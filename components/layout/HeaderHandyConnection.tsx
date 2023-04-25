@@ -29,13 +29,22 @@ const HeaderHandyConnection = (): JSX.Element => {
                 } -mr-5 pr-5 -my-2 py-2`}
                 onClick={() => setExpanded(!expanded)}
             >
-                {handyState.connected ? (
-                    <MdWifiTethering className="text-2xl text-green-400" />
-                ) : loading ? (
-                    <AiOutlineSync className="text-2xl text-yellow-400 animate-spin" />
-                ) : (
-                    <MdReport className="text-2xl text-red-400" />
-                )}
+                <div className="flex gap-2">
+                    {handyState.connected ? (
+                        <span className="text-green-400">Handy Connected</span>
+                    ) : loading ? (
+                        <span className="text-yellow-400">Loading...</span>
+                    ) : (
+                        <span className="text-red-400">No Handy Connected</span>
+                    )}
+                    {handyState.connected ? (
+                        <MdWifiTethering className="text-2xl text-green-400" />
+                    ) : loading ? (
+                        <AiOutlineSync className="text-2xl text-yellow-400 animate-spin" />
+                    ) : (
+                        <MdReport className="text-2xl text-red-400" />
+                    )}
+                </div>
             </div>
             <div
                 className={`${
