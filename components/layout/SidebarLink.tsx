@@ -66,18 +66,17 @@ const SidebarLink = ({ path, label }: { path: string; label: string }): JSX.Elem
         ? "/app/" + String(router.query.app)
         : router.pathname;
     return (
-        <Link href={path.includes("://") ? path : `/${path}`}>
-            <a
-                className={`flex items-center py-2 px-4 gap-4 hover:bg-neutral-700 ${
-                    fullPath === `/${path}`
-                        ? "bg-neutral-900 shadow-inner border-b border-neutral-700"
-                        : "bg-transparent"
-                } transition-all`}
-                target={path.includes("://") ? "_blank" : ""}
-            >
-                {GetIcon(path)}
-                <span className="text-white inline md:hidden lg:inline">{label}</span>
-            </a>
+        <Link
+            href={path.includes("://") ? path : `/${path}`}
+            className={`flex items-center py-2 px-4 gap-4 hover:bg-neutral-700 ${
+                fullPath === `/${path}`
+                    ? "bg-neutral-900 shadow-inner border-b border-neutral-700"
+                    : "bg-transparent"
+            } transition-all`}
+            target={path.includes("://") ? "_blank" : ""}
+        >
+            {GetIcon(path)}
+            <span className="text-white inline md:hidden lg:inline">{label}</span>
         </Link>
     );
 };
