@@ -72,12 +72,14 @@ const FunscriptDropzone = ({
                 }`}
             >
                 {value && (
-                    <p>
+                    <p style={{ textShadow: "2px 2px black" }}>
                         {value.metadata?.title || "Unnamed Funscript"} ({value.actions.length}{" "}
                         actions)
                     </p>
                 )}
-                {!value && <p>Drop a .funscript or .csv here</p>}
+                {!value && (
+                    <p style={{ textShadow: "2px 2px black" }}>Drop a .funscript or .csv here</p>
+                )}
                 {(error || localError) && (
                     <p className="text-red-300 text-sm">{error || localError}</p>
                 )}

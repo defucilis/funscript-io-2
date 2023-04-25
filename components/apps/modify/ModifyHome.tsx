@@ -86,7 +86,7 @@ const ModifyHome = ({
                     {error}
                 </p>
             )}
-            {modifiedFunscript && downloadFile && modifiers.length > 0 && (
+            {modifiedFunscript && downloadFile && (
                 <div className="mb-4">
                     <a
                         href={downloadFile.url}
@@ -94,8 +94,11 @@ const ModifyHome = ({
                         className="h-16 relative block"
                     >
                         <div className="relative w-full h-full">
-                            <div className="relative z-10 bg-black bg-opacity-20 grid place-items-center w-full h-full">
-                                Save modified script
+                            <div
+                                className="relative z-10 bg-black bg-opacity-20 grid place-items-center w-full h-full"
+                                style={{ textShadow: "2px 2px black" }}
+                            >
+                                Save {modifiers.length > 0 ? "modified" : "cleaned"} script
                             </div>
                             <FunscriptHeatmap
                                 className="absolute w-full h-full left-0 top-0 z-0"
