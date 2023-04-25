@@ -59,7 +59,7 @@ const FunscriptDropzone = ({
         <Dropzone
             className={className}
             options={{
-                accept: [".funscript", ".csv"],
+                accept: { "application/json": [".funscript"], "text/csv": [".csv"] },
                 maxSize,
                 onDropAccepted: acceptFiles,
                 onDropRejected: rejectFiles,
