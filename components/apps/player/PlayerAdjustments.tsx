@@ -11,7 +11,7 @@ enum SlideIntervalMode {
 }
 
 const PlayerAdjustments = (): JSX.Element => {
-    const { sendSlideMin, sendSlideMax, sendHstpOffset, handyState } = useHandy();
+    const { sendSlideMin, sendSlideMax, sendHstpOffset, handyState, loading } = useHandy();
 
     const [offset, setOffset] = useState(handyState.hstpOffset);
     const [slideMin, setSlideMin] = useState(handyState.slideMin);
@@ -20,17 +20,18 @@ const PlayerAdjustments = (): JSX.Element => {
     const [slideIntervalMode, setSlideIntervalMode] = useState(SlideIntervalMode.min);
 
     useKeyboard(e => {
+        if(loading) return;
         switch (e.key) {
             case "ArrowUp":
-                setOffset(cur => Math.min(1000, cur + 50));
-                sendHstpOffset(Math.min(1000, offset + 50));
+                setOffset(cur => Math.min(2000, cur + 200));
+                sendHstpOffset(Math.min(2000, offset + 200));
                 break;
             case "ArrowDown":
-                setOffset(cur => Math.max(0, cur - 50));
-                sendHstpOffset(Math.max(0, offset - 50));
+                setOffset(cur => Math.max(-2000, cur - 200));
+                sendHstpOffset(Math.max(-2000, offset - 200));
                 break;
         }
-    }, []);
+    }, [loading]);
 
     return (
         <div className="flex flex-col gap-2 w-full mt-4">
@@ -45,15 +46,17 @@ const PlayerAdjustments = (): JSX.Element => {
                 onIntervalChangeMin={sendSlideMin}
                 onIntervalChangeMax={sendSlideMax}
                 valueUnit="%"
+                disabled={loading}
             />
             <SliderField
-                label="Script vs Video Time Offset"
-                valueUnit=" ms"
-                min={-1000}
-                max={1000}
+                label="Time Offset - ↕"
+                valueOverride={`Handy is ${Math.abs(Math.round(offset))} ms ${offset > 0 ? "ahead" : "behind"}`}
+                min={-2000}
+                max={2000}
                 value={offset}
                 onChange={setOffset}
                 onIntervalChange={sendHstpOffset}
+                disabled={loading}
             />
             <SliderField
                 label="Slide Interval"
@@ -62,6 +65,7 @@ const PlayerAdjustments = (): JSX.Element => {
                 max={100}
                 value={slideInterval}
                 onChange={setSlideInterval}
+                disabled={loading}
             />
             <div className="flex flex-col">
                 <div className="flex justify-between">

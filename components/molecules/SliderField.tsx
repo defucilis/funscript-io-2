@@ -6,6 +6,8 @@ export interface SliderFieldOptions {
     label?: string;
     showValue?: boolean;
     valueUnit?: string;
+    valuePrefix?: string;
+    valueOverride?: string;
     minValueDisplay?: string;
     maxValueDisplay?: string;
     decimalPlaces?: number;
@@ -31,6 +33,8 @@ const SliderField = ({
     label = "",
     showValue = true,
     valueUnit = "",
+    valuePrefix = "",
+    valueOverride = "",
     minValueDisplay = "",
     maxValueDisplay = "",
     decimalPlaces = 0,
@@ -44,6 +48,8 @@ const SliderField = ({
                 label={label}
                 value={value}
                 valueUnit={valueUnit}
+                valuePrefix={valuePrefix}
+                valueOverride={valueOverride}
                 minValueDisplay={minValueDisplay}
                 maxValueDisplay={maxValueDisplay}
                 showValue={showValue}
