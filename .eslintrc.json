@@ -58,6 +58,10 @@
         "import/resolver": {
             "node": {
                 "moduleDirectory": ["node_modules", "./"]
+            },
+            "typescript": {
+                "alwaysTryTypes": true,
+                "project": "./tsconfig.json"
             }
         }
     }
