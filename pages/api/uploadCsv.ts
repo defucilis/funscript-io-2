@@ -13,7 +13,7 @@ const writeFile = (bucket: any, path: string, data: string): Promise<string> => 
             stream.on("error", (err: any) => reject(err));
             stream.on("finish", () => {
                 file.makePublic().then(() => {
-                    resolve(file.publicUrl());
+                    resolve(file.publicUrl().replace(/(%2F)/g, "/"));
                 });
             });
             stream.end(data);
