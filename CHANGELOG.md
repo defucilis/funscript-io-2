@@ -1,3 +1,27 @@
+## v2.2.0 - Fixes, Tweaks and Modifier Presets
+
+##### 29th April 2023
+
+#### Added
+
+-   You can now save modifier presets in the Modify script app
+-   Added analytics (don't freak out, I'm literally just counting page views and visitor counts, no other data, I just have no idea how many people actually use the site lol)
+-   Added modifier presets
+-   Made it possible to directly save the heatmap from the modified funscript
+
+#### Changed
+
+-   Made it clearer whether the handy was delayed or advanced in the local player
+-   Increased the range and keyboard-step-interval for the handy delay slider in the local player
+-   Made the warning error in the custom modifier block flash for extra visibility
+
+#### Fixed
+
+-   Fixed a bug that totally broke local script playback (oops)
+-   Fixed a bug that made it possible to break the handy connection by rapidly moving sliders in the script player
+
+---
+
 ## v2.1.0 - I'm back baybeeee
 
 ##### 25th April 2023

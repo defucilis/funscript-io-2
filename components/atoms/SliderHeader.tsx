@@ -32,7 +32,7 @@ const SliderHeader = ({
     if (!(vertical || showValue || label)) return null;
 
     const getDisplayValue = (val: number): string => {
-        if(valueOverride != null) return valueOverride;
+        if (valueOverride != null) return valueOverride;
         if (val === min && minValueDisplay) return minValueDisplay;
         if (val === max && maxValueDisplay) return maxValueDisplay;
         return (valuePrefix || "") + roundNumber(val, decimalPlaces) + (valueUnit || "");

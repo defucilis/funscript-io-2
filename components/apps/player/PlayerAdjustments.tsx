@@ -19,19 +19,22 @@ const PlayerAdjustments = (): JSX.Element => {
     const [slideInterval, setSlideInterval] = useState(10);
     const [slideIntervalMode, setSlideIntervalMode] = useState(SlideIntervalMode.min);
 
-    useKeyboard(e => {
-        if(loading) return;
-        switch (e.key) {
-            case "ArrowUp":
-                setOffset(cur => Math.min(2000, cur + 200));
-                sendHstpOffset(Math.min(2000, offset + 200));
-                break;
-            case "ArrowDown":
-                setOffset(cur => Math.max(-2000, cur - 200));
-                sendHstpOffset(Math.max(-2000, offset - 200));
-                break;
-        }
-    }, [loading]);
+    useKeyboard(
+        e => {
+            if (loading) return;
+            switch (e.key) {
+                case "ArrowUp":
+                    setOffset(cur => Math.min(2000, cur + 200));
+                    sendHstpOffset(Math.min(2000, offset + 200));
+                    break;
+                case "ArrowDown":
+                    setOffset(cur => Math.max(-2000, cur - 200));
+                    sendHstpOffset(Math.max(-2000, offset - 200));
+                    break;
+            }
+        },
+        [loading]
+    );
 
     return (
         <div className="flex flex-col gap-2 w-full mt-4">
@@ -50,7 +53,9 @@ const PlayerAdjustments = (): JSX.Element => {
             />
             <SliderField
                 label="Time Offset - ↕"
-                valueOverride={`Handy is ${Math.abs(Math.round(offset))} ms ${offset > 0 ? "ahead" : "behind"}`}
+                valueOverride={`Handy is ${Math.abs(Math.round(offset))} ms ${
+                    offset > 0 ? "ahead" : "behind"
+                }`}
                 min={-2000}
                 max={2000}
                 value={offset}

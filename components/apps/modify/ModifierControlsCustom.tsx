@@ -16,7 +16,7 @@ const ModifierControlsCustom = ({
                 }
             </p>
             <p className="text-neutral-500 italic leading-none">
-                <span className="text-red-500 font-bold">IMPORTANT: </span>
+                <span className="text-red-500 font-bold animate-pulse">IMPORTANT: </span>
                 {"This is code that will run on YOUR computer!"}
                 <br />
                 {

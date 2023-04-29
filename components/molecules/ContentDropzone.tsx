@@ -63,7 +63,13 @@ const ContentDropzone = ({
         <Dropzone
             className={className}
             options={{
-                accept: {"video/mp4": [".mp4"], "video/webm": [".webm"], "audio/mp3": [".mp3"], "audio/mp4": [".m4a"], "audio/ogg": [".ogg"]},
+                accept: {
+                    "video/mp4": [".mp4"],
+                    "video/webm": [".webm"],
+                    "audio/mp3": [".mp3"],
+                    "audio/mp4": [".m4a"],
+                    "audio/ogg": [".ogg"],
+                },
                 maxSize,
                 onDropAccepted: acceptFiles,
                 onDropRejected: rejectFiles,
