@@ -1,6 +1,7 @@
 import { Router } from "next/router";
 import Head from "next/head";
 import { AppProps } from "next/dist/shared/lib/router/router";
+import { Analytics } from '@vercel/analytics/react';
 import React, { ReactNode } from "react";
 import NProgress from "nprogress";
 import { Slide, ToastContainer } from "react-toastify";
@@ -30,6 +31,7 @@ function MyApp({ Component, pageProps }: AppProps): ReactNode {
                 limit={3}
                 autoClose={3000}
             />
+            <Analytics />
         </HandyProvider>
     );
 }
