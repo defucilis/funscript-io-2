@@ -1,3 +1,13 @@
+import {
+    getOffsetScript,
+    getLimitedScript,
+    getRemappedScript,
+    getMetadataScript,
+    getCustomFunctionScript,
+    getRandomizedScript,
+} from "lib/funscript-utils/funTweaker";
+import { getHalfSpeedScript } from "lib/funscript-utils/funHalver";
+import { getDoubleSpeedScript } from "lib/funscript-utils/funDoubler";
 import { Funscript } from "lib/funscript-utils/types";
 
 export enum ModifierType {
@@ -21,8 +31,106 @@ export default interface Modifier {
         options: { [key: string]: boolean | string | number },
         onError?: (error: string) => void
     ) => Funscript;
-    onError?: (error: string) => void;
 }
+
+export interface ModifierPreset {
+    name: string;
+    modifiers: Modifier[];
+}
+
+export const createModifier = (type: ModifierType, id: number, onError?: (err: string) => void) => {
+    const defaultFunction = `actions => {
+        //applies a 100ms offset to all actions
+        return actions.map(action => ({...action, at: action.at + 100}));
+    }`;
+
+    switch (type) {
+        case ModifierType.Offset:
+            return {
+                type,
+                id,
+                operation: getOffsetScript,
+                ...ModifierOperations.getOptions({
+                    offset: 0,
+                }),
+            };
+        case ModifierType.Halver:
+            return {
+                type,
+                id,
+                operation: getHalfSpeedScript,
+                ...ModifierOperations.getOptions({
+                    resetAfterPause: false,
+                    removeShortPauses: true,
+                    shortPauseDuration: 2000,
+                    matchFirstDownstroke: false,
+                    matchGroupEndPosition: true,
+                }),
+            };
+        case ModifierType.Doubler:
+            return {
+                type,
+                id,
+                operation: getDoubleSpeedScript,
+                ...ModifierOperations.getOptions({
+                    matchGroupEnd: true,
+                    shortPauseDuration: 100,
+                }),
+            };
+        case ModifierType.Limiter:
+            return {
+                type,
+                id,
+                operation: getLimitedScript,
+                ...ModifierOperations.getOptions({
+                    devicePreset: "handy",
+                    maxSpeed: 0,
+                }),
+            };
+        case ModifierType.Randomizer:
+            return {
+                type,
+                id,
+                operation: getRandomizedScript,
+                ...ModifierOperations.getOptions({
+                    positionJitter: 5,
+                    timeJitter: 50,
+                }),
+            };
+        case ModifierType.Remapper:
+            return {
+                type,
+                id,
+                operation: getRemappedScript,
+                ...ModifierOperations.getOptions({
+                    min: 0,
+                    max: 100,
+                }),
+            };
+        case ModifierType.Metadata:
+            return {
+                type,
+                id,
+                operation: getMetadataScript,
+                ...ModifierOperations.getOptions({}),
+            };
+        case ModifierType.Custom:
+            return {
+                type,
+                id,
+                operation: (
+                    funscript: Funscript,
+                    options: Record<string, string | number | boolean>
+                ) =>
+                    getCustomFunctionScript(funscript, options, err => {
+                        if (onError) onError("Error in custom function block: " + err);
+                    }),
+                ...ModifierOperations.getOptions({ functionText: defaultFunction }),
+            };
+        default:
+            throw new Error("Invalid value " + type + " for ModifierType!");
+    }
+};
 
 export const ModifierOperations = {
     reset: (modifier: Modifier): Modifier => ({

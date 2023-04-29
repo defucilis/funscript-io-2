@@ -1,16 +1,22 @@
 import React, { useState, useEffect } from "react";
-import Modifier, { ModifierOperations } from "lib/modify/Modifier";
+import Modifier, { ModifierOperations, ModifierPreset, createModifier } from "lib/modify/Modifier";
 import { Funscript } from "lib/funscript-utils/types";
 import { addFunscriptMetadata } from "lib/funscript-utils/funConverter";
 import ModifyHome from "./modify/ModifyHome";
 import ModifyAdd from "./modify/ModifyAdd";
 import ModifyEdit from "./modify/ModifyEdit";
+import ModifyPresetSelect from "./modify/ModifyPresetSelect";
+import ModifyPresetSave from "./modify/ModifyPresetSave";
 
 const AppModify = (): JSX.Element => {
+    const [presets, setPresets] = useState<ModifierPreset[]>([]);
+    const [presetIndex, setPresetIndex] = useState(-1);
     const [modifiers, setModifiers] = useState<Modifier[]>([]);
     const [addingModifier, setAddingModifier] = useState(false);
     const [editingModifier, setEditingModifier] = useState<Modifier | null>(null);
     const [editingModifierIndex, setEditingModifierIndex] = useState(-1);
+    const [selectingPreset, setSelectingPreset] = useState(false);
+    const [savingPreset, setSavingPreset] = useState(false);
     const [rawFunscript, setRawFunscript] = useState<Funscript | null>(null);
     const [modifiedFunscript, setModifiedFunscript] = useState<Funscript | null>(null);
     const [downloadFile, setDownloadFile] = useState<{ url: string; filename: string } | null>(
@@ -29,6 +35,15 @@ const AppModify = (): JSX.Element => {
     };
 
     useEffect(() => {
+        const presets = window.localStorage.getItem("modifierPresets");
+        if (!presets) {
+            setPresets([]);
+            return;
+        }
+        setPresets(JSON.parse(presets));
+    }, []);
+
+    useEffect(() => {
         setError("");
         if (!rawFunscript) {
             setModifiedFunscript(null);
@@ -38,11 +53,10 @@ const AppModify = (): JSX.Element => {
             setModifiedFunscript(rawFunscript);
             return;
         }
-
         setModifiedFunscript(
             addFunscriptMetadata(
                 modifiers.reduce((acc, modifier) => {
-                    return modifier.operation(acc, modifier.options, modifier.onError);
+                    return modifier.operation(acc, modifier.options);
                 }, rawFunscript)
             )
         );
@@ -67,7 +81,10 @@ const AppModify = (): JSX.Element => {
             <div className="relative w-full overflow-x-hidden overflow-y-visible min-h-mobilemain md:min-h-main">
                 <ModifyHome
                     modifiers={modifiers}
+                    preset={presetIndex === -1 ? null : presets[presetIndex]}
                     onAddModifier={() => setAddingModifier(true)}
+                    onOpenPresets={() => setSelectingPreset(true)}
+                    onSavePreset={() => setSavingPreset(true)}
                     onEditModifier={index => startEditingModifier(index)}
                     onDeleteModifier={modifier =>
                         setModifiers(cur => cur.filter(m => m.id !== modifier.id))
@@ -89,7 +106,9 @@ const AppModify = (): JSX.Element => {
                     onAddRawFunscript={setRawFunscript}
                     modifiedFunscript={modifiedFunscript}
                     downloadFile={downloadFile}
-                    active={!addingModifier && !editingModifier}
+                    active={
+                        !addingModifier && !editingModifier && !selectingPreset && !savingPreset
+                    }
                     error={error}
                 />
                 <ModifyAdd
@@ -111,6 +130,44 @@ const AppModify = (): JSX.Element => {
                         setEditingModifierIndex(-1);
                     }}
                     active={!!editingModifier}
+                />
+                <ModifyPresetSelect
+                    presets={presets}
+                    onConfirm={presetIndex => {
+                        const newModifiers = presets[presetIndex].modifiers.map(modifierData => {
+                            const modifier = createModifier(modifierData.type, modifierData.id);
+                            modifier.options = modifierData.options;
+                            modifier.defaultOptions = modifierData.defaultOptions;
+                            return modifier;
+                        });
+                        setModifiers(newModifiers);
+                        setPresetIndex(presetIndex);
+                        setSelectingPreset(false);
+                    }}
+                    onCancel={() => {
+                        setSelectingPreset(false);
+                    }}
+                    active={!!selectingPreset}
+                />
+                <ModifyPresetSave
+                    presets={presets}
+                    modifiers={modifiers}
+                    presetIndex={presetIndex}
+                    onOverwrite={newPresets => {
+                        setPresets(newPresets);
+                        window.localStorage.setItem("modifierPresets", JSON.stringify(newPresets));
+                        setSavingPreset(false);
+                    }}
+                    onSaveAsNew={newPresets => {
+                        setPresets(newPresets);
+                        setPresetIndex(newPresets.length - 1);
+                        window.localStorage.setItem("modifierPresets", JSON.stringify(newPresets));
+                        setSavingPreset(false);
+                    }}
+                    onCancel={() => {
+                        setSavingPreset(false);
+                    }}
+                    active={!!savingPreset}
                 />
             </div>
         </div>

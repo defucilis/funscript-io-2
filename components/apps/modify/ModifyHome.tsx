@@ -1,6 +1,6 @@
 import React from "react";
 import { MdAdd } from "react-icons/md";
-import Modifier from "lib/modify/Modifier";
+import Modifier, { ModifierPreset } from "lib/modify/Modifier";
 import Button from "components/atoms/Button";
 import FunscriptInfo from "components/atoms/FunscriptInfo";
 import ButtonIcon from "components/atoms/ButtonIcon";
@@ -12,7 +12,10 @@ import ModifierBlock from "./ModifierBlock";
 
 const ModifyHome = ({
     modifiers,
+    preset,
     onAddModifier,
+    onOpenPresets,
+    onSavePreset,
     onEditModifier,
     onDeleteModifier,
     onResetModifier,
@@ -26,7 +29,10 @@ const ModifyHome = ({
     error,
 }: {
     modifiers: Modifier[];
+    preset: ModifierPreset | null;
     onAddModifier: () => void;
+    onOpenPresets: () => void;
+    onSavePreset: () => void;
     onEditModifier: (index: number) => void;
     onDeleteModifier: (modifier: Modifier) => void;
     onResetModifier: (modifier: Modifier) => void;
@@ -56,6 +62,7 @@ const ModifyHome = ({
                 {rawFunscript && <FunscriptInfo funscript={rawFunscript} />}
             </div>
             <div className="flex flex-col items-center">
+                {preset && <p className="text-xl">Preset: {preset.name}</p>}
                 {modifiers.map((modifier, index) => (
                     <ModifierBlock
                         key={`Modifier_${modifier.id}`}
@@ -72,9 +79,12 @@ const ModifyHome = ({
                     />
                 ))}
             </div>
-            <div className="w-full flex justify-center mt-4 mb-4">
+            <div className="w-full flex justify-center mt-4 mb-4 gap-4">
                 {modifiers.length === 0 ? (
-                    <Button onClick={onAddModifier}>Add your first modifier</Button>
+                    <>
+                        <Button onClick={onAddModifier}>Add your first modifier</Button>
+                        <Button onClick={onOpenPresets}>Or choose a modifier preset</Button>
+                    </>
                 ) : (
                     <ButtonIcon onClick={onAddModifier}>
                         <MdAdd />

@@ -3,23 +3,8 @@ import { MdKeyboardArrowLeft } from "react-icons/md";
 import Button from "components/atoms/Button";
 import ButtonIcon from "components/atoms/ButtonIcon";
 import SelectField from "components/molecules/SelectField";
-import Modifier, { ModifierType, ModifierOperations } from "lib/modify/Modifier";
-import { getHalfSpeedScript } from "lib/funscript-utils/funHalver";
-import {
-    getOffsetScript,
-    getLimitedScript,
-    getRemappedScript,
-    getMetadataScript,
-    getCustomFunctionScript,
-    getRandomizedScript,
-} from "lib/funscript-utils/funTweaker";
-import { getDoubleSpeedScript } from "lib/funscript-utils/funDoubler";
+import Modifier, { ModifierType, ModifierOperations, createModifier } from "lib/modify/Modifier";
 import ModifierControls from "./ModifierControls";
-
-const defaultFunction = `actions => {
-    //applies a 100ms offset to all actions
-    return actions.map(action => ({...action, at: action.at + 100}));
-}`;
 
 const ModifyAdd = ({
     onConfirm,
@@ -58,95 +43,7 @@ const ModifyAdd = ({
             return;
         }
 
-        switch (type) {
-            case ModifierType.Offset:
-                setNewModifier({
-                    type,
-                    id: nextId,
-                    operation: getOffsetScript,
-                    ...ModifierOperations.getOptions({
-                        offset: 0,
-                    }),
-                });
-                break;
-            case ModifierType.Halver:
-                setNewModifier({
-                    type,
-                    id: nextId,
-                    operation: getHalfSpeedScript,
-                    ...ModifierOperations.getOptions({
-                        resetAfterPause: false,
-                        removeShortPauses: true,
-                        shortPauseDuration: 2000,
-                        matchFirstDownstroke: false,
-                        matchGroupEndPosition: true,
-                    }),
-                });
-                break;
-            case ModifierType.Doubler:
-                setNewModifier({
-                    type,
-                    id: nextId,
-                    operation: getDoubleSpeedScript,
-                    ...ModifierOperations.getOptions({
-                        matchGroupEnd: true,
-                        shortPauseDuration: 100,
-                    }),
-                });
-                break;
-            case ModifierType.Limiter:
-                setNewModifier({
-                    type,
-                    id: nextId,
-                    operation: getLimitedScript,
-                    ...ModifierOperations.getOptions({
-                        devicePreset: "handy",
-                        maxSpeed: 0,
-                    }),
-                });
-                break;
-            case ModifierType.Randomizer:
-                setNewModifier({
-                    type,
-                    id: nextId,
-                    operation: getRandomizedScript,
-                    ...ModifierOperations.getOptions({
-                        positionJitter: 5,
-                        timeJitter: 50,
-                    }),
-                });
-                break;
-            case ModifierType.Remapper:
-                setNewModifier({
-                    type,
-                    id: nextId,
-                    operation: getRemappedScript,
-                    ...ModifierOperations.getOptions({
-                        min: 0,
-                        max: 100,
-                    }),
-                });
-                break;
-            case ModifierType.Metadata:
-                setNewModifier({
-                    type,
-                    id: nextId,
-                    operation: getMetadataScript,
-                    ...ModifierOperations.getOptions({}),
-                });
-                break;
-            case ModifierType.Custom:
-                setNewModifier({
-                    type,
-                    id: nextId,
-                    operation: getCustomFunctionScript,
-                    ...ModifierOperations.getOptions({ functionText: defaultFunction }),
-                    onError: error => onError("Error in custom function block: " + error),
-                });
-                break;
-            default:
-                throw new Error("Invalid value " + type + " for ModifierType!");
-        }
+        setNewModifier(createModifier(type, nextId, onError));
         setNextId(cur => cur + 1);
     };
 
