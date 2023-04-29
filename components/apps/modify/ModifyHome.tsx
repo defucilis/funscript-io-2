@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { MdAdd } from "react-icons/md";
 import Modifier, { ModifierPreset } from "lib/modify/Modifier";
 import Button from "components/atoms/Button";
@@ -7,6 +7,7 @@ import ButtonIcon from "components/atoms/ButtonIcon";
 import FunscriptDropzone from "components/molecules/FunscriptDropzone";
 import FunscriptHeatmap from "components/molecules/FunscriptHeatmap";
 import { Funscript } from "lib/funscript-utils/types";
+import ButtonLink from "components/atoms/ButtonLink";
 import FunscriptExplorer from "../../organisms/FunscriptExplorer";
 import ModifierBlock from "./ModifierBlock";
 
@@ -45,6 +46,8 @@ const ModifyHome = ({
     active: boolean;
     error?: string;
 }): JSX.Element => {
+    const [heatmapUrl, setHeatmapUrl] = useState("");
+
     return (
         <div
             className="relative w-full"
@@ -98,27 +101,32 @@ const ModifyHome = ({
             )}
             {modifiedFunscript && downloadFile && (
                 <div className="mb-4">
-                    <a
-                        href={downloadFile.url}
-                        download={downloadFile.filename}
-                        className="h-16 relative block"
-                    >
-                        <div className="relative w-full h-full">
-                            <div
-                                className="relative z-10 bg-black bg-opacity-20 grid place-items-center w-full h-full"
-                                style={{ textShadow: "2px 2px black" }}
-                            >
-                                Save {modifiers.length > 0 ? "modified" : "cleaned"} script
-                            </div>
-                            <FunscriptHeatmap
-                                className="absolute w-full h-full left-0 top-0 z-0"
-                                funscript={modifiedFunscript}
-                            />
-                        </div>
-                    </a>
+                    <FunscriptHeatmap
+                        className="w-full h-16 left-0 top-0 z-0"
+                        funscript={modifiedFunscript}
+                        onDataUrlChange={setHeatmapUrl}
+                    />
                     <FunscriptInfo funscript={modifiedFunscript} />
                 </div>
             )}
+            <div className="flex justify-center gap-4 mb-4">
+                {modifiedFunscript && downloadFile && (
+                    <ButtonLink href={downloadFile.url} download={downloadFile.filename}>
+                        Save {modifiers.length > 0 ? "modified" : "cleaned"} script
+                    </ButtonLink>
+                )}
+                {heatmapUrl && downloadFile && (
+                    <ButtonLink
+                        href={heatmapUrl}
+                        download={downloadFile.filename.replace("_MODIFIED.funscript", ".png")}
+                    >
+                        Save heatmap
+                    </ButtonLink>
+                )}
+                {modifiers.length > 0 && (
+                    <Button onClick={onSavePreset}>Save modifier preset</Button>
+                )}
+            </div>
             {rawFunscript && !modifiedFunscript && <FunscriptExplorer funscript={rawFunscript} />}
             {rawFunscript && modifiedFunscript && (
                 <FunscriptExplorer funscript={rawFunscript} compareFunscript={modifiedFunscript} />

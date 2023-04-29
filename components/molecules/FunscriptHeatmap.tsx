@@ -6,10 +6,12 @@ import useElementDimensions from "lib/hooks/useElementDimensions";
 const FunscriptHeatmap = ({
     funscript,
     className = "",
+    onDataUrlChange = null,
     options,
 }: {
     funscript: Funscript;
     className?: string;
+    onDataUrlChange?: ((dataUrl: string) => void) | null;
     options?: HeatmapOptions;
 }): JSX.Element => {
     const canvas = useRef<HTMLCanvasElement>(null);
@@ -21,6 +23,10 @@ const FunscriptHeatmap = ({
         if (!canvas.current) return;
 
         renderHeatmap(canvas.current, funscript, options);
+        if (onDataUrlChange) {
+            const data = canvas.current.toDataURL("images/png");
+            onDataUrlChange(data);
+        }
     }, [canvas, width, height, funscript, options]);
 
     return (
