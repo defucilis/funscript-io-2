@@ -1,7 +1,6 @@
 import { Router } from "next/router";
 import Head from "next/head";
 import { AppProps } from "next/dist/shared/lib/router/router";
-import { Analytics } from "@vercel/analytics/react";
 import React, { ReactNode } from "react";
 import NProgress from "nprogress";
 import { Slide, ToastContainer } from "react-toastify";
@@ -10,6 +9,7 @@ import { HandyProvider } from "lib/thehandy-react";
 import "../styles/app.css";
 import "nprogress/nprogress.css";
 import "react-toastify/dist/ReactToastify.css";
+import Analytics from "lib/analytics/Analytics";
 
 Router.events.on("routeChangeStart", () => NProgress.start());
 Router.events.on("routeChangeComplete", () => NProgress.done());

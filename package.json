@@ -2,7 +2,7 @@
     "name": "funscript-io-2",
     "author": "@defucilis",
     "license": "MIT",
-    "version": "2.2.0",
+    "version": "2.2.1",
     "scripts": {
         "dev": "next dev",
         "build": "next build",
@@ -14,7 +14,8 @@
         "test:watch": "jest --watchAll"
     },
     "dependencies": {
-        "@vercel/analytics": "^1.0.0",
+        "axios": "^1.4.0",
+        "cors": "^2.8.5",
         "firebase-admin": "latest",
         "next": "latest",
         "nprogress": "latest",
@@ -25,15 +26,18 @@
         "react-icons": "latest",
         "react-toastify": "latest",
         "remark": "latest",
-        "remark-html": "latest"
+        "remark-html": "latest",
+        "ua-parser-js": "^1.0.35"
     },
     "devDependencies": {
         "@testing-library/react": "latest",
+        "@types/cors": "^2.8.13",
         "@types/jest": "latest",
         "@types/node": "latest",
         "@types/nprogress": "latest",
         "@types/numeral": "latest",
         "@types/react": "latest",
+        "@types/ua-parser-js": "^0.7.36",
         "@typescript-eslint/eslint-plugin": "latest",
         "@typescript-eslint/parser": "latest",
         "autoprefixer": "latest",
