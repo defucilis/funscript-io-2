@@ -3,6 +3,7 @@ import { PlayableContent } from "components/molecules/ContentDropzone";
 import useInterval from "lib/hooks/useInterval";
 import useDoubleClick from "lib/hooks/useDoubleClick";
 import useDimensions from "lib/hooks/useDimensions";
+import useElementDimensions from "lib/hooks/useElementDimensions";
 import VideoPlayerControls from "./VideoPlayerControls";
 
 const VideoPlayer = ({
@@ -39,6 +40,7 @@ const VideoPlayer = ({
     const [lastMoveTime, setLastMoveTime] = useState(0);
 
     const { width } = useDimensions();
+    const parentDimensions = useElementDimensions(playerParent);
 
     useEffect(() => {
         const handlePlay = () => onPlay && onPlay();
@@ -148,9 +150,18 @@ const VideoPlayer = ({
                 onMouseMove={bump}
                 style={{
                     cursor: showingUi() ? undefined : "none",
+                    height: parentDimensions.width * (9 / 16),
                 }}
             >
-                <video ref={video} src={content?.url} className="rounded-tl rounded-tr" />
+                <video
+                    ref={video}
+                    src={content?.url}
+                    className="rounded-tl rounded-tr"
+                    style={{
+                        width: parentDimensions.width,
+                        height: parentDimensions.height,
+                    }}
+                />
                 <VideoPlayerControls
                     videoUrl={content?.url}
                     showingUi={showingUi()}
