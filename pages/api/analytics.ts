@@ -40,7 +40,7 @@ export default async (req: NextApiRequest, res: NextApiResponse): Promise<void> 
     const page = (req.query.page || "") as string;
     const browser = (req.query.browser || "") as string;
     const os = (req.query.os || "") as string;
-    const referrer = (req.query.referrer || "") as string;
+    const referrer = (req.query.referrer || "noreferrer") as string;
     const dayString = getDateString();
     console.log({ eventType, page, browser, os, referrer, dayString });
 
