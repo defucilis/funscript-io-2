@@ -1,3 +1,18 @@
+## 2.2.1 - Video Aspect Fix + Custom, Extra-Private Analytics
+
+##### 12th May 2023
+
+#### Changed
+
+-   Wrote my own custom analytics solution which is even more private and doesn't go through any third-party sources. Literally no user data is stored, kept or tracked :D
+-   Opened up the analytics API route to the legacy funscript.io site so I can record visit counts for that site too
+
+#### Fixed
+
+-   All videos now appear within a nice 16:9 container (unless fullscreen)
+
+---
+
 ## v2.2.0 - Fixes, Tweaks and Modifier Presets
 
 ##### 29th April 2023
