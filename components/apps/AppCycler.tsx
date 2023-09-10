@@ -1,11 +1,11 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { MdPause, MdPlayArrow } from "react-icons/md";
 import { toast } from "react-toastify";
+import useHandy from "thehandy-react";
 import { HampState, HandyMode } from "lib/thehandy/types";
 import useAnim from "lib/hooks/useAnim";
 import Mathf from "lib/Mathf";
 import ButtonIcon from "components/atoms/ButtonIcon";
-import useHandy from "lib/thehandy-react";
 import useKeyboard from "lib/hooks/useKeyboard";
 import SliderField from "components/molecules/SliderField";
 import SliderMinMaxField from "components/molecules/SliderMinMaxField";

@@ -2,7 +2,7 @@
     "name": "funscript-io-2",
     "author": "@defucilis",
     "license": "MIT",
-    "version": "2.2.1",
+    "version": "2.2.2",
     "scripts": {
         "dev": "next dev",
         "build": "next build",
@@ -27,7 +27,8 @@
         "react-toastify": "latest",
         "remark": "latest",
         "remark-html": "latest",
-        "ua-parser-js": "^1.0.35"
+        "ua-parser-js": "^1.0.35",
+        "thehandy-react": "1.0.5"
     },
     "devDependencies": {
         "@testing-library/react": "latest",

@@ -1,8 +1,8 @@
 import { useState } from "react";
+import useHandy from "thehandy-react";
 import SliderField from "components/molecules/SliderField";
 import SliderMinMaxField from "components/molecules/SliderMinMaxField";
 import useKeyboard from "lib/hooks/useKeyboard";
-import useHandy from "lib/thehandy-react";
 
 enum SlideIntervalMode {
     min = 0,

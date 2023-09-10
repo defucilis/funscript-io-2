@@ -1,3 +1,13 @@
+## 2.2.2 - TheHandyReact
+
+##### 11th September 2023
+
+#### Changed
+
+-   Switched to using `thehandy-react` npm package, rather than my local version of it. No other changes :D
+
+---
+
 ## 2.2.1 - Video Aspect Fix + Custom, Extra-Private Analytics
 
 ##### 12th May 2023

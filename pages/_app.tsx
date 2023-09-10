@@ -4,7 +4,7 @@ import { AppProps } from "next/dist/shared/lib/router/router";
 import React, { ReactNode } from "react";
 import NProgress from "nprogress";
 import { Slide, ToastContainer } from "react-toastify";
-import { HandyProvider } from "lib/thehandy-react";
+import { HandyProvider } from "thehandy-react";
 
 import "../styles/app.css";
 import "nprogress/nprogress.css";

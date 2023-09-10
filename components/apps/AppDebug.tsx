@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { toast } from "react-toastify";
+import useHandy from "thehandy-react";
 import { HandyMode } from "lib/thehandy/types";
-import useHandy from "lib/thehandy-react";
 import Button from "components/atoms/Button";
 import Slider from "components/atoms/Slider";
 import SliderField from "components/molecules/SliderField";

@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { AiOutlineSync } from "react-icons/ai";
+import useHandy from "thehandy-react";
 import ContentDropzone, { PlayableContent } from "components/molecules/ContentDropzone";
 import { Funscript } from "lib/funscript-utils/types";
 import FunscriptDropzone from "components/molecules/FunscriptDropzone";
-import useHandy from "lib/thehandy-react";
 import { testProcessFunscript } from "lib/customCsvUpload";
 import { HandyMode } from "lib/thehandy/types";
 import Player from "./play/Player";
