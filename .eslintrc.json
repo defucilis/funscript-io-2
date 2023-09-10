@@ -3,11 +3,11 @@
     "plugins": ["@typescript-eslint", "eslint-plugin-import"],
     "extends": [
         "eslint:recommended",
-        "plugin:react/recommended",
         "plugin:@typescript-eslint/recommended",
         "plugin:import/errors",
         "plugin:import/warnings",
-        "plugin:import/typescript"
+        "plugin:import/typescript",
+        "plugin:@next/next/recommended"
 
         // Uncomment the following lines to enable eslint-config-prettier
         // Is not enabled right now to avoid issues with the Next.js repo
@@ -49,7 +49,8 @@
             {
                 "allow": ["log", "warn", "error"]
             }
-        ]
+        ],
+        "@next/next/no-img-element": "off"
     },
     "settings": {
         "react": {
@@ -58,10 +59,6 @@
         "import/resolver": {
             "node": {
                 "moduleDirectory": ["node_modules", "./"]
-            },
-            "typescript": {
-                "alwaysTryTypes": true,
-                "project": "./tsconfig.json"
             }
         }
     }
