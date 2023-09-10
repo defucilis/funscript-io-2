@@ -28,7 +28,7 @@
         "remark": "latest",
         "remark-html": "latest",
         "ua-parser-js": "^1.0.35",
-        "thehandy-react": "1.0.5"
+        "thehandy-react": "2.1.0"
     },
     "devDependencies": {
         "@testing-library/react": "latest",
