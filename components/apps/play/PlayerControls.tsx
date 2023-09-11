@@ -208,6 +208,22 @@ const PlayerControls = ({
     return (
         <div className="absolute left-0 top-0 flex flex-col justify-end w-full h-full">
             <div
+                className={`absolute h-0.5 flex flex-col justify-end cursor-pointer w-full ${
+                    showingUi ? "opacity-0" : "opacity-100"
+                }`}
+                style={{
+                    transition: "all 0.5s",
+                }}
+            >
+                <div
+                    className="absolute z-10 top-0 left-0 h-full bg-primary-400"
+                    style={{
+                        width: `${(time / duration) * 100}%`,
+                        transition: "all 0.5s",
+                    }}
+                />
+            </div>
+            <div
                 className="absolute left-0 bottom-0 w-full h-32 z-0 pointer-events-none"
                 style={{
                     backgroundImage:
