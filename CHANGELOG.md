@@ -1,6 +1,11 @@
-## 2.2.2 - TheHandyReact
+## 2.3.0 - Countdowns
 
 ##### 11th September 2023
+
+#### Added
+
+-   You can now specify a time in your content that you'd like a 20 second countdown to appear for. This is useful for... well, you know what it's useful for :D
+-   Made a minimal playback progress bar appear for videos in fullscreen when the main player controls hide.
 
 #### Changed
 
