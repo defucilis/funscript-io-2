@@ -2,10 +2,12 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import useInterval from "lib/hooks/useInterval";
 import useDoubleClick from "lib/hooks/useDoubleClick";
 import useDimensions from "lib/hooks/useDimensions";
+import useElementDimensions from "lib/hooks/useElementDimensions";
 import { Funscript } from "lib/funscript-utils/types";
 import FunscriptPreview from "components/molecules/FunscriptPreview";
 import useAnim from "lib/hooks/useAnim";
 import PlayerControls from "./PlayerControls";
+import PlayerCountdown from "./PlayerCountdown";
 
 const ScriptPlayer = ({
     script,
@@ -19,6 +21,7 @@ const ScriptPlayer = ({
     onSeekEnd,
     onProgress,
     onDuration,
+    countdownTime,
 }: {
     script: Funscript;
     playing: boolean;
@@ -31,8 +34,10 @@ const ScriptPlayer = ({
     onSeekEnd?: () => void;
     onProgress?: (time: number) => void;
     onDuration?: (duration: number) => void;
+    countdownTime?: number;
 }): JSX.Element => {
     const playerParent = useRef<HTMLDivElement>(null);
+    const parentDimensions = useElementDimensions(playerParent);
     const preview = useRef<HTMLDivElement>(null);
 
     const [duration, setDuration] = useState(0);
@@ -170,6 +175,16 @@ const ScriptPlayer = ({
                         }}
                     />
                 </div>
+                {countdownTime && (
+                    <PlayerCountdown
+                        playbackTime={time}
+                        countdownTime={countdownTime}
+                        style={{
+                            width: parentDimensions.width,
+                            height: parentDimensions.height,
+                        }}
+                    />
+                )}
                 <PlayerControls
                     showingUi={showingUi()}
                     onMouseEnter={() => setMouseInControls(true)}

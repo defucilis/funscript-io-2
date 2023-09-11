@@ -11,10 +11,12 @@ const Player = ({
     content,
     funscript,
     prepared = false,
+    countdownTime = 0,
 }: {
     content: PlayableContent | null;
     funscript: Funscript | null;
     prepared?: boolean;
+    countdownTime?: number;
 }): JSX.Element => {
     const { sendHsspPlay, sendHsspStop, handyState } = useHandy();
 
@@ -83,6 +85,7 @@ const Player = ({
                 <VideoPlayer
                     content={content}
                     playing={playing}
+                    countdownTime={countdownTime}
                     onPlay={() => setPlaying(true)}
                     onPause={() => setPlaying(false)}
                     onProgress={setProgress}
@@ -96,6 +99,7 @@ const Player = ({
                 <AudioPlayer
                     content={content}
                     playing={playing}
+                    countdownTime={countdownTime}
                     onPlay={() => setPlaying(true)}
                     onPause={() => setPlaying(false)}
                     onProgress={setProgress}
@@ -109,6 +113,7 @@ const Player = ({
                 <ScriptPlayer
                     script={funscript}
                     playing={playing}
+                    countdownTime={countdownTime}
                     time={progress * duration}
                     ended={ended}
                     onPlay={() => {

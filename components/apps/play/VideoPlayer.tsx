@@ -5,6 +5,7 @@ import useDoubleClick from "lib/hooks/useDoubleClick";
 import useDimensions from "lib/hooks/useDimensions";
 import useElementDimensions from "lib/hooks/useElementDimensions";
 import VideoPlayerControls from "./VideoPlayerControls";
+import PlayerCountdown from "./PlayerCountdown";
 
 const VideoPlayer = ({
     content,
@@ -16,6 +17,7 @@ const VideoPlayer = ({
     onSeekEnd,
     onProgress,
     onDuration,
+    countdownTime,
 }: {
     content: PlayableContent;
     playing: boolean;
@@ -26,6 +28,7 @@ const VideoPlayer = ({
     onSeekEnd?: () => void;
     onProgress?: (time: number) => void;
     onDuration?: (duration: number) => void;
+    countdownTime?: number;
 }): JSX.Element => {
     const video = useRef<HTMLVideoElement>(null);
     const playerParent = useRef<HTMLDivElement>(null);
@@ -162,6 +165,16 @@ const VideoPlayer = ({
                         height: parentDimensions.height,
                     }}
                 />
+                {!!countdownTime && (
+                    <PlayerCountdown
+                        playbackTime={time}
+                        countdownTime={countdownTime}
+                        style={{
+                            width: parentDimensions.width,
+                            height: parentDimensions.height,
+                        }}
+                    />
+                )}
                 <VideoPlayerControls
                     videoUrl={content?.url}
                     showingUi={showingUi()}

@@ -3,8 +3,10 @@ import { PlayableContent } from "components/molecules/ContentDropzone";
 import useInterval from "lib/hooks/useInterval";
 import useDoubleClick from "lib/hooks/useDoubleClick";
 import useDimensions from "lib/hooks/useDimensions";
+import useElementDimensions from "lib/hooks/useElementDimensions";
 import AudioWaveform from "components/atoms/AudioWaveform";
 import PlayerControls from "./PlayerControls";
+import PlayerCountdown from "./PlayerCountdown";
 
 const AudioPlayer = ({
     content,
@@ -16,6 +18,7 @@ const AudioPlayer = ({
     onSeekEnd,
     onProgress,
     onDuration,
+    countdownTime,
 }: {
     content: PlayableContent;
     playing: boolean;
@@ -26,9 +29,11 @@ const AudioPlayer = ({
     onSeekEnd?: () => void;
     onProgress?: (time: number) => void;
     onDuration?: (duration: number) => void;
+    countdownTime?: number;
 }): JSX.Element => {
     const video = useRef<HTMLAudioElement>(null);
     const playerParent = useRef<HTMLDivElement>(null);
+    const parentDimensions = useElementDimensions(playerParent);
 
     const [time, setTime] = useState(0);
     const [duration, setDuration] = useState(0);
@@ -153,6 +158,16 @@ const AudioPlayer = ({
             >
                 <audio ref={video} src={content?.url} className="rounded-tl rounded-tr" />
                 <AudioWaveform url={content?.url} progress={time / duration} />
+                {countdownTime && (
+                    <PlayerCountdown
+                        playbackTime={time}
+                        countdownTime={countdownTime}
+                        style={{
+                            width: parentDimensions.width,
+                            height: parentDimensions.height,
+                        }}
+                    />
+                )}
                 <PlayerControls
                     showingUi={showingUi()}
                     onMouseEnter={() => setMouseInControls(true)}
