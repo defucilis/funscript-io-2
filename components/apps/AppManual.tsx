@@ -1,7 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { toast } from "react-toastify";
-import useHandy from "thehandy-react";
-import { HampState, HandyMode } from "lib/thehandy/types";
+import useHandy, { HampState, HandyMode } from "thehandy-react";
 import SliderField from "components/molecules/SliderField";
 import ManualControls from "./manual/ManualControls";
 

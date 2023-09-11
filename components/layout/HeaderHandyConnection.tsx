@@ -1,8 +1,7 @@
 import { useEffect, useState } from "react";
 import { MdReport, MdWifiTethering } from "react-icons/md";
 import { AiOutlineSync } from "react-icons/ai";
-import useHandy from "thehandy-react";
-import { HampState, HandyMode, HsspState } from "lib/thehandy/types";
+import useHandy, { HampState, HandyMode, HsspState } from "thehandy-react";
 
 const HeaderHandyConnection = (): JSX.Element => {
     const { refresh, connectionKey, loading, connect, disconnect, handyState } = useHandy();

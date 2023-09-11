@@ -28,7 +28,7 @@
         "remark": "latest",
         "remark-html": "latest",
         "ua-parser-js": "^1.0.35",
-        "thehandy-react": "2.1.0"
+        "thehandy-react": "2.1.1"
     },
     "devDependencies": {
         "@next/eslint-plugin-next": "^12.2.5",

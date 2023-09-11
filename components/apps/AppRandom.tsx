@@ -1,8 +1,7 @@
 import { useEffect, useState } from "react";
 import { MdPause, MdPlayArrow, MdSkipNext } from "react-icons/md";
 import { toast } from "react-toastify";
-import useHandy from "thehandy-react";
-import { HampState, HandyMode } from "lib/thehandy/types";
+import useHandy, { HampState, HandyMode } from "thehandy-react";
 import ProgressRing from "components/atoms/ProgressRing";
 import useAnim from "lib/hooks/useAnim";
 import Mathf from "lib/Mathf";

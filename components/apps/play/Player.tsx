@@ -1,9 +1,8 @@
 import { useCallback, useEffect, useState } from "react";
-import useHandy from "thehandy-react";
+import useHandy, { HsspState } from "thehandy-react";
 import { PlayableContent } from "components/molecules/ContentDropzone";
 import { Funscript } from "lib/funscript-utils/types";
 import FunscriptHeatmap from "components/molecules/FunscriptHeatmap";
-import { HsspState } from "lib/thehandy/types";
 import AudioPlayer from "./AudioPlayer";
 import ScriptPlayer from "./ScriptPlayer";
 import VideoPlayer from "./VideoPlayer";
